@@ -20,7 +20,6 @@ struct {
 static void opengl_configure();
 static void framebuffer_size_callback(GLFWwindow* window, i32 width, i32 height);
 static void enter_fullscreen();
-static void toggle_fullscreen();
 
 void opengl_configure() {
   glEnable(GL_BLEND);
@@ -43,24 +42,6 @@ void enter_fullscreen() {
     monitor,
     NULL
   );
-}
-
-void toggle_fullscreen() {
-  window_state.fullscreen = !window_state.fullscreen;
-  void* old_window = window_state.window;
-  if (window_state.fullscreen) {
-    enter_fullscreen();
-  }
-  else {
-    window_state.window = glfwCreateWindow(window_state.width, window_state.height, window_state.title, NULL, NULL);
-  }
-  if (!window_state.window) {
-    fprintf(stderr, "Failed to toggle window fullscreen mode\n");
-    window_state.window = old_window;
-  }
-  else {
-    glfwDestroyWindow(old_window);
-  }
 }
 
 // TODO(lucas): Get rid of this!
@@ -113,8 +94,13 @@ void window_clear() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+float r = 0.0f;
+
 void window_swapbuffers() {
-  render_sprite(sprite_shader, -1, 0, 0, (vec3) {1.0, 0, 0}, quad_vao);
+  r += 0.1f;
+  if (r > 10)
+    r = 0;
+  render_sprite(sprite_shader, -1, 0, 0, (vec3) {1.0f / r, 0, 0}, quad_vao);
 
   glfwSwapBuffers(window_state.window);
 }
@@ -131,9 +117,6 @@ i32 window_pollevents() {
 i32 window_process_input() {
   if (glfwGetKey(window_state.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window_state.window, 1);
-  }
-  if (glfwGetKey(window_state.window, GLFW_KEY_F) == GLFW_PRESS) {
-    toggle_fullscreen();
   }
   return 0;
 }
