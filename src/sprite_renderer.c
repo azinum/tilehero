@@ -1,9 +1,7 @@
 // sprite_renderer.c
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-
 #include "game_common.h"
+#include "renderer_common.h"
 #include "matrix_math.h"
 #include "sprite_renderer.h"
 

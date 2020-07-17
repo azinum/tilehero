@@ -1,11 +1,9 @@
 // window.c
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <GL/gl.h>
 #include <assert.h>
 
 #include "game_common.h"
+#include "renderer_common.h"
 #include "shader.h"
 #include "sprite_renderer.h"
 #include "window.h"

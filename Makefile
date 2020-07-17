@@ -4,6 +4,11 @@ include config.mk
 
 all: prepare compile run
 
+mac: prepare compile_mac run
+
+compile_mac:
+	${CC} ${FLAGS} ${LIBS_MAC}
+
 clean:
 	rm -dr ${BUILD_DIR}/*
 
