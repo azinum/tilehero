@@ -31,13 +31,19 @@ void sprite_init_data(u32* vbo, u32* quad_vao) {
   glBindVertexArray(0);
 }
 
-void render_sprite(u32 program, i32 texture, i32 x, i32 y, vec3 color, u32 quad_vao) {
-  (void)color; (void)texture;
+void render_sprite(u32 program, i32 texture, i32 x, i32 y, vec2 size, float angle, vec3 color, u32 quad_vao) {
+  (void)texture;
 
-  mat4 projection = mm_orthographic(0, 3, 4, 0, -1, 1);
+  mat4 projection = mm_orthographic(0, 800, 600, 0, -1, 1); // NOTE(lucas): This is temporary. Will calculate the projection matrix once elsewhere.
 
   mat4 model = mm_mat4d(1.0f);
   translate(model, x, y);
+
+  translate(model, 0.5f * size.x, 0.5f * size.y);
+  rotate(model, angle);
+  translate(model, -0.5f * size.x, -0.5f * size.y);
+
+  scale(model, size.x, size.y);
 
   glUseProgram(program);
   glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);

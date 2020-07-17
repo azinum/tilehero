@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <GL/gl.h>
+#include <assert.h>
 
 #include "game_common.h"
 #include "shader.h"
@@ -85,7 +86,7 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   opengl_configure();
   sprite_shader = shader_compile("resources/shaders/sprite");
   sprite_init_data(&vbo, &quad_vao);
-  printf("vbo: %u, vao: %u\n", vbo, quad_vao);
+  assert(vbo > 0 && quad_vao > 0);
   return 0;
 }
 
@@ -94,14 +95,13 @@ void window_clear() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-float r = 0.0f;
+float x = 0;
+float y = 0;
+i32 angle = 0;
 
 void window_swapbuffers() {
-  r += 0.1f;
-  if (r > 10)
-    r = 0;
-  render_sprite(sprite_shader, -1, 0, 0, (vec3) {1.0f / r, 0, 0}, quad_vao);
-
+  render_sprite(sprite_shader, -1, x, y, (vec2) {10, 10}, angle, (vec3) {0.9f, 0.1f, 0.12f}, quad_vao);
+  angle = (angle + 1) % 360;
   glfwSwapBuffers(window_state.window);
 }
 
@@ -117,6 +117,18 @@ i32 window_pollevents() {
 i32 window_process_input() {
   if (glfwGetKey(window_state.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window_state.window, 1);
+  }
+  if (glfwGetKey(window_state.window, GLFW_KEY_A) == GLFW_PRESS) {
+    x -= 1.0f;
+  }
+  if (glfwGetKey(window_state.window, GLFW_KEY_D) == GLFW_PRESS) {
+    x += 1.0f;
+  }
+  if (glfwGetKey(window_state.window, GLFW_KEY_W) == GLFW_PRESS) {
+    y -= 1.0f;
+  }
+  if (glfwGetKey(window_state.window, GLFW_KEY_S) == GLFW_PRESS) {
+    y += 1.0f;
   }
   return 0;
 }

@@ -9,10 +9,13 @@
 #undef USE_SSE // Streaming SIMD Extensions
 #define PI_32 3.14159265359f
 
-
 typedef struct vec3 {
   float x, y, z;
 } vec3;
+
+typedef struct vec2 {
+  float x, y;
+} vec2;
 
 typedef struct quaternion {
   float x, y, z, w;
@@ -22,9 +25,15 @@ typedef struct mat4 {
   float elements[4][4];
 } mat4;
 
-#define translate(M, X, Y) { \
-  M = mm_multiply_mat4(M, mm_translate((vec3) {X, Y, 0})); \
-} \
+#define translate(MODEL, X, Y) { \
+  MODEL = mm_multiply_mat4(MODEL, mm_translate((vec3) {X, Y, 0})); \
+}
+#define scale(MODEL, X, Y) { \
+  MODEL = mm_multiply_mat4(MODEL, mm_scale((vec3) {X, Y, 1})); \
+}
+#define rotate(MODEL, ANGLE) { \
+  MODEL = mm_multiply_mat4(MODEL, mm_rotate(ANGLE, (vec3) {0, 0, 1})); \
+}
 
 inline float mm_toradians(float degrees) {
   float result = degrees * (PI_32 / 180.0f);
@@ -102,7 +111,7 @@ inline mat4 mm_perspective(float fov, float aspect_ratio, float z_near, float z_
   result.elements[2][3] = -1.0f;
   result.elements[2][2] = (z_near + z_far) / (z_near - z_far);
   result.elements[3][2] = (2.0f * z_near * z_far) / (z_near - z_far);
-  result.elements[3][3] = 1.0f; // Note: Can't see anything if this is 0. Need to check what it does.
+  result.elements[3][3] = 2.0f;
 
   return result;
 }
@@ -211,6 +220,16 @@ inline mat4 mm_translate(vec3 translation) {
   result.elements[3][0] = translation.x;
   result.elements[3][1] = translation.y;
   result.elements[3][2] = translation.z;
+
+  return result;
+}
+
+inline mat4 mm_scale(vec3 scale) {
+  mat4 result = mm_mat4d(1.0f);
+
+  result.elements[0][0] = scale.x;
+  result.elements[1][1] = scale.y;
+  result.elements[2][2] = scale.z;
 
   return result;
 }
