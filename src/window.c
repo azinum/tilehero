@@ -4,8 +4,9 @@
 
 #include "game_common.h"
 #include "renderer_common.h"
+#include "matrix_math.h"
+#include "renderer.h"
 #include "shader.h"
-#include "sprite_renderer.h"
 #include "window.h"
 
 struct {
@@ -45,7 +46,7 @@ void enter_fullscreen() {
 
 // TODO(lucas): Get rid of this!
 i32 sprite_shader = 0;
-u32 vbo, quad_vao;
+u32 quad_vao;
 
 i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   window_state.title = title;
@@ -83,8 +84,8 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   glfwSwapInterval(1);
   opengl_configure();
   sprite_shader = shader_compile("resources/shaders/sprite");
-  sprite_init_data(&vbo, &quad_vao);
-  assert(vbo > 0 && quad_vao > 0);
+  sprite_init_data(&quad_vao);
+  renderer_init();
   return 0;
 }
 
