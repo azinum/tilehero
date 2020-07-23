@@ -1,11 +1,9 @@
 // window.c
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <GL/gl.h>
 #include <assert.h>
 
 #include "game_common.h"
+#include "renderer_common.h"
 #include "shader.h"
 #include "sprite_renderer.h"
 #include "window.h"
@@ -97,11 +95,9 @@ void window_clear() {
 
 float x = 0;
 float y = 0;
-i32 angle = 0;
 
 void window_swapbuffers() {
-  render_sprite(sprite_shader, -1, x, y, (vec2) {10, 10}, angle, (vec3) {0.9f, 0.1f, 0.12f}, quad_vao);
-  angle = (angle + 1) % 360;
+  render_sprite(sprite_shader, -1, x, y, (vec2) {10, 10}, 0, (vec3) {0.9f, 0.1f, 0.12f}, quad_vao);
   glfwSwapBuffers(window_state.window);
 }
 
