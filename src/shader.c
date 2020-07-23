@@ -1,9 +1,7 @@
 // shader.c
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-
 #include "game_common.h"
+#include "renderer_common.h"
 #include "file_loader.h"
 #include "shader.h"
 
@@ -12,6 +10,8 @@
 // NOTE(lucas): Returns the shader program id/pointer.
 i32 shader_compile(const char* shader) {
   i32 shader_program = -1;
+  u32 vert_shader = 0;
+  u32 frag_shader = 0;
   char path[PATH_LENGTH_MAX] = {0};
   snprintf(path, PATH_LENGTH_MAX, "%s.vert", shader);
   const char* vert_source = read_entire_file(path);
@@ -19,8 +19,6 @@ i32 shader_compile(const char* shader) {
   const char* frag_source = read_entire_file(path);
   if (!vert_source || !frag_source)
     goto done;
-  u32 vert_shader = 0;
-  u32 frag_shader = 0;
 
   i32 success = 0;
   char err_log[ERR_BUFFER_SIZE];

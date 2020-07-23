@@ -14,4 +14,6 @@ BUILD_DIR=build
 
 LIBS=-lpng -lm -lGLEW -lglfw -lGL
 
+LIBS_MAC=-lpng -lm -lGLEW -lglfw -framework OpenGL
+
 FLAGS=${SRC} -I${INCLUDE_DIR} -o ${BUILD_DIR}/${PROG_NAME} -O2 -Wall -W
