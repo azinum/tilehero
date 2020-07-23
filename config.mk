@@ -4,7 +4,7 @@ CC=gcc
 
 PROG_NAME=tilehero2
 
-INCLUDE_DIR=src
+INCLUDE_DIR=include
 
 RES_DIR=resources
 
