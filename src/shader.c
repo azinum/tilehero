@@ -1,6 +1,6 @@
 // shader.c
 
-#include "game_common.h"
+#include "common.h"
 #include "renderer_common.h"
 #include "file_loader.h"
 #include "shader.h"

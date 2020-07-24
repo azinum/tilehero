@@ -1,13 +1,14 @@
-// game_common.h
+// common.h
 
-#ifndef _GAME_COMMON_H
-#define _GAME_COMMON_H
+#ifndef _COMMON_H
+#define _COMMON_H
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
+#define PI32 3.14159265359f
 #define ARR_SIZE(ARR) ((sizeof(ARR)) / (sizeof(ARR[0])))
 #define PATH_LENGTH_MAX 512
 

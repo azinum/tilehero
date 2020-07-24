@@ -2,7 +2,7 @@
 
 #include <assert.h>
 
-#include "game_common.h"
+#include "common.h"
 #include "renderer_common.h"
 #include "matrix_math.h"
 #include "renderer.h"

@@ -1,6 +1,6 @@
 // renderer.c
 
-#include "game_common.h"
+#include "common.h"
 #include "renderer_common.h"
 #include "matrix_math.h"
 #include "renderer.h"
@@ -18,7 +18,7 @@ static mat4 projection = {0};
 
 void renderer_init() {
   renderer_state.vbo_count = 0;
-  projection = mm_orthographic(0, 1920/4, 1080/4, 0, -1, 1);
+  projection = mm_orthographic(0, 1920 / 4, 1080 / 4, 0, -1, 1);
 }
 
 void sprite_init_data(u32* quad_vao) {
