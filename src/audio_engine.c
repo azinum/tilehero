@@ -39,11 +39,11 @@ i32 open_stream() {
 }
 
 i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info, PaStreamCallbackFlags flags, void* user_data) {
-
+  (void)in_buff; (void)time_info; (void)flags; (void)user_data;
   float* out = (float*)out_buff;
 
   for (i32 i = 0; i < (i32)frames_per_buffer; i++) {
-    float frame = 0.2f * sin(audio_engine.tick * 110 * 2 * PI32 / audio_engine.sample_rate);
+    float frame = 0;
     *out++ = frame;
     *out++ = frame;
     audio_engine.tick++;

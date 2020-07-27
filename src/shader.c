@@ -7,7 +7,6 @@
 
 #define ERR_BUFFER_SIZE 512
 
-// NOTE(lucas): Returns the shader program id/pointer.
 i32 shader_compile(const char* shader) {
   i32 shader_program = -1;
   u32 vert_shader = 0;
