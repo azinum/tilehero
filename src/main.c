@@ -4,6 +4,6 @@
 #include "game.h"
 
 int main(void) {
-  game_execute(1280, 720, 0);
+  game_execute(1280, 720, 1);
   return 0;
 }

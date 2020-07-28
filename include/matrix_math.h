@@ -6,7 +6,18 @@
 
 #include <math.h>
 
-#undef USE_SSE // Streaming SIMD Extensions
+#ifndef NO_SSE
+
+#if __SSE__
+#define USE_SSE 1
+#endif
+
+#endif
+
+#if USE_SSE
+#include <xmmintrin.h>
+#endif
+
 #define PI_32 3.14159265359f
 
 typedef struct vec3 {
@@ -21,8 +32,11 @@ typedef struct quaternion {
   float x, y, z, w;
 } quaternion;
 
-typedef struct mat4 {
+typedef union mat4 {
   float elements[4][4];
+#if USE_SSE
+  __m128 rows[4];
+#endif
 } mat4;
 
 #define translate(MODEL, X, Y) { \
@@ -34,6 +48,29 @@ typedef struct mat4 {
 #define rotate(MODEL, ANGLE) { \
   MODEL = mm_multiply_mat4(MODEL, mm_rotate(ANGLE, (vec3) {0, 0, 1})); \
 }
+
+#ifdef USE_SSE
+
+inline mat4 mm_transpose(mat4 a) {
+  mat4 result = a;
+
+  _MM_TRANSPOSE4_PS(result.rows[0], result.rows[1], result.rows[2], result.rows[3]);
+
+  return result;
+}
+
+inline __m128 mm_linear_combine_sse(__m128 left, mat4 right) {
+  __m128 result;
+
+  result = _mm_mul_ps(_mm_shuffle_ps(left, left, 0x00), right.rows[0]);
+  result = _mm_add_ps(result, _mm_mul_ps(_mm_shuffle_ps(left, left, 0x55), right.rows[1]));
+  result = _mm_add_ps(result, _mm_mul_ps(_mm_shuffle_ps(left, left, 0xaa), right.rows[2]));
+  result = _mm_add_ps(result, _mm_mul_ps(_mm_shuffle_ps(left, left, 0xff), right.rows[3]));
+
+  return result;
+}
+
+#endif  // USE_SSE
 
 inline float mm_toradians(float degrees) {
   float result = degrees * (PI_32 / 180.0f);
@@ -144,8 +181,17 @@ inline mat4 mm_mat4d(float diagonal) {
 
 inline mat4 mm_multiply_mat4(mat4 a, mat4 b) {
   mat4 result;
-#ifdef USE_SSE
 
+#ifdef USE_SSE
+  mat4 left = mm_transpose(a);
+  mat4 right = mm_transpose(b);
+
+  result.rows[0] = mm_linear_combine_sse(left.rows[0], right);
+  result.rows[1] = mm_linear_combine_sse(left.rows[1], right);
+  result.rows[2] = mm_linear_combine_sse(left.rows[2], right);
+  result.rows[3] = mm_linear_combine_sse(left.rows[3], right);
+
+  result = mm_transpose(result);
 #else
   int column;
   for (column = 0; column < 4; ++column) {
