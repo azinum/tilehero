@@ -7,6 +7,7 @@
 #include "image_loader.h"
 #include "texture_loader.h"
 
+// TODO(lucas): Figure out a way to encapsulate this better.
 u32 load_texture(const char* path) {
   u32 texture_id = 0;
   Image image;

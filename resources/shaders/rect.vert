@@ -1,4 +1,4 @@
-// sprite.vert
+// rect.vert
 
 #version 330 core
 

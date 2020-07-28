@@ -9,7 +9,6 @@ static i32 load_png(const char* file_name, struct Image* image);
 
 i32 load_png(const char* file_name, struct Image* image) {
   FILE* file = fopen(file_name, "rb");
-  assert(file != NULL);
   if (!file)
     return -1;
 

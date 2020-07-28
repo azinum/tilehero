@@ -48,7 +48,6 @@ void enter_fullscreen() {
 }
 
 // TODO(lucas): Get rid of this!
-u32 sprite_shader = 0;
 u32 texture_id = 0;
 
 i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
@@ -86,7 +85,6 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   }
   glfwSwapInterval(1);
   opengl_configure();
-  sprite_shader = shader_compile("resources/shaders/sprite");
   sprite_init_data();
   texture_id = load_texture("resources/sprites/boy-with-helm.png");
   renderer_init();
@@ -102,7 +100,8 @@ float x = 0;
 float y = 0;
 
 void window_swapbuffers() {
-  render_sprite(sprite_shader, texture_id, x, y, 16, 16, 0, (vec3) {0.9f, 0.1f, 0.12f});
+  render_rect(x, y, 16, 16, 0.9f, 0.1f, 0.12f, 0, 0.04f);
+  render_sprite(texture_id, x, y, 16, 16, 0.9f, 0.1f, 0.12f, 0);
   glfwSwapBuffers(window_state.window);
 }
 
