@@ -11,7 +11,7 @@ static u32 quad_vao = 0;
 static u32 sprite_shader, rect_shader;
 
 void renderer_init() {
-  projection = mm_orthographic(0, 1920/4, 1080/4, 0, -1, 1);
+  projection = mm_orthographic(0, 1920 / 4, 1080 / 4, 0, -1, 1);
   sprite_shader = shader_compile("resources/shaders/sprite");
   rect_shader = shader_compile("resources/shaders/rect");
 }
@@ -42,7 +42,7 @@ void sprite_init_data() {
   glBindVertexArray(0);
 }
 
-void render_sprite(u32 texture, i32 x, i32 y, i32 w, i32 h, float r, float g, float b, float angle) {
+void render_sprite(u32 texture, i32 x, i32 y, i32 w, i32 h, float angle) {
   const u32 program = sprite_shader;
   glUseProgram(program);
 
@@ -57,7 +57,6 @@ void render_sprite(u32 texture, i32 x, i32 y, i32 w, i32 h, float r, float g, fl
 
   glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
   glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
-  glUniform3f(glGetUniformLocation(program, "in_color"), r, g, b);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture);

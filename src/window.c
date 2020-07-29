@@ -33,7 +33,7 @@ void framebuffer_size_callback(GLFWwindow* window, i32 width, i32 height) {
   (void)window;
   window_state.width = width;
   window_state.height = height;
-  glViewport(0, 0, width, height);
+  // glViewport(0, 0, width, height);
 }
 
 void enter_fullscreen() {
@@ -92,7 +92,7 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
 }
 
 void window_clear() {
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClearColor(0.05f, 0.1f, 0.2f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -101,7 +101,7 @@ float y = 0;
 
 void window_swapbuffers() {
   render_rect(x, y, 16, 16, 0.9f, 0.1f, 0.12f, 0, 0.04f);
-  render_sprite(texture_id, x, y, 16, 16, 0.9f, 0.1f, 0.12f, 0);
+  render_sprite(texture_id, x, y, 16, 16, 0);
   glfwSwapBuffers(window_state.window);
 }
 
