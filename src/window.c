@@ -7,7 +7,7 @@
 #include "matrix_math.h"
 #include "renderer.h"
 #include "shader.h"
-#include "texture_loader.h"
+#include "texture.h"
 #include "window.h"
 
 struct {

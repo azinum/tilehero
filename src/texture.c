@@ -1,13 +1,12 @@
-// texture_loader.c
+// texture.c
 
 #include <png.h>
 
 #include "common.h"
 #include "renderer_common.h"
 #include "image_loader.h"
-#include "texture_loader.h"
+#include "texture.h"
 
-// TODO(lucas): Figure out a way to encapsulate this better.
 u32 load_texture(const char* path) {
   u32 texture_id = 0;
   Image image;
@@ -15,6 +14,15 @@ u32 load_texture(const char* path) {
     fprintf(stderr, "Failed to load png texture\n");
     return 0;
   }
+  texture_id = load_texture_from_image(&image);
+
+  free(image.pixel_buffer);
+  return texture_id;
+}
+
+u32 load_texture_from_image(struct Image* image) {
+  u32 texture_id = 0;
+
   glGenTextures(1, &texture_id);
   glBindTexture(GL_TEXTURE_2D, texture_id);
 
@@ -24,9 +32,8 @@ u32 load_texture(const char* path) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.pixel_buffer);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->pixel_buffer);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  free(image.pixel_buffer);
   return texture_id;
 }

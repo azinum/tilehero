@@ -18,6 +18,7 @@ void renderer_init() {
 
 void sprite_init_data() {
   float vertices[] = {
+    // vertex,  uv coord
     0.0f, 1.0f, 0.0f, 1.0f,
     1.0f, 0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 0.0f,
