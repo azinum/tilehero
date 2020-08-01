@@ -5,6 +5,7 @@
 #include "matrix_math.h"
 #include "audio_engine.h"
 #include "entity.h"
+#include "renderer.h"
 #include "game.h"
 
 Game_state game_state;
@@ -44,6 +45,7 @@ void game_run() {
       entity_update(e);
       entity_render(e);
     }
+    render_rect(window.mouse_x, window.mouse_y, 16, 16, 0.1f, 0.85f, 0.22f, 0, 0.03f);
 
     window_swapbuffers();
     window_clear();

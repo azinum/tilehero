@@ -3,6 +3,16 @@
 #ifndef _WINDOW_H
 #define _WINDOW_H
 
+struct {
+  void* window;
+  const char* title;
+  i32 width;
+  i32 height;
+  u8 fullscreen;
+  double mouse_x;
+  double mouse_y;
+} window;
+
 i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title);
 
 void window_clear();
