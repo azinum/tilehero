@@ -40,7 +40,7 @@ void game_run() {
       break;
     }
     game_state.tick++;
-    render_rect(window.mouse_x - 12, window.mouse_y - 12, 24, 24, 0.1f, 0.85f, 0.22f, 0, 1.0f / 24);
+    render_rect(window.mouse_x - 12, window.mouse_y - 12, 0.1f, 24, 24, 0.1f, 0.85f, 0.22f, 0, 5.0f / 24);
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
       entity_update(e);

@@ -97,12 +97,12 @@ void render_texture_region(u32 texture, i32 x, i32 y, i32 w, i32 h, float angle,
   glBindVertexArray(0);
 }
 
-void render_rect(i32 x, i32 y, i32 w, i32 h, float r, float g, float b, float angle, float border_width) {
+void render_rect(float x, float y, float z, float w, float h, float r, float g, float b, float angle, float border_width) {
   const u32 program = rect_shader;
   glUseProgram(program);
 
   mat4 model = mm_mat4d(1.0f);
-  translate(model, x, y);
+  model = mm_translate((vec3) {x, y, z});
 
   translate(model, 0.5f * w, 0.5f * h);
   rotate(model, angle);
@@ -114,7 +114,6 @@ void render_rect(i32 x, i32 y, i32 w, i32 h, float r, float g, float b, float an
   glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
   glUniform3f(glGetUniformLocation(program, "in_color"), r, g, b);
   glUniform1f(glGetUniformLocation(program, "border_width"), border_width);
-  glUniform1f(glGetUniformLocation(program, "z_depth"), 1);
 
   glBindVertexArray(quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
