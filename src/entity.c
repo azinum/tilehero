@@ -14,13 +14,20 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
 }
 
 void entity_update(Entity* e) {
-  if (!(game_state.tick % 12)) {
-    e->x = (i32)(e->x + e->w) % (320);
+  e->x += e->x_speed;
+  e->y += e->y_speed;
+  if (e->x < 0) {
+    e->x_speed = -e->x_speed;
+    e->x = 0;
+  }
+  if (e->x > 250) {
+    e->x_speed = -e->x_speed;
+    e->x = 250;
   }
 }
 
 void entity_render(Entity* e) {
-  u32 texture = 1;
+  u32 texture = 1;  // NOTE(lucas): Temp!
   render_rect(e->x, e->y, e->w, e->h, 0.9f, 0.1f, 0.12f, 0, 0.03f);
   render_texture_region(texture, e->x, e->y, e->w, e->h, 0, 0, 0, 8, 8, 48, 8);
 }

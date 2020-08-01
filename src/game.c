@@ -25,8 +25,11 @@ Entity* add_entity(float x, float y, float w, float h) {
 void game_state_init(Game_state* game) {
   game->is_running = 1;
   game->entity_count = 0;
-  add_entity(16 * 12, 16 * 4, 16, 16);
-  add_entity(16 * 3, 16 * 12, 16, 16);
+  for (i32 i = 0; i < 16; i++) {
+    Entity* e = add_entity(16 * (rand() % 16), 16 * i, 16, 16);
+    while (!e->x_speed)
+      e->x_speed = (rand() % 2) - (rand() % 2);
+  }
 }
 
 void game_run() {

@@ -103,9 +103,11 @@ void render_rect(i32 x, i32 y, i32 w, i32 h, float r, float g, float b, float an
 
   mat4 model = mm_mat4d(1.0f);
   translate(model, x, y);
+
   translate(model, 0.5f * w, 0.5f * h);
   rotate(model, angle);
   translate(model, -0.5f * w, -0.5f * h);
+
   scale(model, w, h);
 
   glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
@@ -116,4 +118,10 @@ void render_rect(i32 x, i32 y, i32 w, i32 h, float r, float g, float b, float an
   glBindVertexArray(quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
+}
+
+void renderer_free() {
+  shader_delete(sprite_shader);
+  shader_delete(rect_shader);
+  glDeleteVertexArrays(1, &quad_vao);
 }

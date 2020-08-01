@@ -33,7 +33,7 @@ void framebuffer_size_callback(GLFWwindow* window, i32 width, i32 height) {
   (void)window;
   window_state.width = width;
   window_state.height = height;
-  // glViewport(0, 0, width, height);
+  glViewport(0, 0, width, height);
 }
 
 void enter_fullscreen() {
