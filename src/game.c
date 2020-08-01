@@ -27,7 +27,7 @@ void game_state_init(Game_state* game) {
   game->is_running = 1;
   game->entity_count = 0;
   for (i32 i = 0; i < 16; i++) {
-    Entity* e = add_entity(16 * (rand() % 16), 16 * i, 16, 16);
+    Entity* e = add_entity(32 * (rand() % 32), 32 * i, 64, 64);
     while (!e->x_speed)
       e->x_speed = (rand() % 2) - (rand() % 2);
   }
@@ -40,12 +40,12 @@ void game_run() {
       break;
     }
     game_state.tick++;
+    render_rect(window.mouse_x - 12, window.mouse_y - 12, 24, 24, 0.1f, 0.85f, 0.22f, 0, 1.0f / 24);
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
       entity_update(e);
       entity_render(e);
     }
-    render_rect(window.mouse_x, window.mouse_y, 16, 16, 0.1f, 0.85f, 0.22f, 0, 0.03f);
 
     window_swapbuffers();
     window_clear();

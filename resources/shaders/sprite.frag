@@ -11,4 +11,7 @@ uniform vec2 uv_range;  // x2, y2
 
 void main() {
 	color = texture(image, (uv * uv_range) + uv_offset);
+	if (color.a < 0.1) {
+		discard;
+	}
 }

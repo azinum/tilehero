@@ -40,7 +40,7 @@ void init_sprite_data() {
 
 void renderer_init() {
   init_sprite_data();
-  projection = mm_orthographic(0, 1440 / 2, 900 / 2, 0, -1, 1);
+  projection = mm_orthographic(0, 1440, 900, 0, -1, 1);
   sprite_shader = shader_compile("resources/shaders/sprite");
   rect_shader = shader_compile("resources/shaders/rect");
 }
@@ -114,6 +114,7 @@ void render_rect(i32 x, i32 y, i32 w, i32 h, float r, float g, float b, float an
   glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
   glUniform3f(glGetUniformLocation(program, "in_color"), r, g, b);
   glUniform1f(glGetUniformLocation(program, "border_width"), border_width);
+  glUniform1f(glGetUniformLocation(program, "z_depth"), 1);
 
   glBindVertexArray(quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);

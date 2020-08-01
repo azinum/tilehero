@@ -28,6 +28,6 @@ void entity_update(Entity* e) {
 
 void entity_render(Entity* e) {
   u32 texture = 1;  // NOTE(lucas): Temp!
-  render_rect(e->x, e->y, e->w, e->h, 0.9f, 0.1f, 0.12f, 0, 0.03f);
+  render_rect(e->x, e->y, e->w, e->h, 0.9f, 0.1f, 0.12f, 0, 1.0f / (e->w));
   render_texture_region(texture, e->x, e->y, e->w, e->h, 0, 0, 0, 8, 8, 48, 8);
 }
