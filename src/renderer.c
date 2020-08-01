@@ -58,6 +58,9 @@ void render_sprite(u32 texture, i32 x, i32 y, i32 w, i32 h, float angle) {
   glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
   glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
 
+  glUniform2f(glGetUniformLocation(program, "uv_offset"), 0, 0);
+  glUniform2f(glGetUniformLocation(program, "uv_range"), 8.0f / 48.0f, 8.0f / 8.0f);
+
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture);
 

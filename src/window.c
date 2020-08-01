@@ -86,7 +86,7 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   glfwSwapInterval(1);
   opengl_configure();
   sprite_init_data();
-  texture_id = load_texture("resources/sprites/boy-with-helm.png");
+  texture_id = load_texture("resources/sprites/spritesheet.png");
   renderer_init();
   return 0;
 }
@@ -100,7 +100,7 @@ float x = 0;
 float y = 0;
 
 void window_swapbuffers() {
-  render_rect(x, y, 16, 16, 0.9f, 0.1f, 0.12f, 0, 0.04f);
+  render_rect(x, y, 16, 16, 0.9f, 0.1f, 0.12f, 0, 0.03f);
   render_sprite(texture_id, x, y, 16, 16, 0);
   glfwSwapBuffers(window_state.window);
 }
