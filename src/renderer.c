@@ -10,13 +10,9 @@ static mat4 projection = {0};
 static u32 quad_vao = 0;
 static u32 sprite_shader, rect_shader;
 
-void renderer_init() {
-  projection = mm_orthographic(0, 1920 / 4, 1080 / 4, 0, -1, 1);
-  sprite_shader = shader_compile("resources/shaders/sprite");
-  rect_shader = shader_compile("resources/shaders/rect");
-}
+static void init_sprite_data();
 
-void sprite_init_data() {
+void init_sprite_data() {
   float vertices[] = {
     // vertex,  uv coord
     0.0f, 1.0f, 0.0f, 1.0f,
@@ -40,6 +36,13 @@ void sprite_init_data() {
   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+}
+
+void renderer_init() {
+  init_sprite_data();
+  projection = mm_orthographic(0, 1440 / 2, 900 / 2, 0, -1, 1);
+  sprite_shader = shader_compile("resources/shaders/sprite");
+  rect_shader = shader_compile("resources/shaders/rect");
 }
 
 void render_sprite(u32 texture, i32 x, i32 y, i32 w, i32 h, float angle) {

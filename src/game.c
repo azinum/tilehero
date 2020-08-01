@@ -4,9 +4,14 @@
 #include "window.h"
 #include "matrix_math.h"
 #include "audio_engine.h"
+#include "entity.h"
 #include "game.h"
 
+#define ENTITIES_MAX (128)
+
 typedef struct Game_state {
+  Entity entities[ENTITIES_MAX];
+  i32 entity_count;
   u8 is_running;
 } Game_state;
 
@@ -14,9 +19,21 @@ Game_state game_state;
 
 static void game_state_init(Game_state* game);
 static void game_run();
+static Entity* add_entity(float x, float y, float w, float h);
+
+Entity* add_entity(float x, float y, float w, float h) {
+  Entity* e = NULL;
+  if (game_state.entity_count >= ENTITIES_MAX)
+    return NULL;
+  e = &game_state.entities[game_state.entity_count++];
+  entity_init(e, x, y, w, h);
+  return e;
+}
 
 void game_state_init(Game_state* game) {
   game->is_running = 1;
+  game->entity_count = 0;
+  add_entity(128, 56, 16, 16);
 }
 
 void game_run() {
@@ -25,8 +42,14 @@ void game_run() {
       break;
     }
     window_pollevents();
-    window_clear();
+    
+    for (i32 i = 0; i < game_state.entity_count; i++) {
+      Entity* e = &game_state.entities[i];
+      entity_render(e);
+    }
+
     window_swapbuffers();
+    window_clear();
   }
   window_close();
 }

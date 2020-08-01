@@ -85,9 +85,8 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   }
   glfwSwapInterval(1);
   opengl_configure();
-  sprite_init_data();
-  texture_id = load_texture("resources/sprites/spritesheet.png");
   renderer_init();
+  texture_id = load_texture("resources/sprites/spritesheet.png");
   return 0;
 }
 
@@ -96,12 +95,7 @@ void window_clear() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-float x = 0;
-float y = 0;
-
 void window_swapbuffers() {
-  render_rect(x, y, 16, 16, 0.9f, 0.1f, 0.12f, 0, 0.03f);
-  render_texture_region(texture_id, x, y, 16, 16, 0, 32, 0, 8, 8, 48, 8);
   glfwSwapBuffers(window_state.window);
 }
 
@@ -119,16 +113,12 @@ i32 window_process_input() {
     glfwSetWindowShouldClose(window_state.window, 1);
   }
   if (glfwGetKey(window_state.window, GLFW_KEY_A) == GLFW_PRESS) {
-    x -= 1.0f;
   }
   if (glfwGetKey(window_state.window, GLFW_KEY_D) == GLFW_PRESS) {
-    x += 1.0f;
   }
   if (glfwGetKey(window_state.window, GLFW_KEY_W) == GLFW_PRESS) {
-    y -= 1.0f;
   }
   if (glfwGetKey(window_state.window, GLFW_KEY_S) == GLFW_PRESS) {
-    y += 1.0f;
   }
   return 0;
 }
