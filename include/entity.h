@@ -8,8 +8,10 @@ typedef struct Entity {
   float x_speed, y_speed;
 } Entity;
 
-void entity_init(struct Entity* e, float x, float y, float w, float h);
+void entity_init(Entity* e, float x, float y, float w, float h);
 
-void entity_render(struct Entity* e);
+void entity_update(Entity* e);
+
+void entity_render(Entity* e);
 
 #endif

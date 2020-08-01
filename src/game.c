@@ -7,14 +7,6 @@
 #include "entity.h"
 #include "game.h"
 
-#define ENTITIES_MAX (128)
-
-typedef struct Game_state {
-  Entity entities[ENTITIES_MAX];
-  i32 entity_count;
-  u8 is_running;
-} Game_state;
-
 Game_state game_state;
 
 static void game_state_init(Game_state* game);
@@ -33,18 +25,20 @@ Entity* add_entity(float x, float y, float w, float h) {
 void game_state_init(Game_state* game) {
   game->is_running = 1;
   game->entity_count = 0;
-  add_entity(128, 56, 16, 16);
+  add_entity(16 * 12, 16 * 4, 16, 16);
+  add_entity(16 * 3, 16 * 12, 16, 16);
 }
 
 void game_run() {
   while (game_state.is_running) {
+    window_pollevents();
     if (window_process_input() != 0 || window_should_close()) {
       break;
     }
-    window_pollevents();
-    
+    game_state.tick++;
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
+      entity_update(e);
       entity_render(e);
     }
 
