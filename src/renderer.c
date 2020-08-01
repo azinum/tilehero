@@ -52,14 +52,39 @@ void render_sprite(u32 texture, i32 x, i32 y, i32 w, i32 h, float angle) {
   translate(model, 0.5f * w, 0.5f * h);
   rotate(model, angle);
   translate(model, -0.5f * w, -0.5f * h);
-
   scale(model, w, h);
 
   glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
   glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
 
   glUniform2f(glGetUniformLocation(program, "uv_offset"), 0, 0);
-  glUniform2f(glGetUniformLocation(program, "uv_range"), 8.0f / 48.0f, 8.0f / 8.0f);
+  glUniform2f(glGetUniformLocation(program, "uv_range"), 1, 1);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  glBindVertexArray(quad_vao);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindVertexArray(0);
+}
+
+void render_texture_region(u32 texture, i32 x, i32 y, i32 w, i32 h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range, i32 texture_width, i32 texture_height) {
+  const u32 program = sprite_shader;
+  glUseProgram(sprite_shader);
+
+  mat4 model = mm_mat4d(1.0f);
+  translate(model, x, y);
+
+  translate(model, 0.5f * w, 0.5f * h);
+  rotate(model, angle);
+  translate(model, -0.5f * w, -0.5f * h);
+  scale(model, w, h);
+
+  glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
+  glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
+
+  glUniform2f(glGetUniformLocation(program, "uv_offset"), (float)x_offset / texture_width, (float)y_offset / texture_height);
+  glUniform2f(glGetUniformLocation(program, "uv_range"), (float)x_range / texture_width, (float)y_range / texture_height);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture);

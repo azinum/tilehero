@@ -101,7 +101,7 @@ float y = 0;
 
 void window_swapbuffers() {
   render_rect(x, y, 16, 16, 0.9f, 0.1f, 0.12f, 0, 0.03f);
-  render_sprite(texture_id, x, y, 16, 16, 0);
+  render_texture_region(texture_id, x, y, 16, 16, 0, 32, 0, 8, 8, 48, 8);
   glfwSwapBuffers(window_state.window);
 }
 
