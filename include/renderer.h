@@ -3,9 +3,9 @@
 #ifndef _RENDERER_H
 #define _RENDERER_H
 
-void renderer_init();
+extern union mat4 model, view, projection;
 
-void render_sprite(u32 texture, i32 x, i32 y, i32 w, i32 h, float angle);
+void renderer_init();
 
 void render_texture_region(u32 texture, float x, float y, float w, float h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range, i32 texture_width, i32 texture_height);
 

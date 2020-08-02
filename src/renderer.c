@@ -6,13 +6,14 @@
 #include "shader.h"
 #include "renderer.h"
 
-static mat4 projection = {0};
+mat4 model, view, projection;
+
 static u32 quad_vao = 0;
 static u32 sprite_shader, rect_shader;
 
-static void init_sprite_data();
+static void init_quad_data();
 
-void init_sprite_data() {
+void init_quad_data() {
   float vertices[] = {
     // vertex,  uv coord
     0.0f, 1.0f, 0.0f, 1.0f,
@@ -39,43 +40,19 @@ void init_sprite_data() {
 }
 
 void renderer_init() {
-  init_sprite_data();
+  init_quad_data();
+  model = mm_mat4d(1.0f);
+  view = mm_mat4d(1.0f);
   projection = mm_orthographic(0, 1440, 900, 0, -1, 1);
   sprite_shader = shader_compile("resources/shaders/sprite");
   rect_shader = shader_compile("resources/shaders/rect");
-}
-
-void render_sprite(u32 texture, i32 x, i32 y, i32 w, i32 h, float angle) {
-  const u32 program = sprite_shader;
-  glUseProgram(program);
-
-  mat4 model = mm_mat4d(1.0f);
-  translate(model, x, y);
-
-  translate(model, 0.5f * w, 0.5f * h);
-  rotate(model, angle);
-  translate(model, -0.5f * w, -0.5f * h);
-  scale(model, w, h);
-
-  glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
-  glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
-
-  glUniform2f(glGetUniformLocation(program, "uv_offset"), 0, 0);
-  glUniform2f(glGetUniformLocation(program, "uv_range"), 1, 1);
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture);
-
-  glBindVertexArray(quad_vao);
-  glDrawArrays(GL_TRIANGLES, 0, 6);
-  glBindVertexArray(0);
 }
 
 void render_texture_region(u32 texture, float x, float y, float w, float h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range, i32 texture_width, i32 texture_height) {
   const u32 program = sprite_shader;
   glUseProgram(sprite_shader);
 
-  mat4 model = mm_mat4d(1.0f);
+  model = mm_mat4d(1.0f);
   translate(model, x, y);
 
   translate(model, 0.5f * w, 0.5f * h);
@@ -83,8 +60,9 @@ void render_texture_region(u32 texture, float x, float y, float w, float h, floa
   translate(model, -0.5f * w, -0.5f * h);
   scale(model, w, h);
 
-  glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
   glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
+  glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+  glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
 
   glUniform2f(glGetUniformLocation(program, "uv_offset"), (float)x_offset / texture_width, (float)y_offset / texture_height);
   glUniform2f(glGetUniformLocation(program, "uv_range"), (float)x_range / texture_width, (float)y_range / texture_height);
@@ -101,7 +79,7 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
   const u32 program = rect_shader;
   glUseProgram(program);
 
-  mat4 model = mm_mat4d(1.0f);
+  model = mm_mat4d(1.0f);
   model = mm_translate((vec3) {x, y, z});
 
   translate(model, 0.5f * w, 0.5f * h);
@@ -110,8 +88,10 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
 
   scale(model, w, h);
 
-  glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
   glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
+  glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+  glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
+
   glUniform3f(glGetUniformLocation(program, "in_color"), r, g, b);
   glUniform1f(glGetUniformLocation(program, "border_width"), border_width);
 

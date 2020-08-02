@@ -8,6 +8,7 @@
 #include "renderer.h"
 #include "shader.h"
 #include "texture.h"
+#include "camera.h" // NOTE(lucas): TEMP
 #include "window.h"
 
 static void opengl_configure();
@@ -26,6 +27,7 @@ void framebuffer_size_callback(GLFWwindow* glfw_window, i32 width, i32 height) {
   window.width = width;
   window.height = height;
   glViewport(0, 0, width, height);
+  projection = mm_orthographic(0, width, height, 0, -1, 1);
 }
 
 // TODO(lucas): Get rid of this!
@@ -86,17 +88,23 @@ i32 window_pollevents() {
   return 0;
 }
 
+float a = 1;
+
 i32 window_process_input() {
   if (glfwGetKey(window.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window.window, 1);
   }
   if (glfwGetKey(window.window, GLFW_KEY_A) == GLFW_PRESS) {
+    camera.x += 1.0f;
   }
   if (glfwGetKey(window.window, GLFW_KEY_D) == GLFW_PRESS) {
+    camera.x -= 1.0f;
   }
   if (glfwGetKey(window.window, GLFW_KEY_W) == GLFW_PRESS) {
+    camera.y -= 1.0f;
   }
   if (glfwGetKey(window.window, GLFW_KEY_S) == GLFW_PRESS) {
+    camera.y += 1.0f;
   }
   glfwGetCursorPos(window.window, &window.mouse_x, &window.mouse_y);
   return 0;

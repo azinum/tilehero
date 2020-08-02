@@ -4,6 +4,7 @@
 #define _GAME_H
 
 #include "common.h"
+#include "camera.h"
 #include "entity.h"
 
 #define ENTITIES_MAX (128)
