@@ -38,5 +38,5 @@ void entity_update(Entity* e) {
 
 void entity_render(Entity* e) {
   render_rect(e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0.9f, 0.1f, 0.12f, 0, 1.0f / (e->w));
-  render_texture_region(textures[TEXTURE_SPRITES].id, e->x - camera.x, e->y - camera.y, e->w, e->h, 0, 0, 0, 8, 8, 48, 8);
+  render_texture_region(textures[TEXTURE_SPRITES].id, e->x - camera.x, e->y - camera.y, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8, 48, 8);
 }
