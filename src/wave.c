@@ -1,6 +1,7 @@
 // wave.c
 
 #include "common.h"
+#include "audio.h"
 #include "wave.h"
 
 i32 load_wave_from_file(const char* filename, struct Audio_source* source) {

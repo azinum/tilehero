@@ -6,6 +6,7 @@
 #include "image_loader.h"
 #include "renderer_common.h"
 #include "wave.h"
+#include "audio.h"
 #include "resource.h"
 
 #define TEXTURE_PATH "resource/texture"
@@ -14,7 +15,7 @@
 #define SOUND_EXT "wav"
 
 struct Texture textures[MAX_TEXTURE];
-struct Sound sounds[MAX_SOUND];
+struct Audio_source sounds[MAX_SOUND];
 
 static const char* texture_filenames[MAX_TEXTURE] = {
   "spritesheet",
@@ -79,5 +80,6 @@ void resources_load() {
     snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", SOUND_PATH, sound_filenames[i], SOUND_EXT);
     struct Audio_source audio_source = {0};
     load_wave_from_file(filename, &audio_source);
+    sounds[i] = audio_source;
   }
 }

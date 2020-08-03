@@ -21,12 +21,14 @@ struct Texture {
   u32 id;
 };
 
-struct Sound {
-  u32 id;
+struct Audio_source {
+  float* sample_buffer;
+  u32 sample_count;
+  u32 sample_rate;
 };
 
-extern struct Texture textures[MAX_TEXTURE];
-extern struct Sound sounds[MAX_SOUND];
+extern struct Texture textures[];
+extern struct Audio_source sounds[];
 
 struct Texture load_texture_from_file(const char* path);
 
