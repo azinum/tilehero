@@ -64,6 +64,8 @@ struct Texture load_texture_from_file(const char* path) {
 }
 
 // NOTE(lucas): All resources are loaded even though we're not using all of them.
+// Maybe we should load resources when they are needed; when they are requested?
+// But how (or when rather) do we unload the resources?
 void resources_load() {
   (void)texture_filenames;
   for (i16 i = 0; i < MAX_TEXTURE; i++) {

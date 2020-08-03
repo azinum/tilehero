@@ -1,5 +1,5 @@
 // matrix_math.h
-// Based on HandMadeMath
+// Thanks to HandMadeMath
 
 #ifndef _MMATH_H
 #define _MMATH_H
@@ -18,7 +18,7 @@
 #include <xmmintrin.h>
 #endif
 
-#define PI_32 3.14159265359f
+#define PI32 3.14159265359f
 
 typedef struct vec3 {
   float x, y, z;
@@ -73,7 +73,7 @@ inline __m128 mm_linear_combine_sse(__m128 left, mat4 right) {
 #endif  // USE_SSE
 
 inline float mm_toradians(float degrees) {
-  float result = degrees * (PI_32 / 180.0f);
+  float result = degrees * (PI32 / 180.0f);
   return result;
 }
 
@@ -142,7 +142,7 @@ inline mat4 mat4_zero(void) {
 inline mat4 mm_perspective(float fov, float aspect_ratio, float z_near, float z_far) {
   mat4 result = mat4_zero();
 
-  float tan_theta = tanf(fov * (PI_32 / 360.0f));
+  float tan_theta = tanf(fov * (PI32 / 360.0f));
   result.elements[0][0] = 1.0f / tan_theta;
   result.elements[1][1] = aspect_ratio / tan_theta;
   result.elements[2][3] = -1.0f;

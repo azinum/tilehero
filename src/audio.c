@@ -43,7 +43,7 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
   float* out = (float*)out_buff;
 
   for (i32 i = 0; i < (i32)frames_per_buffer; i++) {
-    float frame = 0;
+    float frame = 0.1f * (sin(audio_engine.tick * 220 * PI32 * 2 / audio_engine.sample_rate));
     *out++ = frame;
     *out++ = frame;
     audio_engine.tick++;
