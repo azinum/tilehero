@@ -3,6 +3,8 @@
 #ifndef _RESOURCE_H
 #define _RESOURCE_H
 
+#include "audio.h"
+
 enum Texture_type {
   TEXTURE_SPRITES,
   MAX_TEXTURE,
@@ -16,15 +18,9 @@ enum Sound_type {
 };
 
 struct Texture {
+  u32 id;
   i16 w;
   i16 h;
-  u32 id;
-};
-
-struct Audio_source {
-  float* sample_buffer;
-  u32 sample_count;
-  u32 sample_rate;
 };
 
 extern struct Texture textures[];

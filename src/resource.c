@@ -17,11 +17,11 @@
 struct Texture textures[MAX_TEXTURE];
 struct Audio_source sounds[MAX_SOUND];
 
-static const char* texture_filenames[MAX_TEXTURE] = {
+static const char* texture_filenames[] = {
   "spritesheet",
 };
 
-static const char* sound_filenames[MAX_SOUND] = {
+static const char* sound_filenames[] = {
   "hit_hurt",
   "random_1",
   "random_2",
