@@ -1,9 +1,9 @@
-// audio_engine.c
+// audio.c
 
 #include <portaudio.h>
 
 #include "common.h"
-#include "audio_engine.h"
+#include "audio.h"
 
 typedef struct Audio_engine {
   i32 sample_rate;

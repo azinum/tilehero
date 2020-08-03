@@ -1,7 +1,7 @@
-// audio_engine.h
+// audio.h
 
-#ifndef _AUDIO_ENGINE_H
-#define _AUDIO_ENGINE_H
+#ifndef _AUDIO_H
+#define _AUDIO_H
 
 #define SAMPLE_RATE (44100)
 #define FRAMES_PER_BUFFER (256)
