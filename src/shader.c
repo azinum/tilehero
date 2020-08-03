@@ -11,10 +11,10 @@ i32 shader_compile(const char* shader) {
   i32 shader_program = -1;
   u32 vert_shader = 0;
   u32 frag_shader = 0;
-  char path[PATH_LENGTH_MAX] = {0};
-  snprintf(path, PATH_LENGTH_MAX, "%s.vert", shader);
+  char path[MAX_PATH_LENGTH] = {0};
+  snprintf(path, MAX_PATH_LENGTH, "%s.vert", shader);
   const char* vert_source = read_entire_file(path);
-  snprintf(path, PATH_LENGTH_MAX, "%s.frag", shader);
+  snprintf(path, MAX_PATH_LENGTH, "%s.frag", shader);
   const char* frag_source = read_entire_file(path);
   if (!vert_source || !frag_source)
     goto done;

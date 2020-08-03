@@ -13,7 +13,7 @@
 
 #define PI32 3.14159265359f
 #define ARR_SIZE(ARR) ((sizeof(ARR)) / (sizeof(ARR[0])))
-#define PATH_LENGTH_MAX 512
+#define MAX_PATH_LENGTH (512)
 
 typedef int64_t i64;
 typedef uint64_t u64;

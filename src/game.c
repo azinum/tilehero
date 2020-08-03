@@ -73,12 +73,9 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
   }
   resources_load();
   game_init(&game_state);
-  // NOTE(lucas): The audio engine will not invoke the callback function in case initialization fails.
   if (audio_engine_init(SAMPLE_RATE, FRAMES_PER_BUFFER, game_run) != 0) {
     fprintf(stderr, "Failed to initialize audio engine\n");
-    // NOTE(lucas): Run the game without audio? Maybe an device is missing,
-    // if that's the case then we'd might want to be checking for devices
-    // while the game is running?
+    // NOTE(lucas): Run the game without audio?
     game_run();
   }
   return 0;

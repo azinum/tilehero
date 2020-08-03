@@ -5,15 +5,25 @@
 #include "common.h"
 #include "image_loader.h"
 #include "renderer_common.h"
+#include "wave.h"
 #include "resource.h"
 
 #define TEXTURE_PATH "resource/texture"
+#define SOUND_PATH "resource/audio"
 #define TEXTURE_EXT "png"
+#define SOUND_EXT "wav"
 
 struct Texture textures[MAX_TEXTURE];
+struct Sound sounds[MAX_SOUND];
 
 static const char* texture_filenames[MAX_TEXTURE] = {
   "spritesheet",
+};
+
+static const char* sound_filenames[MAX_SOUND] = {
+  "hit_hurt",
+  "random_1",
+  "random_2",
 };
 
 static u32 load_texture_from_image(struct Image* image);
@@ -52,14 +62,22 @@ struct Texture load_texture_from_file(const char* path) {
   return result;
 }
 
+// NOTE(lucas): All resources are loaded even though we're not using all of them.
 void resources_load() {
   (void)texture_filenames;
   for (i16 i = 0; i < MAX_TEXTURE; i++) {
-    char filename[PATH_LENGTH_MAX];
-    snprintf(filename, PATH_LENGTH_MAX, "%s/%s.%s", TEXTURE_PATH, texture_filenames[i], TEXTURE_EXT);
+    char filename[MAX_PATH_LENGTH] = {0};
+    snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", TEXTURE_PATH, texture_filenames[i], TEXTURE_EXT);
     struct Texture texture = load_texture_from_file(filename);
     if (texture.id > 0) {
       textures[i] = texture;
     }
+  }
+
+  for (i16 i = 0; i < MAX_SOUND; i++) {
+    char filename[MAX_PATH_LENGTH] = {0};
+    snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", SOUND_PATH, sound_filenames[i], SOUND_EXT);
+    struct Audio_source audio_source = {0};
+    load_wave_from_file(filename, &audio_source);
   }
 }
