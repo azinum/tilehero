@@ -6,6 +6,7 @@
 typedef struct Entity {
   float x, y, w, h;
   float x_speed, y_speed;
+  i32 sprite_id;
 } Entity;
 
 void entity_init(Entity* e, float x, float y, float w, float h);

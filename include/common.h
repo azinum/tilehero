@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 #define PI32 3.14159265359f
 #define ARR_SIZE(ARR) ((sizeof(ARR)) / (sizeof(ARR[0])))

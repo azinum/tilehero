@@ -95,16 +95,16 @@ i32 window_process_input() {
     glfwSetWindowShouldClose(window.window, 1);
   }
   if (glfwGetKey(window.window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera.x += 1.0f;
+    camera.x -= 5.0f;
   }
   if (glfwGetKey(window.window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera.x -= 1.0f;
+    camera.x += 5.0f;
   }
   if (glfwGetKey(window.window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera.y -= 1.0f;
+    camera.y -= 5.0f;
   }
   if (glfwGetKey(window.window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera.y += 1.0f;
+    camera.y += 5.0f;
   }
   glfwGetCursorPos(window.window, &window.mouse_x, &window.mouse_y);
   return 0;
