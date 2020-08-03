@@ -6,6 +6,7 @@
 #include "audio_engine.h"
 #include "entity.h"
 #include "renderer.h"
+#include "resource.h"
 #include "game.h"
 
 Game_state game_state;
@@ -66,11 +67,12 @@ void game_run() {
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
-  game_init(&game_state);
   if (window_open(window_width, window_height, fullscreen, "Tile Hero") != 0) {
     fprintf(stderr, "Failed to open window\n");
     return -1;
   }
+  resources_load();
+  game_init(&game_state);
   // NOTE(lucas): The audio engine will not invoke the callback function in case initialization fails.
   if (audio_engine_init(SAMPLE_RATE, FRAMES_PER_BUFFER, game_run) != 0) {
     fprintf(stderr, "Failed to initialize audio engine\n");
@@ -78,7 +80,6 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
     // if that's the case then we'd might want to be checking for devices
     // while the game is running?
     game_run();
-    return 0;
   }
   return 0;
 }

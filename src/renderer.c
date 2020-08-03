@@ -44,8 +44,8 @@ void renderer_init() {
   model = mm_mat4d(1.0f);
   view = mm_mat4d(1.0f);
   projection = mm_orthographic(0, 1440, 900, 0, -1, 1);
-  sprite_shader = shader_compile("resources/shaders/sprite");
-  rect_shader = shader_compile("resources/shaders/rect");
+  sprite_shader = shader_compile("resource/shader/sprite");
+  rect_shader = shader_compile("resource/shader/rect");
 }
 
 void render_texture_region(u32 texture, float x, float y, float w, float h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range, i32 texture_width, i32 texture_height) {

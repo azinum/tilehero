@@ -7,7 +7,6 @@
 #include "matrix_math.h"
 #include "renderer.h"
 #include "shader.h"
-#include "texture.h"
 #include "camera.h" // NOTE(lucas): TEMP
 #include "window.h"
 
@@ -29,9 +28,6 @@ void framebuffer_size_callback(GLFWwindow* glfw_window, i32 width, i32 height) {
   glViewport(0, 0, width, height);
   projection = mm_orthographic(0, width, height, 0, -1, 1);
 }
-
-// TODO(lucas): Get rid of this!
-u32 texture_id = 0;
 
 i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   window.title = title;
@@ -66,7 +62,6 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   glfwSwapInterval(1);
   opengl_configure();
   renderer_init();
-  texture_id = load_texture("resources/sprites/spritesheet.png");
   return 0;
 }
 
