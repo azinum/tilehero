@@ -71,6 +71,7 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   if (open_stream() != 0) {
     return -1;
   }
-  callback();
+  if (callback)
+    callback();
   return 0;
 }

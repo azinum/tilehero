@@ -4,7 +4,7 @@
 #define _AUDIO_H
 
 #define SAMPLE_RATE (44100)
-#define FRAMES_PER_BUFFER (256)
+#define FRAMES_PER_BUFFER (512)
 
 struct Audio_source {
   float* sample_buffer;

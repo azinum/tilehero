@@ -5,7 +5,7 @@
 #include "common.h"
 #include "image_loader.h"
 #include "renderer_common.h"
-#include "wave.h"
+#include "riff.h"
 #include "audio.h"
 #include "resource.h"
 
@@ -67,7 +67,6 @@ struct Texture load_texture_from_file(const char* path) {
 // Maybe we should load resources when they are needed; when they are requested?
 // But how (or when rather) do we unload the resources?
 void resources_load() {
-  (void)texture_filenames;
   for (i16 i = 0; i < MAX_TEXTURE; i++) {
     char filename[MAX_PATH_LENGTH] = {0};
     snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", TEXTURE_PATH, texture_filenames[i], TEXTURE_EXT);
@@ -81,7 +80,7 @@ void resources_load() {
     char filename[MAX_PATH_LENGTH] = {0};
     snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", SOUND_PATH, sound_filenames[i], SOUND_EXT);
     struct Audio_source audio_source = {0};
-    load_wave_from_file(filename, &audio_source);
+    load_wav_from_file(filename, &audio_source);
     sounds[i] = audio_source;
   }
 }
