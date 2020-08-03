@@ -6,7 +6,7 @@ PROG_NAME=tilehero2
 
 INCLUDE_DIR=include
 
-RES_DIR=resources
+RES_DIR=resource
 
 SRC=src/*.c
 
