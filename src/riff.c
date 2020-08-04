@@ -7,16 +7,16 @@
 #define FORMAT_PCM 0x1  // Uncompressed format
 
 struct RIFF_header {
-  char chunk_id[4];  // 'R', 'I', 'F', 'F'
+  char chunk_id[4];
   i32 size;
-  char wave_id[4];  // 'W', 'A', 'V', 'E'
+  char wave_id[4];
   char format_chunk[4];
   i32 format_chunk_size;
   i16 format_type;
   i16 channel_count;
   i32 sample_rate;
   i32 data_rate;  // (sample rate * bits per sample * channels) / 8
-  i16 data_block_size;  // (BitsPerSample * Channels) / 8
+  i16 data_block_size;  // (bits per sample * channels) / 8
   i16 bits_per_sample;
   char data_chunk_header[4];
   i32 data_size;
@@ -57,9 +57,16 @@ void print_riff_header(struct RIFF_header* header) {
   );
 }
 
-i32 load_wav_from_file(const char* filename, struct Audio_source* source) {
-  (void)source;
+inline void i16_to_f32(float* out, const i16* in, i32 sample_count) {
+  assert(out != NULL && in != NULL);
 
+  for (i32 i = 0; i < sample_count; i++) {
+    *out++ = in[i] / 32768.0f;
+  }
+}
+
+i32 load_wav_from_file(const char* filename, struct Audio_source* source) {
+  i32 status = 0;
   FILE* fp = fopen(filename, "rb");
   if (!fp) {
     fprintf(stderr, "Failed to open file '%s'\n", filename);
@@ -75,16 +82,31 @@ i32 load_wav_from_file(const char* filename, struct Audio_source* source) {
   i32 bytes_read = fread(&header, 1, sizeof(struct RIFF_header), fp);
   if (bytes_read < (i32)sizeof(struct RIFF_header)) {
     fprintf(stderr, "Invalid WAV file\n");
-    fclose(fp);
-    return -1;
+    status = -1;
+    goto done;
   }
 
-  assert(bytes_read == sizeof(struct RIFF_header));
   print_riff_header(&header);
 
-  source->sample_count = header.data_size / (header.bits_per_sample / 8);
-  source->sample_rate = header.sample_rate;
+  if (header.format_type != FORMAT_PCM) {
+    fprintf(stderr, "Format not supported (0x%x)\n", header.format_type);
+    status = -1;
+    goto done;
+  }
+  
+  const i32 sample_count = header.data_size / (header.bits_per_sample / 8);
+  void* sample_data = malloc(header.data_size);
+  i32 sample_data_bytes_read = fread(sample_data, 1, header.data_size, fp);
 
+  assert(sample_data_bytes_read == header.data_size);
+
+  source->sample_buffer = malloc(sample_count * sizeof(float));
+  i16_to_f32(source->sample_buffer, (i16*)sample_data, sample_count);
+  source->sample_count = sample_count;
+  source->sample_rate = header.sample_rate;
+  free(sample_data);
+
+done:
   fclose(fp);
-  return 0;
+  return status;
 }
