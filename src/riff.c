@@ -85,9 +85,9 @@ i32 load_wav_from_file(const char* filename, struct Audio_source* source) {
     status = -1;
     goto done;
   }
-
+#if 0
   print_riff_header(&header);
-
+#endif
   if (header.format_type != FORMAT_PCM) {
     fprintf(stderr, "Format not supported (0x%x)\n", header.format_type);
     status = -1;

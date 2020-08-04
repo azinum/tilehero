@@ -30,4 +30,6 @@ struct Texture load_texture_from_file(const char* path);
 
 void resources_load();
 
+void resources_unload();
+
 #endif

@@ -79,8 +79,19 @@ void resources_load() {
   for (i16 i = 0; i < MAX_SOUND; i++) {
     char filename[MAX_PATH_LENGTH] = {0};
     snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", SOUND_PATH, sound_filenames[i], SOUND_EXT);
-    struct Audio_source audio_source = {0};
-    load_wav_from_file(filename, &audio_source);
-    sounds[i] = audio_source;
+    struct Audio_source source = {0};
+    load_wav_from_file(filename, &source);
+    sounds[i] = source;
+  }
+}
+
+void resources_unload() {
+  for (i32 i = 0; i < MAX_SOUND; i++) {
+    struct Audio_source* source = &sounds[i];
+    if (source->sample_buffer) {
+      free(source->sample_buffer);
+      source->sample_count = 0;
+      source->sample_rate = 0;
+    }
   }
 }

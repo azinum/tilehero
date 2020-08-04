@@ -32,7 +32,7 @@ void game_init(Game_state* game) {
   srand((u32)time(NULL));
   game->is_running = 1;
   game->entity_count = 0;
-  for (i32 i = 0; i < 16; i++) {
+  for (i32 i = 0; i < 3; i++) {
     Entity* e = add_entity(32 * (rand() % 32), 32 * i, 32, 32);
     while (!e->x_speed) {
       e->x_speed = random_number(-3, 3);
@@ -45,6 +45,7 @@ void game_init(Game_state* game) {
 }
 
 void game_run() {
+  resources_load();
   while (game_state.is_running) {
     window_pollevents();
     if (window_process_input() != 0 || window_should_close()) {
@@ -64,6 +65,7 @@ void game_run() {
     window_clear();
   }
   window_close();
+  resources_unload();
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
@@ -71,7 +73,6 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
     fprintf(stderr, "Failed to open window\n");
     return -1;
   }
-  resources_load();
   game_init(&game_state);
   if (audio_engine_init(SAMPLE_RATE, FRAMES_PER_BUFFER, game_run) != 0) {
     fprintf(stderr, "Failed to initialize audio engine\n");
