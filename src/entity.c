@@ -42,12 +42,12 @@ void entity_update(Entity* e) {
   }
 
   if (collided) {
-    audio_play_once(rand() % MAX_SOUND, 0.2f);
+    audio_play_once(e->sprite_id % MAX_SOUND, 0.2f);
   }
 }
 
 void entity_render(Entity* e) {
-  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, camera.z, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
+  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
 }
 
 void entity_render_highlight(Entity* e) {

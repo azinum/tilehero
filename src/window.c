@@ -25,8 +25,8 @@ void framebuffer_size_callback(GLFWwindow* glfw_window, i32 width, i32 height) {
   (void)glfw_window;
   window.width = width;
   window.height = height;
-  glViewport(0, 0, width, height);
-  projection = mm_orthographic(0, width, height, 0, -1, 1);
+  glViewport(0, 0, width / 2, height / 2);
+  projection = mm_orthographic(0, width / 2, height / 2, 0, -1, 1);
 }
 
 i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
@@ -66,7 +66,7 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
 }
 
 void window_clear() {
-  glClearColor(0.05f, 0.1f, 0.2f, 1.0f);
+  glClearColor(0.03f, 0.11f, 0.19f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

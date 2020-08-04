@@ -5,6 +5,7 @@
 #include "matrix_math.h"
 #include "shader.h"
 #include "resource.h"
+#include "window.h"
 #include "renderer.h"
 
 mat4 model, view, projection;
@@ -44,7 +45,7 @@ void renderer_init() {
   init_quad_data();
   model = mm_mat4d(1.0f);
   view = mm_mat4d(1.0f);
-  projection = mm_orthographic(0, 1440, 900, 0, -1, 1);
+  projection = mm_orthographic(0, window.width, window.height, 0, -1, 1);
   sprite_shader = shader_compile("resource/shader/sprite");
   rect_shader = shader_compile("resource/shader/rect");
 }
