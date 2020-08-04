@@ -13,7 +13,7 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->y = y;
   e->w = w;
   e->h = h;
-  e->sprite_id = rand() % MAX_TEXTURE;
+  e->sprite_id = rand() % 6;
 }
 
 void entity_update(Entity* e) {
@@ -47,6 +47,9 @@ void entity_update(Entity* e) {
 }
 
 void entity_render(Entity* e) {
-  render_rect(e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0.9f, 0.1f, 0.12f, 0, 1.0f / (e->w));
-  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
+  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, camera.z, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
+}
+
+void entity_render_highlight(Entity* e) {
+  render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 0, 1.0f / (e->w));
 }

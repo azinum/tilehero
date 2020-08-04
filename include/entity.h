@@ -15,4 +15,6 @@ void entity_update(Entity* e);
 
 void entity_render(Entity* e);
 
+void entity_render_highlight(Entity* e);
+
 #endif

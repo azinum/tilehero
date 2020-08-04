@@ -6,8 +6,6 @@
 #include "resource.h"
 #include "audio.h"
 
-#define MAX_SOUNDS_PLAYING (32)
-
 struct Sound_state {
   i32 id;
   u32 sample_index;
@@ -78,10 +76,7 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   audio_engine.sample_rate = sample_rate;
   audio_engine.frames_per_buffer = frames_per_buffer;
   audio_engine.tick = 0;
-
-  audio_engine.sound.id = -1;
-  audio_engine.sound.sample_index = 0;
-  audio_engine.sound.amp = 0;
+  audio_engine.sound = (struct Sound_state) {0};
 
   i32 output_device = Pa_GetDefaultOutputDevice();
   audio_engine.out_port.device = output_device;

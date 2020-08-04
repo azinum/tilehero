@@ -101,6 +101,12 @@ i32 window_process_input() {
   if (glfwGetKey(window.window, GLFW_KEY_S) == GLFW_PRESS) {
     camera.y += 5.0f;
   }
+  if (glfwGetKey(window.window, GLFW_KEY_Z) == GLFW_PRESS) {
+    camera.z += 0.1f;
+  }
+  if (glfwGetKey(window.window, GLFW_KEY_X) == GLFW_PRESS) {
+    camera.z -= 0.1f;
+  }
   glfwGetCursorPos(window.window, &window.mouse_x, &window.mouse_y);
   return 0;
 }

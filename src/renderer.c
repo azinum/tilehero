@@ -49,12 +49,11 @@ void renderer_init() {
   rect_shader = shader_compile("resource/shader/rect");
 }
 
-void render_texture_region(struct Texture texture, float x, float y, float w, float h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range) {
+void render_texture_region(struct Texture texture, float x, float y, float z, float w, float h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range) {
   const u32 program = sprite_shader;
   glUseProgram(sprite_shader);
 
-  model = mm_mat4d(1.0f);
-  translate(model, x, y);
+  model = mm_translate((vec3) {x, y, z});
 
   translate(model, 0.5f * w, 0.5f * h);
   rotate(model, angle);
@@ -80,7 +79,6 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
   const u32 program = rect_shader;
   glUseProgram(program);
 
-  model = mm_mat4d(1.0f);
   model = mm_translate((vec3) {x, y, z});
 
   translate(model, 0.5f * w, 0.5f * h);

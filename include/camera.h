@@ -6,6 +6,7 @@
 struct {
   float x;
   float y;
+  float z;
 } camera;
 
 void camera_init(float x, float y);
