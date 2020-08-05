@@ -6,6 +6,9 @@
 #include "resource.h"
 #include "audio.h"
 
+#define MAX_SOUNDS_PLAYING (32)
+#define MASTER_VOLUME (0.4f)
+
 struct Sound_state {
   i32 id;
   u32 sample_index;
@@ -16,7 +19,9 @@ typedef struct Audio_engine {
   i32 sample_rate;
   i32 frames_per_buffer;
   i32 tick;
-  struct Sound_state sound;
+  struct Sound_state sounds[MAX_SOUNDS_PLAYING];
+  i32 sound_count;
+  float master_volume;
   PaStream* stream;
   PaStreamParameters in_port, out_port;
 } Audio_engine;
@@ -50,18 +55,35 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
   (void)in_buff; (void)time_info; (void)flags; (void)user_data;
   float* out = (float*)out_buff;
 
-  const struct Audio_source* source = &sounds[audio_engine.sound.id];
-  struct Sound_state* sound = &audio_engine.sound;
+  for (i32 buffer_index = 0; buffer_index < (i32)frames_per_buffer; buffer_index++) {
+    float l_frame = 0, r_frame = 0;
 
-  for (i32 i = 0; i < (i32)frames_per_buffer; i++) {
-    float frame = 0;
-    if (sound->sample_index < source->sample_count) {
-      frame += sound->amp * source->sample_buffer[sound->sample_index];
-      sound->sample_index++;
+    for (i32 i = 0; i < audio_engine.sound_count; i++) {
+      struct Sound_state* sound = &audio_engine.sounds[i];
+      const struct Audio_source* source = &sounds[sound->id];
+      if (sound->sample_index < source->sample_count) {
+        if (source->channel_count == 2) {
+          l_frame += sound->amp * source->sample_buffer[sound->sample_index++];
+          r_frame += sound->amp * source->sample_buffer[sound->sample_index++];
+        }
+        else {
+          float frame = sound->amp * source->sample_buffer[sound->sample_index++];
+          l_frame += frame;
+          r_frame += frame;
+        }
+      }
     }
-    *out++ = frame;
-    *out++ = frame;
+    *out++ = audio_engine.master_volume * l_frame;
+    *out++ = audio_engine.master_volume * r_frame;
     audio_engine.tick++;
+  }
+
+  for (i32 i = 0; i < audio_engine.sound_count; i++) {
+    struct Sound_state* sound = &audio_engine.sounds[i];
+    const struct Audio_source* source = &sounds[sound->id];
+    if (sound->sample_index >= source->sample_count) {
+      audio_engine.sounds[i] = audio_engine.sounds[--audio_engine.sound_count];
+    }
   }
   return paContinue;
 }
@@ -76,13 +98,14 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   audio_engine.sample_rate = sample_rate;
   audio_engine.frames_per_buffer = frames_per_buffer;
   audio_engine.tick = 0;
-  audio_engine.sound = (struct Sound_state) {0};
+  audio_engine.sound_count = 0;
+  audio_engine.master_volume = MASTER_VOLUME;
 
   i32 output_device = Pa_GetDefaultOutputDevice();
   audio_engine.out_port.device = output_device;
   audio_engine.out_port.channelCount = 2;
   audio_engine.out_port.sampleFormat = paFloat32;
-  audio_engine.out_port.suggestedLatency = Pa_GetDeviceInfo(audio_engine.out_port.device)->defaultLowOutputLatency;
+  audio_engine.out_port.suggestedLatency = Pa_GetDeviceInfo(audio_engine.out_port.device)->defaultHighOutputLatency;
   audio_engine.out_port.hostApiSpecificStreamInfo = NULL;
   if (open_stream() != 0) {
     return -1;
@@ -94,9 +117,15 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
 
 // NOTE(lucas): We are expecting a valid sound id here.
 void audio_play_once(i32 sound_id, float amp) {
-  audio_engine.sound = (struct Sound_state) {
+  if (audio_engine.sound_count >= MAX_SOUNDS_PLAYING) {
+    fprintf(stderr, "[Warning]: Too many sounds playing at once!\n");
+    return;
+  }
+
+  struct Sound_state sound = {
     .id = sound_id,
     .sample_index = 0,
-    .amp = amp,
+    .amp = amp
   };
+  audio_engine.sounds[audio_engine.sound_count++] = sound;
 }

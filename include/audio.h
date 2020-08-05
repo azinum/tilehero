@@ -10,6 +10,7 @@ struct Audio_source {
   float* sample_buffer;
   u32 sample_count;
   u32 sample_rate;
+  i16 channel_count;
 };
 
 typedef void (*callback_func)();

@@ -107,6 +107,7 @@ i32 load_wav_from_file(const char* filename, struct Audio_source* source) {
   i16_to_f32(source->sample_buffer, (i16*)sample_data, sample_count);
   source->sample_count = sample_count;
   source->sample_rate = header.sample_rate;
+  source->channel_count = header.channel_count;
   free(sample_data);
 
 done:

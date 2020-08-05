@@ -42,7 +42,7 @@ void entity_update(Entity* e) {
   }
 
   if (collided) {
-    audio_play_once(e->sprite_id % MAX_SOUND, 0.2f);
+    audio_play_once(e->sprite_id % MAX_SOUND, 0.3f);
   }
 }
 
