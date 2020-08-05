@@ -76,14 +76,22 @@ void resources_load() {
       textures[i] = texture;
     }
   }
+}
 
-  for (i16 i = 0; i < MAX_SOUND; i++) {
-    char filename[MAX_PATH_LENGTH] = {0};
-    snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", SOUND_PATH, sound_filenames[i], SOUND_EXT);
-    struct Audio_source source = {0};
-    load_wav_from_file(filename, &source);
-    sounds[i] = source;
+// NOTE(lucas): We might want to figure out before-hand which resources we need.
+// What we do now is that we load the resources at the time we need them (audio resources). This might be
+// a bad thing because of the 'blocking' nature of loading resources. At the moment we are loading resources
+// sequentially with the game, so we might get laggy frames because we are waiting for resources to be loaded!
+void resource_load_sound(i32 sound_id) {
+  if (sound_id < 0 || sound_id >= MAX_SOUND) {
+    fprintf(stderr, "Failed to load sound (no such sound id: %i)\n", sound_id);
+    return;
   }
+  char filename[MAX_PATH_LENGTH] = {0};
+  snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", SOUND_PATH, sound_filenames[sound_id], SOUND_EXT);
+  struct Audio_source source = {0};
+  load_wav_from_file(filename, &source);
+  sounds[sound_id] = source;
 }
 
 void resources_unload() {

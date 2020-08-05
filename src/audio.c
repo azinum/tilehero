@@ -122,6 +122,11 @@ void audio_play_once(i32 sound_id, float amp) {
     return;
   }
 
+  struct Audio_source* source = &sounds[sound_id];
+  if (!source->sample_buffer) {
+    resource_load_sound(sound_id);
+  }
+
   struct Sound_state sound = {
     .id = sound_id,
     .sample_index = 0,

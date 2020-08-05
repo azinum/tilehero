@@ -31,6 +31,8 @@ struct Texture load_texture_from_file(const char* path);
 
 void resources_load();
 
+void resource_load_sound(i32 sound_id);
+
 void resources_unload();
 
 #endif
