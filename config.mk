@@ -2,7 +2,7 @@
 
 CC=gcc
 
-PROG_NAME=tilehero2
+PROG_NAME=tilehero
 
 INCLUDE_DIR=include
 
