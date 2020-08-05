@@ -14,6 +14,7 @@ enum Sound_type {
   SOUND_HIT_HURT,
   SOUND_RANDOM_1,
   SOUND_RANDOM_2,
+  SOUND_GOOD_MORNING,
   MAX_SOUND,
 };
 

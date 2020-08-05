@@ -16,23 +16,23 @@ struct RIFF_header {
   i16 channel_count;
   i32 sample_rate;
   i32 data_rate;  // (sample rate * bits per sample * channels) / 8
-  i16 data_block_size;  // (bits per sample * channels) / 8
+  i16 data_block_size;  // (bits per sample * channels) / 8 => bytes per frame / sample
   i16 bits_per_sample;
   char data_chunk_header[4];
   i32 data_size;
 } __attribute__((packed));
 
-inline void print_riff_header(struct RIFF_header* header);
+static void print_riff_header(const char* filename, struct RIFF_header* header);
 
-void print_riff_header(struct RIFF_header* header) {
+void print_riff_header(const char* filename, struct RIFF_header* header) {
   printf(
-    "RIFF header:\n"
+    "RIFF header(%s):\n"
     "  chunk_id: %.4s\n"
     "  size: %i\n"
     "  wave_id: %.4s\n"
     "  format_chunk: %.4s\n"
     "  format_chunk_size: %i\n"
-    "  format_type: %i\n"
+    "  format_type: 0x%x\n"
     "  channel_count: %i\n"
     "  sample_rate: %i\n"
     "  data_rate: %i\n"
@@ -41,6 +41,7 @@ void print_riff_header(struct RIFF_header* header) {
     "  data_chunk_header: %.4s\n"
     "  data_size: %i\n"
     ,
+    filename,
     header->chunk_id,
     header->size,
     header->wave_id,
@@ -86,7 +87,9 @@ i32 load_wav_from_file(const char* filename, struct Audio_source* source) {
     goto done;
   }
 #if 0
-  print_riff_header(&header);
+  print_riff_header(filename, &header);
+#else
+  (void)print_riff_header;
 #endif
   if (header.format_type != FORMAT_PCM) {
     fprintf(stderr, "Format not supported (0x%x)\n", header.format_type);
@@ -94,7 +97,7 @@ i32 load_wav_from_file(const char* filename, struct Audio_source* source) {
     goto done;
   }
   
-  const i32 sample_count = header.data_size / (header.bits_per_sample / 8);
+  const i32 sample_count = header.data_size / (header.data_block_size);
   void* sample_data = malloc(header.data_size);
   i32 sample_data_bytes_read = fread(sample_data, 1, header.data_size, fp);
 
