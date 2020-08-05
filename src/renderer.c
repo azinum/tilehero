@@ -10,6 +10,7 @@
 
 mat4 model, view, projection;
 
+static vec4 tint = (vec4) {1, 1, 1, 1};
 static u32 quad_vao = 0;
 static u32 sprite_shader, rect_shader;
 
@@ -67,6 +68,7 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
 
   glUniform2f(glGetUniformLocation(program, "uv_offset"), (float)x_offset / texture.w, (float)y_offset / texture.h);
   glUniform2f(glGetUniformLocation(program, "uv_range"), (float)x_range / texture.w, (float)y_range / texture.h);
+  glUniform4f(glGetUniformLocation(program, "tint"), tint.x, tint.y, tint.z, tint.w);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture.id);
@@ -98,6 +100,15 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
   glBindVertexArray(quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
+}
+
+void renderer_set_tint(float r, float g, float b, float a) {
+  tint = (vec4) {
+    .x = r,
+    .y = g,
+    .z = b,
+    .w = a,
+  };
 }
 
 void renderer_free() {

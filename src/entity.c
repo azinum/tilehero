@@ -17,32 +17,37 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
 }
 
 void entity_update(Entity* e) {
-  u8 collided = 0;
+  u8 collision = 0;
   e->x += e->x_speed;
   e->y += e->y_speed;
   if (e->x < 0) {
     e->x_speed = -e->x_speed;
     e->x = 0;
-    collided = 1;
+    collision = 1;
   }
   if (e->x > 250) {
     e->x_speed = -e->x_speed;
     e->x = 250;
-    collided = 1;
+    collision = 1;
   }
   if (e->y < 0) {
     e->y_speed = -e->y_speed;
     e->y = 0;
-    collided = 1;
+    collision = 1;
   }
   if (e->y > 250) {
     e->y_speed = -e->y_speed;
     e->y = 250;
-    collided = 1;
+    collision = 1;
   }
 
-  if (collided) {
+  if (collision) {
     audio_play_once(e->sprite_id % MAX_SOUND, 0.3f);
+    // entity_render_highlight_color(e, 1, 1, 1);
+    renderer_set_tint(15, 15, 15, 1);
+  }
+  else {
+    renderer_set_tint(1, 1, 1, 1);
   }
 }
 
@@ -52,4 +57,8 @@ void entity_render(Entity* e) {
 
 void entity_render_highlight(Entity* e) {
   render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 0, 1.0f / (e->w));
+}
+
+void entity_render_highlight_color(Entity* e, float r, float g, float b) {
+  render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, r, g, b, 0, 1);
 }

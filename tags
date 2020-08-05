@@ -1,0 +1,233 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ARR_SIZE	include/common.h	15;"	d
+Audio_engine	src/audio.c	/^typedef struct Audio_engine {$/;"	s	file:
+Audio_engine	src/audio.c	/^} Audio_engine;$/;"	t	typeref:struct:Audio_engine	file:
+Audio_source	include/audio.h	/^struct Audio_source {$/;"	s
+BUILD_DIR	config.mk	/^BUILD_DIR=build$/;"	m
+CC	config.mk	/^CC=gcc$/;"	m
+ENTITIES_MAX	include/game.h	10;"	d
+ERR_BUFFER_SIZE	src/shader.c	8;"	d	file:
+Entity	include/entity.h	/^typedef struct Entity {$/;"	s
+Entity	include/entity.h	/^} Entity;$/;"	t	typeref:struct:Entity
+FLAGS	config.mk	/^FLAGS=${SRC} -I${INCLUDE_DIR} -o ${BUILD_DIR}\/${PROG_NAME} -O2 -Wall -W -Wno-missing-braces -std=c99$/;"	m
+FORMAT_PCM	src/riff.c	7;"	d	file:
+FRAMES_PER_BUFFER	include/audio.h	7;"	d
+Game_state	include/game.h	/^typedef struct Game_state {$/;"	s
+Game_state	include/game.h	/^} Game_state;$/;"	t	typeref:struct:Game_state
+INCLUDE_DIR	config.mk	/^INCLUDE_DIR=include$/;"	m
+Image	include/image_loader.h	/^typedef struct Image {$/;"	s
+Image	include/image_loader.h	/^} Image;$/;"	t	typeref:struct:Image
+LIBS	config.mk	/^LIBS=-lportaudio -lpng -lm -lGLEW -lglfw -lGL$/;"	m
+LIBS_MAC	config.mk	/^LIBS_MAC=-lportaudio -lpng -lm -lGLEW -lglfw -framework OpenGL$/;"	m
+MASTER_VOLUME	src/audio.c	10;"	d	file:
+MAX_PATH_LENGTH	include/common.h	16;"	d
+MAX_SOUND	include/resource.h	/^  MAX_SOUND,$/;"	e	enum:Sound_type
+MAX_SOUNDS_PLAYING	src/audio.c	9;"	d	file:
+MAX_TEXTURE	include/resource.h	/^  MAX_TEXTURE,$/;"	e	enum:Texture_type
+PI32	include/common.h	14;"	d
+PI32	include/matrix_math.h	21;"	d
+PROG_NAME	config.mk	/^PROG_NAME=tilehero$/;"	m
+RES_DIR	config.mk	/^RES_DIR=resource$/;"	m
+RIFF_header	src/riff.c	/^struct RIFF_header {$/;"	s	file:
+SAMPLE_RATE	include/audio.h	6;"	d
+SOUND_EXT	src/resource.c	15;"	d	file:
+SOUND_GOOD_MORNING	include/resource.h	/^  SOUND_GOOD_MORNING,$/;"	e	enum:Sound_type
+SOUND_HIT_HURT	include/resource.h	/^  SOUND_HIT_HURT,$/;"	e	enum:Sound_type
+SOUND_PATH	src/resource.c	13;"	d	file:
+SOUND_RANDOM_1	include/resource.h	/^  SOUND_RANDOM_1,$/;"	e	enum:Sound_type
+SOUND_RANDOM_2	include/resource.h	/^  SOUND_RANDOM_2,$/;"	e	enum:Sound_type
+SRC	config.mk	/^SRC=src\/*.c$/;"	m
+Sound_state	src/audio.c	/^struct Sound_state {$/;"	s	file:
+Sound_type	include/resource.h	/^enum Sound_type {$/;"	g
+TEXTURE_EXT	src/resource.c	14;"	d	file:
+TEXTURE_PATH	src/resource.c	12;"	d	file:
+TEXTURE_SPRITES	include/resource.h	/^  TEXTURE_SPRITES,$/;"	e	enum:Texture_type
+Texture	include/resource.h	/^struct Texture {$/;"	s
+Texture_type	include/resource.h	/^enum Texture_type {$/;"	g
+USE_SSE	include/matrix_math.h	12;"	d
+_AUDIO_H	include/audio.h	4;"	d
+_CAMERA_H	include/camera.h	4;"	d
+_COMMON_H	include/common.h	4;"	d
+_ENTITY_H	include/entity.h	4;"	d
+_FILE_LOADER_H	include/file_loader.h	4;"	d
+_GAME_H	include/game.h	4;"	d
+_IMAGE_LOADER_H	include/image_loader.h	4;"	d
+_MMATH_H	include/matrix_math.h	5;"	d
+_RENDERER_COMMON_H	include/renderer_common.h	4;"	d
+_RENDERER_H	include/renderer.h	4;"	d
+_RESOURCE_H	include/resource.h	4;"	d
+_RIFF_H	include/riff.h	4;"	d
+_SHADER_H	include/shader.h	4;"	d
+_WINDOW_H	include/window.h	4;"	d
+a	src/window.c	/^float a = 1;$/;"	v
+add_entity	src/game.c	/^Entity* add_entity(float x, float y, float w, float h) {$/;"	f
+amp	src/audio.c	/^  float amp;$/;"	m	struct:Sound_state	file:
+audio_engine	src/audio.c	/^static Audio_engine audio_engine;$/;"	v	file:
+audio_engine_init	src/audio.c	/^i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func callback) {$/;"	f
+audio_play_once	src/audio.c	/^void audio_play_once(i32 sound_id, float amp) {$/;"	f
+bits_per_sample	src/riff.c	/^  i16 bits_per_sample;$/;"	m	struct:RIFF_header	file:
+callback_func	include/audio.h	/^typedef void (*callback_func)();$/;"	t
+camera	include/camera.h	/^} camera;$/;"	v	typeref:struct:__anon2
+camera_init	src/camera.c	/^void camera_init(float x, float y) {$/;"	f
+camera_update	src/camera.c	/^void camera_update() {$/;"	f
+channel_count	include/audio.h	/^  i16 channel_count;$/;"	m	struct:Audio_source
+channel_count	src/riff.c	/^  i16 channel_count;$/;"	m	struct:RIFF_header	file:
+chunk_id	src/riff.c	/^  char chunk_id[4];$/;"	m	struct:RIFF_header	file:
+data_block_size	src/riff.c	/^  i16 data_block_size;  \/\/ (bits per sample * channels) \/ 8 => bytes per frame \/ sample$/;"	m	struct:RIFF_header	file:
+data_chunk_header	src/riff.c	/^  char data_chunk_header[4];$/;"	m	struct:RIFF_header	file:
+data_rate	src/riff.c	/^  i32 data_rate;  \/\/ (sample rate * bits per sample * channels) \/ 8$/;"	m	struct:RIFF_header	file:
+data_size	src/riff.c	/^  i32 data_size;$/;"	m	struct:RIFF_header	file:
+depth	include/image_loader.h	/^  i16 depth;$/;"	m	struct:Image
+elements	include/matrix_math.h	/^  float elements[4][4];$/;"	m	union:mat4
+entities	include/game.h	/^  struct Entity entities[ENTITIES_MAX];$/;"	m	struct:Game_state	typeref:struct:Game_state::Entity
+entity_count	include/game.h	/^  i32 entity_count;$/;"	m	struct:Game_state
+entity_init	src/entity.c	/^void entity_init(Entity* e, float x, float y, float w, float h) {$/;"	f
+entity_render	src/entity.c	/^void entity_render(Entity* e) {$/;"	f
+entity_render_highlight	src/entity.c	/^void entity_render_highlight(Entity* e) {$/;"	f
+entity_update	src/entity.c	/^void entity_update(Entity* e) {$/;"	f
+format_chunk	src/riff.c	/^  char format_chunk[4];$/;"	m	struct:RIFF_header	file:
+format_chunk_size	src/riff.c	/^  i32 format_chunk_size;$/;"	m	struct:RIFF_header	file:
+format_type	src/riff.c	/^  i16 format_type;$/;"	m	struct:RIFF_header	file:
+framebuffer_size_callback	src/window.c	/^void framebuffer_size_callback(GLFWwindow* glfw_window, i32 width, i32 height) {$/;"	f
+frames_per_buffer	src/audio.c	/^  i32 frames_per_buffer;$/;"	m	struct:Audio_engine	file:
+fullscreen	include/window.h	/^  u8 fullscreen;$/;"	m	struct:__anon1
+game_execute	src/game.c	/^i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {$/;"	f
+game_init	src/game.c	/^void game_init(Game_state* game) {$/;"	f
+game_run	src/game.c	/^void game_run() {$/;"	f
+game_state	src/game.c	/^Game_state game_state;$/;"	v
+h	include/entity.h	/^  float x, y, w, h;$/;"	m	struct:Entity
+h	include/resource.h	/^  i16 h;$/;"	m	struct:Texture
+height	include/image_loader.h	/^  i16 height;$/;"	m	struct:Image
+height	include/window.h	/^  i32 height;$/;"	m	struct:__anon1
+i16	include/common.h	/^typedef int16_t i16;$/;"	t
+i16_to_f32	src/riff.c	/^inline void i16_to_f32(float* out, const i16* in, i32 sample_count) {$/;"	f
+i32	include/common.h	/^typedef int32_t i32;$/;"	t
+i64	include/common.h	/^typedef int64_t i64;$/;"	t
+i8	include/common.h	/^typedef int8_t i8;$/;"	t
+id	include/resource.h	/^  u32 id;$/;"	m	struct:Texture
+id	src/audio.c	/^  i32 id;$/;"	m	struct:Sound_state	file:
+in_port	src/audio.c	/^  PaStreamParameters in_port, out_port;$/;"	m	struct:Audio_engine	file:
+init_quad_data	src/renderer.c	/^void init_quad_data() {$/;"	f
+is_running	include/game.h	/^  u8 is_running;$/;"	m	struct:Game_state
+load_image	src/image_loader.c	/^i32 load_image(const char* path, struct Image* image) {$/;"	f
+load_png	src/image_loader.c	/^i32 load_png(const char* file_name, struct Image* image) {$/;"	f
+load_texture_from_file	src/resource.c	/^struct Texture load_texture_from_file(const char* path) {$/;"	f
+load_texture_from_image	src/resource.c	/^u32 load_texture_from_image(struct Image* image) {$/;"	f
+load_wav_from_file	src/riff.c	/^i32 load_wav_from_file(const char* filename, struct Audio_source* source) {$/;"	f
+main	src/main.c	/^int main(void) {$/;"	f
+master_volume	src/audio.c	/^  float master_volume;$/;"	m	struct:Audio_engine	file:
+mat4	include/matrix_math.h	/^typedef union mat4 {$/;"	u
+mat4	include/matrix_math.h	/^} mat4;$/;"	t	typeref:union:mat4
+mat4_zero	include/matrix_math.h	/^inline mat4 mat4_zero(void) {$/;"	f
+mm_add_vec3	include/matrix_math.h	/^inline vec3 mm_add_vec3(vec3 a, vec3 b) {$/;"	f
+mm_cross	include/matrix_math.h	/^inline vec3 mm_cross(vec3 a, vec3 b) {$/;"	f
+mm_dot_vec3	include/matrix_math.h	/^inline float mm_dot_vec3(vec3 a, vec3 b) {$/;"	f
+mm_length_sq_vec3	include/matrix_math.h	/^inline float mm_length_sq_vec3(vec3 vec) {$/;"	f
+mm_length_vec3	include/matrix_math.h	/^inline float mm_length_vec3(vec3 vec) {$/;"	f
+mm_linear_combine_sse	include/matrix_math.h	/^inline __m128 mm_linear_combine_sse(__m128 left, mat4 right) {$/;"	f
+mm_lookat	include/matrix_math.h	/^inline mat4 mm_lookat(vec3 eye, vec3 center, vec3 up) {$/;"	f
+mm_mat4d	include/matrix_math.h	/^inline mat4 mm_mat4d(float diagonal) {$/;"	f
+mm_multiply_mat4	include/matrix_math.h	/^inline mat4 mm_multiply_mat4(mat4 a, mat4 b) {$/;"	f
+mm_normalize_vec3	include/matrix_math.h	/^inline vec3 mm_normalize_vec3(vec3 vec) {$/;"	f
+mm_orthographic	include/matrix_math.h	/^inline mat4 mm_orthographic(float left, float right, float bottom, float top, float z_near, float z_far) {$/;"	f
+mm_perspective	include/matrix_math.h	/^inline mat4 mm_perspective(float fov, float aspect_ratio, float z_near, float z_far) {$/;"	f
+mm_rotate	include/matrix_math.h	/^inline mat4 mm_rotate(float angle, vec3 axis) {$/;"	f
+mm_scale	include/matrix_math.h	/^inline mat4 mm_scale(vec3 scale) {$/;"	f
+mm_subtract_vec3	include/matrix_math.h	/^inline vec3 mm_subtract_vec3(vec3 a, vec3 b) {$/;"	f
+mm_toradians	include/matrix_math.h	/^inline float mm_toradians(float degrees) {$/;"	f
+mm_translate	include/matrix_math.h	/^inline mat4 mm_translate(vec3 translation) {$/;"	f
+mm_translate_mat4	include/matrix_math.h	/^inline mat4 mm_translate_mat4(mat4 a, vec3 translation) {$/;"	f
+mm_transpose	include/matrix_math.h	/^inline mat4 mm_transpose(mat4 a) {$/;"	f
+model	src/renderer.c	/^mat4 model, view, projection;$/;"	v
+mouse_over	src/game.c	12;"	d	file:
+mouse_x	include/window.h	/^  double mouse_x;$/;"	m	struct:__anon1
+mouse_y	include/window.h	/^  double mouse_y;$/;"	m	struct:__anon1
+open_stream	src/audio.c	/^i32 open_stream() {$/;"	f
+opengl_configure	src/window.c	/^void opengl_configure() {$/;"	f
+out_port	src/audio.c	/^  PaStreamParameters in_port, out_port;$/;"	m	struct:Audio_engine	file:
+pitch	include/image_loader.h	/^  i16 pitch;$/;"	m	struct:Image
+pixel_buffer	include/image_loader.h	/^  u8* pixel_buffer;$/;"	m	struct:Image
+print_riff_header	src/riff.c	/^void print_riff_header(const char* filename, struct RIFF_header* header) {$/;"	f
+projection	src/renderer.c	/^mat4 model, view, projection;$/;"	v
+quad_vao	src/renderer.c	/^static u32 quad_vao = 0;$/;"	v	file:
+quaternion	include/matrix_math.h	/^typedef struct quaternion {$/;"	s
+quaternion	include/matrix_math.h	/^} quaternion;$/;"	t	typeref:struct:quaternion
+random_number	src/game.c	/^inline float random_number(float from, float to) {$/;"	f
+read_entire_file	src/file_loader.c	/^char* read_entire_file(const char* path) {$/;"	f
+rect_shader	src/renderer.c	/^static u32 sprite_shader, rect_shader;$/;"	v	file:
+render_rect	src/renderer.c	/^void render_rect(float x, float y, float z, float w, float h, float r, float g, float b, float angle, float border_width) {$/;"	f
+render_texture_region	src/renderer.c	/^void render_texture_region(struct Texture texture, float x, float y, float z, float w, float h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range) {$/;"	f
+renderer_free	src/renderer.c	/^void renderer_free() {$/;"	f
+renderer_init	src/renderer.c	/^void renderer_init() {$/;"	f
+resources_load	src/resource.c	/^void resources_load() {$/;"	f
+resources_unload	src/resource.c	/^void resources_unload() {$/;"	f
+rotate	include/matrix_math.h	48;"	d
+rows	include/matrix_math.h	/^  __m128 rows[4];$/;"	m	union:mat4
+sample_buffer	include/audio.h	/^  float* sample_buffer;$/;"	m	struct:Audio_source
+sample_count	include/audio.h	/^  u32 sample_count;$/;"	m	struct:Audio_source
+sample_index	src/audio.c	/^  u32 sample_index;$/;"	m	struct:Sound_state	file:
+sample_rate	include/audio.h	/^  u32 sample_rate;$/;"	m	struct:Audio_source
+sample_rate	src/audio.c	/^  i32 sample_rate;$/;"	m	struct:Audio_engine	file:
+sample_rate	src/riff.c	/^  i32 sample_rate;$/;"	m	struct:RIFF_header	file:
+scale	include/matrix_math.h	45;"	d
+shader_compile	src/shader.c	/^i32 shader_compile(const char* shader) {$/;"	f
+shader_delete	src/shader.c	/^void shader_delete(i32 shader_program) {$/;"	f
+size	src/riff.c	/^  i32 size;$/;"	m	struct:RIFF_header	file:
+sound_count	src/audio.c	/^  i32 sound_count;$/;"	m	struct:Audio_engine	file:
+sound_filenames	src/resource.c	/^static const char* sound_filenames[] = {$/;"	v	file:
+sounds	src/audio.c	/^  struct Sound_state sounds[MAX_SOUNDS_PLAYING];$/;"	m	struct:Audio_engine	typeref:struct:Audio_engine::Sound_state	file:
+sounds	src/resource.c	/^struct Audio_source sounds[MAX_SOUND];$/;"	v	typeref:struct:Audio_source
+sprite_id	include/entity.h	/^  i32 sprite_id;$/;"	m	struct:Entity
+sprite_shader	src/renderer.c	/^static u32 sprite_shader, rect_shader;$/;"	v	file:
+stereo_callback	src/audio.c	/^i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info, PaStreamCallbackFlags flags, void* user_data) {$/;"	f
+stream	src/audio.c	/^  PaStream* stream;$/;"	m	struct:Audio_engine	file:
+texture_filenames	src/resource.c	/^static const char* texture_filenames[] = {$/;"	v	file:
+textures	src/resource.c	/^struct Texture textures[MAX_TEXTURE];$/;"	v	typeref:struct:Texture
+tick	include/game.h	/^  i32 tick;$/;"	m	struct:Game_state
+tick	src/audio.c	/^  i32 tick;$/;"	m	struct:Audio_engine	file:
+title	include/window.h	/^  const char* title;$/;"	m	struct:__anon1
+translate	include/matrix_math.h	42;"	d
+u16	include/common.h	/^typedef uint16_t u16;$/;"	t
+u32	include/common.h	/^typedef uint32_t u32;$/;"	t
+u64	include/common.h	/^typedef uint64_t u64;$/;"	t
+u8	include/common.h	/^typedef uint8_t u8;$/;"	t
+vec2	include/matrix_math.h	/^typedef struct vec2 {$/;"	s
+vec2	include/matrix_math.h	/^} vec2;$/;"	t	typeref:struct:vec2
+vec3	include/matrix_math.h	/^typedef struct vec3 {$/;"	s
+vec3	include/matrix_math.h	/^} vec3;$/;"	t	typeref:struct:vec3
+view	src/renderer.c	/^mat4 model, view, projection;$/;"	v
+w	include/entity.h	/^  float x, y, w, h;$/;"	m	struct:Entity
+w	include/matrix_math.h	/^  float x, y, z, w;$/;"	m	struct:quaternion
+w	include/resource.h	/^  i16 w;$/;"	m	struct:Texture
+wave_id	src/riff.c	/^  char wave_id[4];$/;"	m	struct:RIFF_header	file:
+width	include/image_loader.h	/^  i16 width;$/;"	m	struct:Image
+width	include/window.h	/^  i32 width;$/;"	m	struct:__anon1
+window	include/window.h	/^  void* window;$/;"	m	struct:__anon1
+window	include/window.h	/^} window;$/;"	v	typeref:struct:__anon1
+window_clear	src/window.c	/^void window_clear() {$/;"	f
+window_close	src/window.c	/^void window_close() {$/;"	f
+window_open	src/window.c	/^i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {$/;"	f
+window_pollevents	src/window.c	/^i32 window_pollevents() {$/;"	f
+window_process_input	src/window.c	/^i32 window_process_input() {$/;"	f
+window_should_close	src/window.c	/^u8 window_should_close() {$/;"	f
+window_swapbuffers	src/window.c	/^void window_swapbuffers() {$/;"	f
+x	include/camera.h	/^  float x;$/;"	m	struct:__anon2
+x	include/entity.h	/^  float x, y, w, h;$/;"	m	struct:Entity
+x	include/matrix_math.h	/^  float x, y, z, w;$/;"	m	struct:quaternion
+x	include/matrix_math.h	/^  float x, y, z;$/;"	m	struct:vec3
+x	include/matrix_math.h	/^  float x, y;$/;"	m	struct:vec2
+x_speed	include/entity.h	/^  float x_speed, y_speed;$/;"	m	struct:Entity
+y	include/camera.h	/^  float y;$/;"	m	struct:__anon2
+y	include/entity.h	/^  float x, y, w, h;$/;"	m	struct:Entity
+y	include/matrix_math.h	/^  float x, y, z, w;$/;"	m	struct:quaternion
+y	include/matrix_math.h	/^  float x, y, z;$/;"	m	struct:vec3
+y	include/matrix_math.h	/^  float x, y;$/;"	m	struct:vec2
+y_speed	include/entity.h	/^  float x_speed, y_speed;$/;"	m	struct:Entity
+z	include/camera.h	/^  float z;$/;"	m	struct:__anon2
+z	include/matrix_math.h	/^  float x, y, z, w;$/;"	m	struct:quaternion
+z	include/matrix_math.h	/^  float x, y, z;$/;"	m	struct:vec3

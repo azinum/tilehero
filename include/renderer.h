@@ -13,4 +13,6 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
 
 void render_rect(float x, float y, float z, float w, float h, float r, float g, float b, float angle, float border_width);
 
+void renderer_set_tint(float r, float g, float b, float a);
+
 #endif

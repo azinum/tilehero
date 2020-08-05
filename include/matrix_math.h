@@ -20,6 +20,10 @@
 
 #define PI32 3.14159265359f
 
+typedef struct vec4 {
+  float x, y, z, w;
+} vec4;
+
 typedef struct vec3 {
   float x, y, z;
 } vec3;
@@ -27,10 +31,6 @@ typedef struct vec3 {
 typedef struct vec2 {
   float x, y;
 } vec2;
-
-typedef struct quaternion {
-  float x, y, z, w;
-} quaternion;
 
 typedef union mat4 {
   float elements[4][4];
