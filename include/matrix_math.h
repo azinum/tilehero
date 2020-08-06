@@ -142,13 +142,12 @@ inline mat4 mat4_zero(void) {
 inline mat4 mm_perspective(float fov, float aspect_ratio, float z_near, float z_far) {
   mat4 result = mat4_zero();
 
-  float tan_theta = tanf(fov * (PI32 / 360.0f));
-  result.elements[0][0] = 1.0f / tan_theta;
-  result.elements[1][1] = aspect_ratio / tan_theta;
+  result.elements[0][0] = 1.0f / (1.0f * fov);
+  result.elements[1][1] = -1.0f / (aspect_ratio * fov);
   result.elements[2][3] = -1.0f;
-  result.elements[2][2] = (z_near + z_far) / (z_near - z_far);
-  result.elements[3][2] = (2.0f * z_near * z_far) / (z_near - z_far);
-  result.elements[3][3] = 1.0f;
+  result.elements[2][2] = 0;
+  result.elements[3][2] = 1.0f / (2.0f * z_near * z_far) / (z_near - z_far);
+  result.elements[3][3] = (z_near + z_far) / (z_near - z_far) / (2 * z_far * z_near) / (z_near - z_far);
 
   return result;
 }

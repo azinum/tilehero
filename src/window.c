@@ -16,7 +16,9 @@ static void framebuffer_size_callback(GLFWwindow* window, i32 width, i32 height)
 void opengl_configure() {
   glEnable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
   glShadeModel(GL_FLAT);
+  glEnable(GL_TEXTURE_2D);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
@@ -25,8 +27,8 @@ void framebuffer_size_callback(GLFWwindow* glfw_window, i32 width, i32 height) {
   (void)glfw_window;
   window.width = width;
   window.height = height;
-  glViewport(0, 0, width, height);
-  projection = mm_orthographic(0, width, height, 0, -1, 1);
+  // glViewport(0, 0, width, height);
+  // projection = mm_orthographic(0, width, height, 0, -1, 1);
 }
 
 i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
