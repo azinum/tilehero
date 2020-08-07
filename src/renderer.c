@@ -110,6 +110,10 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
       text_index++) {
 
     char current_char = text[text_index];
+    if (current_char == '\n') {
+      x_position = x;
+      y_position += (size * kerning);
+    }
     if (current_char >= 32 && current_char < 127) {
       float x_offset = 0;
       float y_offset = (current_char - 32) * font_size;

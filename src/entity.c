@@ -7,7 +7,11 @@
 #include "audio.h"
 #include "entity.h"
 
+#define TEXT_BUFF_SIZE (96)
+
 static i16 id_count = 0;
+static char temp_text[TEXT_BUFF_SIZE];
+
 
 void entity_init(Entity* e, float x, float y, float w, float h) {
   memset(e, 0, sizeof(Entity));
@@ -53,20 +57,16 @@ void entity_update(Entity* e) {
   }
 }
 
-#define TEXT_BUFF_SIZE (96)
-static char temp_text[TEXT_BUFF_SIZE];
-
 void entity_render(Entity* e) {
-  snprintf(temp_text, TEXT_BUFF_SIZE, "%i", e->id);
-  render_text(textures[TEXTURE_FONT],
-    e->x - camera.x + 25,
-    e->y - camera.y + 25, 0.1f, 100, 60, e->w / 2, 0.8f, temp_text, TEXT_BUFF_SIZE);
-
   render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
 }
 
 void entity_render_highlight(Entity* e) {
   render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 1.0f, 0, 1.0f / (e->w));
+  snprintf(temp_text, TEXT_BUFF_SIZE, "id=%i\n\nx=%i\n\ny=%i", e->id, (i32)e->x, (i32)e->y);
+  render_text(textures[TEXTURE_FONT],
+    e->x - camera.x + 32,
+    e->y - camera.y + 32, 0.1f, 200, 300, e->w / 2, 0.55f, temp_text, TEXT_BUFF_SIZE);
 }
 
 void entity_render_highlight_color(Entity* e, float r, float g, float b) {
