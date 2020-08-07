@@ -7,6 +7,8 @@
 #include "audio.h"
 #include "entity.h"
 
+static i16 id_count = 0;
+
 void entity_init(Entity* e, float x, float y, float w, float h) {
   memset(e, 0, sizeof(Entity));
   e->x = x;
@@ -14,6 +16,7 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->w = w;
   e->h = h;
   e->sprite_id = rand() % 6;
+  e->id = id_count++;
 }
 
 void entity_update(Entity* e) {
@@ -48,9 +51,16 @@ void entity_update(Entity* e) {
   else {
     renderer_set_tint(1, 1, 1, 1);
   }
+
 }
 
 void entity_render(Entity* e) {
+  const float x_offset = -25,
+    y_offset = -25;
+  render_texture_region(textures[TEXTURE_FONT],
+    e->x - camera.x - x_offset,
+    e->y - camera.y - y_offset, 0.1f /* z */, e->w / 2, e->h / 2, 0 /* rotation */, 0, 16 * ((e->id % 10) + 16), 16, 16);
+
   render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
 }
 

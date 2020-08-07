@@ -34,7 +34,7 @@ void game_init(Game_state* game) {
   srand((u32)time(NULL));
   game->is_running = 1;
   game->entity_count = 0;
-  for (i32 i = 0; i < 8; i++) {
+  for (i32 i = 0; i < 10; i++) {
     Entity* e = add_entity(3 * (rand() % 32), 4 * i, 32, 32);
     while (!e->x_speed) {
       e->x_speed = random_number(-2, 2);

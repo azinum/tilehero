@@ -7,6 +7,7 @@
 
 enum Texture_type {
   TEXTURE_SPRITES,
+  TEXTURE_FONT,
   MAX_TEXTURE,
 };
 

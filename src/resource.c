@@ -19,6 +19,7 @@ struct Audio_source sounds[MAX_SOUND];
 
 static const char* texture_filenames[] = {
   "spritesheet",
+  "font",
 };
 
 static const char* sound_filenames[] = {
