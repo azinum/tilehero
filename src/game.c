@@ -34,7 +34,7 @@ void game_init(Game_state* game) {
   srand((u32)time(NULL));
   game->is_running = 1;
   game->entity_count = 0;
-  for (i32 i = 0; i < 10; i++) {
+  for (i32 i = 0; i < 5; i++) {
     Entity* e = add_entity(3 * (rand() % 32), 4 * i, 32, 32);
     while (!e->x_speed) {
       e->x_speed = random_number(-2, 2);
@@ -47,6 +47,9 @@ void game_init(Game_state* game) {
 }
 
 void game_run() {
+  const char* some_text = "TILE HERO";
+  u32 some_text_length = strlen(some_text);
+
   resources_load();
   game_init(&game_state);
   while (game_state.is_running) {
@@ -65,7 +68,17 @@ void game_run() {
         entity_render_highlight(e);
       }
     }
-    render_rect(0 - camera.x, 0 - camera.y, 0.1f, 250 + 32, 250 + 32, 0.3f, 0.85f, 0.2f, 0, 1 / 250.0f);
+    render_rect(0 - camera.x, 0 - camera.y, 0.1f, 250 + 32, 250 + 32, 0.3f, 0.85f, 0.2f, 1.0f, 0, 1 / 250.0f);
+
+    render_text(textures[TEXTURE_FONT],
+      10, 10, // x, y
+      0.9f, // z
+      80 /* w */, 60 /* h */,
+      24, // Font size
+      0.7f, // Font kerning
+      some_text,
+      some_text_length
+    );
 
     window_swapbuffers();
     window_clear();

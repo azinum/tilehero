@@ -5,7 +5,7 @@
 in vec2 TexCoords;
 out vec4 color;
 
-uniform vec3 in_color;
+uniform vec4 in_color;
 uniform float border_width;
 
 void main() {
@@ -19,6 +19,6 @@ void main() {
     discard;
   }
   else {
-    color = vec4(in_color, 1.0);
+    color = in_color;
   }
 }

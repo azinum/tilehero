@@ -12,7 +12,9 @@ mat4 model, view, projection;
 
 static vec4 tint = (vec4) {1, 1, 1, 1};
 static u32 quad_vao = 0;
-static u32 sprite_shader, rect_shader;
+static u32 sprite_shader,
+  rect_shader,
+  text_shader;
 
 static void init_quad_data();
 
@@ -49,11 +51,12 @@ void renderer_init() {
   projection = mm_orthographic(0, window.width, window.height, 0, -1, 1);
   sprite_shader = shader_compile("resource/shader/sprite");
   rect_shader = shader_compile("resource/shader/rect");
+  text_shader = shader_compile("resource/shader/text");
 }
 
 void render_texture_region(struct Texture texture, float x, float y, float z, float w, float h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range) {
   const u32 program = sprite_shader;
-  glUseProgram(sprite_shader);
+  glUseProgram(program);
 
   model = mm_translate((vec3) {x, y, z});
 
@@ -78,7 +81,57 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
   glBindVertexArray(0);
 }
 
-void render_rect(float x, float y, float z, float w, float h, float r, float g, float b, float angle, float border_width) {
+// NOTE(lucas): The font texture is ascii
+// NOTE(lucas): w and h for text wrapping
+// NOTE(lucas): There's only support for mono fonts
+void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, const char* text, u32 text_length) {
+  (void)w; (void)h;
+
+  float font_size = font_texture.w;
+
+  const u32 program = text_shader;
+  glUseProgram(program);
+
+  glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
+  glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+
+  glUniform4f(glGetUniformLocation(program, "tint"), tint.x, tint.y, tint.z, tint.w);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, font_texture.id);
+
+  glBindVertexArray(quad_vao);
+
+  float x_position = x;
+  for (u32 text_index = 0;
+      text_index < text_length &&
+      text_index < strlen(text);
+      text_index++) {
+
+    char current_char = text[text_index];
+    if (current_char >= 32 && current_char < 127) {
+      float x_offset = 0;
+      float y_offset = (current_char - 32) * font_size;
+      float x_range = font_size;
+      float y_range = font_size;
+
+      model = mm_translate((vec3) {x_position, y, z});
+      scale(model, size, size);
+
+      glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
+      glUniform2f(glGetUniformLocation(program, "uv_offset"), (float)x_offset / font_texture.w, (float)y_offset / font_texture.h);
+      glUniform2f(glGetUniformLocation(program, "uv_range"), (float)x_range / font_texture.w, (float)y_range / font_texture.h);
+
+      glDrawArrays(GL_TRIANGLES, 0, 6);
+
+      x_position += size * kerning;
+    }
+  }
+
+  glBindVertexArray(0);
+}
+
+void render_rect(float x, float y, float z, float w, float h, float r, float g, float b, float a, float angle, float border_width) {
   const u32 program = rect_shader;
   glUseProgram(program);
 
@@ -94,7 +147,7 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
   glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
   glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
 
-  glUniform3f(glGetUniformLocation(program, "in_color"), r, g, b);
+  glUniform4f(glGetUniformLocation(program, "in_color"), r, g, b, a);
   glUniform1f(glGetUniformLocation(program, "border_width"), border_width);
 
   glBindVertexArray(quad_vao);

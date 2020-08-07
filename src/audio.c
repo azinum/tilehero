@@ -20,7 +20,7 @@ typedef struct Audio_engine {
   i32 frames_per_buffer;
   i32 tick;
   struct Sound_state sounds[MAX_SOUNDS_PLAYING];
-  i32 sound_count;
+  u32 sound_count;
   float master_volume;
   PaStream* stream;
   PaStreamParameters in_port, out_port;
@@ -58,7 +58,7 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
   for (i32 buffer_index = 0; buffer_index < (i32)frames_per_buffer; buffer_index++) {
     float l_frame = 0, r_frame = 0;
 
-    for (i32 i = 0; i < audio_engine.sound_count; i++) {
+    for (u32 i = 0; i < audio_engine.sound_count; i++) {
       struct Sound_state* sound = &audio_engine.sounds[i];
       const struct Audio_source* source = &sounds[sound->id];
       if (sound->sample_index < source->sample_count) {
@@ -78,7 +78,7 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
     audio_engine.tick++;
   }
 
-  for (i32 i = 0; i < audio_engine.sound_count; i++) {
+  for (u32 i = 0; i < audio_engine.sound_count; i++) {
     struct Sound_state* sound = &audio_engine.sounds[i];
     const struct Audio_source* source = &sounds[sound->id];
     if (sound->sample_index >= source->sample_count) {
@@ -121,6 +121,7 @@ void audio_play_once(i32 sound_id, float amp) {
     fprintf(stderr, "[Warning]: Too many sounds playing at once!\n");
     return;
   }
+  assert(sound_id >= 0 && sound_id < MAX_SOUND);
 
   struct Audio_source* source = &sounds[sound_id];
   if (!source->sample_buffer) {

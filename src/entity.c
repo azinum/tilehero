@@ -51,23 +51,25 @@ void entity_update(Entity* e) {
   else {
     renderer_set_tint(1, 1, 1, 1);
   }
-
 }
 
+#define TEXT_BUFF_SIZE (32)
+
 void entity_render(Entity* e) {
-  const float x_offset = -25,
-    y_offset = -25;
-  render_texture_region(textures[TEXTURE_FONT],
-    e->x - camera.x - x_offset,
-    e->y - camera.y - y_offset, 0.1f /* z */, e->w / 2, e->h / 2, 0 /* rotation */, 0, 16 * ((e->id % 10) + 16), 16, 16);
+  char text[TEXT_BUFF_SIZE];
+  snprintf(text, TEXT_BUFF_SIZE, "%i", e->id);
+  render_text(textures[TEXTURE_FONT],
+    e->x - camera.x + 25,
+    e->y - camera.y + 25, 0.1f, 80, 60, e->w / 2, 0.8f, text, TEXT_BUFF_SIZE);
+  render_rect(e->x - camera.x + 25, e->y - camera.y + 25, 0.011f, 80, 60, 0.3, 0.4f, 0.9f, 1.0f, 0, 0.03f);
 
   render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
 }
 
 void entity_render_highlight(Entity* e) {
-  render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 0, 1.0f / (e->w));
+  render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 1.0f, 0, 1.0f / (e->w));
 }
 
 void entity_render_highlight_color(Entity* e, float r, float g, float b) {
-  render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, r, g, b, 0, 1);
+  render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, r, g, b, 1.0f, 0, 1);
 }
