@@ -53,15 +53,14 @@ void entity_update(Entity* e) {
   }
 }
 
-#define TEXT_BUFF_SIZE (32)
+#define TEXT_BUFF_SIZE (96)
+static char temp_text[TEXT_BUFF_SIZE];
 
 void entity_render(Entity* e) {
-  char text[TEXT_BUFF_SIZE];
-  snprintf(text, TEXT_BUFF_SIZE, "%i", e->id);
+  snprintf(temp_text, TEXT_BUFF_SIZE, "%i", e->id);
   render_text(textures[TEXTURE_FONT],
     e->x - camera.x + 25,
-    e->y - camera.y + 25, 0.1f, 80, 60, e->w / 2, 0.8f, text, TEXT_BUFF_SIZE);
-  render_rect(e->x - camera.x + 25, e->y - camera.y + 25, 0.011f, 80, 60, 0.3, 0.4f, 0.9f, 1.0f, 0, 0.03f);
+    e->y - camera.y + 25, 0.1f, 100, 60, e->w / 2, 0.8f, temp_text, TEXT_BUFF_SIZE);
 
   render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
 }

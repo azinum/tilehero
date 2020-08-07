@@ -73,7 +73,7 @@ void game_run() {
     render_text(textures[TEXTURE_FONT],
       10, 10, // x, y
       0.9f, // z
-      80 /* w */, 60 /* h */,
+      180 /* w */, 50 /* h */,
       24, // Font size
       0.7f, // Font kerning
       some_text,

@@ -103,6 +103,7 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
   glBindVertexArray(quad_vao);
 
   float x_position = x;
+  float y_position = y;
   for (u32 text_index = 0;
       text_index < text_length &&
       text_index < strlen(text);
@@ -115,7 +116,8 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
       float x_range = font_size;
       float y_range = font_size;
 
-      model = mm_translate((vec3) {x_position, y, z});
+      model = mm_translate((vec3) {x_position, y_position, z});
+
       scale(model, size, size);
 
       glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
@@ -125,13 +127,20 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
       glDrawArrays(GL_TRIANGLES, 0, 6);
 
       x_position += size * kerning;
+      if ((x_position + (size * kerning)) > (x + w)) {
+        x_position = x;
+        y_position += (size * kerning);
+      }
     }
   }
 
   glBindVertexArray(0);
+#if 0
+  render_rect(x, y, z + 0.01f, w, h, 1.0f, 1.0f, 1.0f, 0.8f, 0, 0.03f);
+#endif
 }
 
-void render_rect(float x, float y, float z, float w, float h, float r, float g, float b, float a, float angle, float border_width) {
+void render_rect(float x, float y, float z, float w, float h, float r, float g, float b, float a, float angle, float thickness) {
   const u32 program = rect_shader;
   glUseProgram(program);
 
@@ -148,7 +157,8 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
   glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
 
   glUniform4f(glGetUniformLocation(program, "in_color"), r, g, b, a);
-  glUniform1f(glGetUniformLocation(program, "border_width"), border_width);
+  glUniform1f(glGetUniformLocation(program, "thickness"), thickness);
+  glUniform1f(glGetUniformLocation(program, "aspect"), w / h);
 
   glBindVertexArray(quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
