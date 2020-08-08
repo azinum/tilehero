@@ -66,7 +66,7 @@ void entity_render_highlight(Entity* e) {
   snprintf(temp_text, TEXT_BUFF_SIZE, "id=%i\n\nx=%i\n\ny=%i", e->id, (i32)e->x, (i32)e->y);
   render_text(textures[TEXTURE_FONT],
     e->x - camera.x + 32,
-    e->y - camera.y + 32, 0.1f, 200, 300, e->w / 2, 0.55f, temp_text, TEXT_BUFF_SIZE);
+    e->y - camera.y + 32, 0.1f, 100, 100, e->w / 2, 0.7f, temp_text, TEXT_BUFF_SIZE);
 }
 
 void entity_render_highlight_color(Entity* e, float r, float g, float b) {

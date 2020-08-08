@@ -71,13 +71,13 @@ void game_run() {
     }
     render_rect(0 - camera.x, 0 - camera.y, 0.1f, 250 + 32, 250 + 32, 0.3f, 0.85f, 0.2f, 1.0f, 0, 1 / 250.0f);
 
-    snprintf(some_text, UI_TEXT_BUFF_SIZE, "Camera x: %g, y: %g", camera.x, camera.y);
+    snprintf(some_text, UI_TEXT_BUFF_SIZE, "Camera x: %i, y: %i\n\nWin w: %i, h: %i\n", (i32)camera.x, (i32)camera.y, window.width, window.height);
     render_text(textures[TEXTURE_FONT],
       10, 10, // x, y
       0.9f, // z
-      800 /* w */, 64 /* h */,
-      16, // Font size
-      0.6f, // Font kerning
+      150 /* w */, 150 /* h */,
+      11, // Font size
+      0.7f, // Font kerning
       some_text,
       ARR_SIZE(some_text)
     );

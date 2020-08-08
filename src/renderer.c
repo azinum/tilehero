@@ -139,8 +139,9 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
   }
 
   glBindVertexArray(0);
-#if 0
-  render_rect(x, y, z + 0.01f, w, h, 1.0f, 1.0f, 1.0f, 0.8f, 0, 0.03f);
+#if 1
+  render_rect(x, y, z + 0.005f, w, h, 0, 0, 0, 0.2f, 0, 1.0f);
+  render_rect(x, y, z + 0.01f, w, h, 0.5f, 0.6f, 1.0f, 0.7f, 0, 0.01f);
 #endif
 }
 
