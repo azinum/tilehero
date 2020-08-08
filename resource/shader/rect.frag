@@ -15,11 +15,13 @@ void main() {
   float max_y = max_x / aspect;
   float min_y = min_x / aspect;
 
-  if (TexCoords.x < max_x && TexCoords.x > min_x
-      && TexCoords.y < max_y && TexCoords.y > min_y) {
-    discard;
+  if ((TexCoords.x <= thickness) ||
+      (TexCoords.x >= max_x) ||
+      (TexCoords.y <= (thickness * aspect)) ||
+      (TexCoords.y >= (max_y * aspect))) {
+    color = in_color;
   }
   else {
-    color = in_color;
+    discard;
   }
 }

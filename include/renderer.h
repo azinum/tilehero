@@ -15,6 +15,8 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
 
 void render_rect(float x, float y, float z, float w, float h, float r, float g, float b, float a, float angle, float thickness);
 
+void render_filled_rect(float x, float y, float z, float w, float h, float r, float g, float b, float a, float angle);
+
 void renderer_set_tint(float r, float g, float b, float a);
 
 #endif

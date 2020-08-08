@@ -15,6 +15,7 @@ Game_state game_state;
 
 static void game_init(Game_state* game);
 static void game_run();
+static void dev_hud_render();
 static Entity* add_entity(float x, float y, float w, float h);
 
 Entity* add_entity(float x, float y, float w, float h) {
@@ -46,11 +47,8 @@ void game_init(Game_state* game) {
   camera_init(0, 0);
 }
 
-#define UI_TEXT_BUFF_SIZE (128)
 
 void game_run() {
-  char some_text[UI_TEXT_BUFF_SIZE] = {0};
-
   resources_load();
   game_init(&game_state);
   while (game_state.is_running) {
@@ -60,6 +58,7 @@ void game_run() {
     }
     game_state.tick++;
     camera_update();
+    render_rect(0 - camera.x, 0 - camera.y, 0, 250 + 32, 250 + 32, 0.3f, 0.85f, 0.2f, 1.0f, 0, 0.004f);
 
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
@@ -69,24 +68,30 @@ void game_run() {
         entity_render_highlight(e);
       }
     }
-    render_rect(0 - camera.x, 0 - camera.y, 0.1f, 250 + 32, 250 + 32, 0.3f, 0.85f, 0.2f, 1.0f, 0, 1 / 250.0f);
 
-    snprintf(some_text, UI_TEXT_BUFF_SIZE, "Camera x: %i, y: %i\n\nWin w: %i, h: %i\n", (i32)camera.x, (i32)camera.y, window.width, window.height);
-    render_text(textures[TEXTURE_FONT],
-      10, 10, // x, y
-      0.9f, // z
-      150 /* w */, 150 /* h */,
-      11, // Font size
-      0.7f, // Font kerning
-      some_text,
-      ARR_SIZE(some_text)
-    );
-
+    dev_hud_render();
     window_swapbuffers();
     window_clear();
   }
   window_close();
   resources_unload();
+}
+
+#define UI_TEXT_BUFF_SIZE (256)
+
+void dev_hud_render() {
+  char some_text[UI_TEXT_BUFF_SIZE] = {0};
+
+  snprintf(some_text, UI_TEXT_BUFF_SIZE, "Camera x: %i, y: %i\nWin w: %i, h: %i", (i32)camera.x, (i32)camera.y, window.width, window.height);
+  render_text(textures[TEXTURE_FONT],
+    10, 10, // x, y
+    0.9f, // z
+    280 /* w */, 60 /* h */,
+    16, // Font size
+    0.7f, // Font kerning
+    some_text,
+    UI_TEXT_BUFF_SIZE
+  );
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {

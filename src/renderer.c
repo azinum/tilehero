@@ -14,6 +14,7 @@ static vec4 tint = (vec4) {1, 1, 1, 1};
 static u32 quad_vao = 0;
 static u32 sprite_shader,
   rect_shader,
+  filled_rect_shader,
   text_shader;
 
 static void init_quad_data();
@@ -51,6 +52,7 @@ void renderer_init() {
   projection = mm_orthographic(0, window.width, window.height, 0, -1, 1);
   sprite_shader = shader_compile("resource/shader/sprite");
   rect_shader = shader_compile("resource/shader/rect");
+  filled_rect_shader = shader_compile("resource/shader/filled_rect");
   text_shader = shader_compile("resource/shader/text");
 }
 
@@ -82,11 +84,12 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
 }
 
 // NOTE(lucas): The font texture is ascii
-// NOTE(lucas): w and h for text wrapping
-// NOTE(lucas): There's only support for mono fonts
 void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, const char* text, u32 text_length) {
-  (void)w; (void)h;
 
+#if 1
+  // render_filled_rect(x, y, z - 0.005f, w, h, 0, 0, 0, 0.9f, 0);
+  // render_rect(x, y, z + 0.01f, w, h, 1.0f, 1.0f, 1.0f, 0.8f, 0, 1.0f / (w));
+#endif
   float font_size = font_texture.w;
 
   const u32 program = text_shader;
@@ -110,11 +113,10 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
       text_index++) {
 
     char current_char = text[text_index];
-    if (current_char == '\n') {
-      x_position = x;
-      y_position += (size * kerning);
+    if (y_position >= (y + h)) {
+      break;
     }
-    if (current_char >= 32 && current_char < 127) {
+    if (current_char >= 32 && current_char < 127 && current_char != '\n') {
       float x_offset = 0;
       float y_offset = (current_char - 32) * font_size;
       float x_range = font_size;
@@ -131,18 +133,14 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
       glDrawArrays(GL_TRIANGLES, 0, 6);
 
       x_position += size * kerning;
-      if ((x_position + (size * kerning)) > (x + w)) {
-        x_position = x;
-        y_position += (size * kerning);
-      }
+    }
+    if ((x_position + (size * kerning)) > (x + w) || current_char == '\n') {
+      x_position = x;
+      y_position += (size * (kerning * 2));
     }
   }
 
   glBindVertexArray(0);
-#if 1
-  render_rect(x, y, z + 0.005f, w, h, 0, 0, 0, 0.2f, 0, 1.0f);
-  render_rect(x, y, z + 0.01f, w, h, 0.5f, 0.6f, 1.0f, 0.7f, 0, 0.01f);
-#endif
 }
 
 void render_rect(float x, float y, float z, float w, float h, float r, float g, float b, float a, float angle, float thickness) {
@@ -163,11 +161,35 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
 
   glUniform4f(glGetUniformLocation(program, "in_color"), r, g, b, a);
   glUniform1f(glGetUniformLocation(program, "thickness"), thickness);
-  glUniform1f(glGetUniformLocation(program, "aspect"), w / h);
+  glUniform1f(glGetUniformLocation(program, "aspect"), (float)w / h);
 
   glBindVertexArray(quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
+}
+
+void render_filled_rect(float x, float y, float z, float w, float h, float r, float g, float b, float a, float angle) {
+  const u32 program = filled_rect_shader;
+  glUseProgram(program);
+
+  model = mm_translate((vec3) {x, y, z});
+
+  translate(model, 0.5f * w, 0.5f * h);
+  rotate(model, angle);
+  translate(model, -0.5f * w, -0.5f * h);
+
+  scale(model, w, h);
+
+  glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
+  glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
+  glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
+
+  glUniform4f(glGetUniformLocation(program, "in_color"), r, g, b, a);
+
+  glBindVertexArray(quad_vao);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindVertexArray(0);
+
 }
 
 void renderer_set_tint(float r, float g, float b, float a) {
