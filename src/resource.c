@@ -27,6 +27,8 @@ static const char* sound_filenames[] = {
   "random_1",
   "random_2",
   "good_morning",
+
+  "metaking",
 };
 
 static u32 load_texture_from_image(struct Image* image);

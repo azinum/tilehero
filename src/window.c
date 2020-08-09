@@ -28,8 +28,8 @@ void framebuffer_size_callback(GLFWwindow* glfw_window, i32 width, i32 height) {
   (void)glfw_window;
   window.width = width;
   window.height = height;
-  // glViewport(0, 0, width, height);
-  // projection = mm_orthographic(0, width, height, 0, -1, 1);
+  glViewport(0, 0, width, height);
+  projection = mm_orthographic(0, width, height, 0, -1, 1);
 }
 
 i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {

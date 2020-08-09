@@ -45,6 +45,7 @@ void game_init(Game_state* game) {
     }
   }
   camera_init(0, 0);
+  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.5f);
 }
 
 
@@ -84,12 +85,12 @@ void dev_hud_render() {
 
   // snprintf(some_text, UI_TEXT_BUFF_SIZE, "Camera x: %i, y: %i\nWin w: %i, h: %i", (i32)camera.x, (i32)camera.y, window.width, window.height);
   snprintf(some_text, UI_TEXT_BUFF_SIZE, "camera.x: %i, camera.y: %i\n\nwindow.width: %i, window.height: %i, game_state.tick: %i, asldalsd aksld lkajsdkljlkjslajda sdkjalskjdjk THE END", (i32)camera.x, (i32)camera.y, window.width, window.height, game_state.tick);
-#if 0
+#if 1
   render_text(textures[TEXTURE_FONT],
     10.0f, 10.0f, // x, y
     0.9f, // z
     200,   // Width
-    400 - (100 * (1 + sin(game_state.tick / 100.0f))),  // Height
+    350 - (100 * (1 + sin(game_state.tick / 100.0f))),  // Height
     16, // Font size
     0.7f, // Font kerning
     // 25.0f * (1 + sin(game_state.tick / 80.0f)), // Margin
@@ -97,8 +98,7 @@ void dev_hud_render() {
     some_text,
     UI_TEXT_BUFF_SIZE
   );
-#endif
-
+#else
   render_text(textures[TEXTURE_FONT],
     10.0f, 10.0f, // x, y
     0.9f, // z
@@ -110,6 +110,7 @@ void dev_hud_render() {
     some_text,
     UI_TEXT_BUFF_SIZE
   );
+#endif
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {

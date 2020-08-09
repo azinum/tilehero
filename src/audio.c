@@ -9,6 +9,12 @@
 #define MAX_SOUNDS_PLAYING (32)
 #define MASTER_VOLUME (0.4f)
 
+enum Channel_type {
+  CHANNEL_MUSIC,
+  CHANNEL_AMBIENCE,
+  MAX_CHANNEL,
+};
+
 struct Sound_state {
   i32 id;
   u32 sample_index;
@@ -22,6 +28,7 @@ typedef struct Audio_engine {
   struct Sound_state sounds[MAX_SOUNDS_PLAYING];
   u32 sound_count;
   float master_volume;
+  struct Sound_state channels[MAX_CHANNEL];
   PaStream* stream;
   PaStreamParameters in_port, out_port;
 } Audio_engine;
@@ -57,6 +64,22 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
 
   for (i32 buffer_index = 0; buffer_index < (i32)frames_per_buffer; buffer_index++) {
     float l_frame = 0, r_frame = 0;
+
+    for (u32 i = 0; i < MAX_CHANNEL; i++) {
+      struct Sound_state* sound = &audio_engine.channels[i];
+      const struct Audio_source* source = &sounds[sound->id];
+      if (sound->sample_index < source->sample_count) {
+        if (source->channel_count == 2) {
+          l_frame += sound->amp * source->sample_buffer[sound->sample_index++];
+          r_frame += sound->amp * source->sample_buffer[sound->sample_index++];
+        }
+        else {
+          float frame = sound->amp * source->sample_buffer[sound->sample_index++];
+          l_frame += frame;
+          r_frame += frame;
+        }
+      }
+    }
 
     for (u32 i = 0; i < audio_engine.sound_count; i++) {
       struct Sound_state* sound = &audio_engine.sounds[i];
@@ -100,6 +123,7 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   audio_engine.tick = 0;
   audio_engine.sound_count = 0;
   audio_engine.master_volume = MASTER_VOLUME;
+  memset(audio_engine.channels, 0, sizeof(struct Sound_state) * MAX_CHANNEL);
 
   i32 output_device = Pa_GetDefaultOutputDevice();
   audio_engine.out_port.device = output_device;
@@ -113,6 +137,23 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   if (callback)
     callback();
   return 0;
+}
+
+void audio_play_once_on_channel(i32 sound_id, u32 channel, float amp) {
+  assert(channel < MAX_CHANNEL);
+  assert(sound_id >= 0 && sound_id < MAX_SOUND);
+
+  struct Audio_source* source = &sounds[sound_id];
+  if (!source->sample_buffer) {
+    resource_load_sound(sound_id);
+  }
+
+  struct Sound_state sound = {
+    .id = sound_id,
+    .sample_index = 0,
+    .amp = amp
+  };
+  audio_engine.channels[channel] = sound;
 }
 
 // NOTE(lucas): We are expecting a valid sound id here.
