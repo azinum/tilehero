@@ -87,8 +87,11 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
 void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, const char* text, u32 text_length) {
 
 #if 1
-  // render_filled_rect(x, y, z - 0.005f, w, h, 0, 0, 0, 0.9f, 0);
-  render_rect(x, y, z, w, h, 1.0f, 1.0f, 1.0f, 0.8f, 0, 1.0f / w);
+  render_filled_rectangle(x, y, z - 0.005f, w, h,
+    0, 0, 0, 1,
+    0.38f, 0.21f, 0.85f, 1,
+    0, 2.0f / w);
+  // render_rect(x, y, z, w, h, 1.0f, 1.0f, 1.0f, 0.8f, 0, 1.0f / w);
 #endif
   float font_size = font_texture.w;
 
@@ -161,7 +164,6 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
 
   glUniform4f(glGetUniformLocation(program, "in_color"), r, g, b, a);
   glUniform1f(glGetUniformLocation(program, "thickness"), thickness);
-  // glUniform1f(glGetUniformLocation(program, "aspect"), (float)w / h);
   glUniform2f(glGetUniformLocation(program, "rect_size"), w, h);
 
   glBindVertexArray(quad_vao);
@@ -169,7 +171,7 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
   glBindVertexArray(0);
 }
 
-void render_filled_rect(float x, float y, float z, float w, float h, float r, float g, float b, float a, float angle) {
+void render_filled_rectangle(float x, float y, float z, float w, float h, float r, float g, float b, float a, float border_r, float border_g, float border_b, float border_a, float angle, float thickness) {
   const u32 program = filled_rect_shader;
   glUseProgram(program);
 
@@ -186,6 +188,9 @@ void render_filled_rect(float x, float y, float z, float w, float h, float r, fl
   glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
 
   glUniform4f(glGetUniformLocation(program, "in_color"), r, g, b, a);
+  glUniform4f(glGetUniformLocation(program, "border_color"), border_r, border_g, border_b, border_a);
+  glUniform1f(glGetUniformLocation(program, "thickness"), thickness);
+  glUniform2f(glGetUniformLocation(program, "rect_size"), w, h);
 
   glBindVertexArray(quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
