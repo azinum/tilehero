@@ -82,13 +82,31 @@ void game_run() {
 void dev_hud_render() {
   char some_text[UI_TEXT_BUFF_SIZE] = {0};
 
-  snprintf(some_text, UI_TEXT_BUFF_SIZE, "Camera x: %i, y: %i\nWin w: %i, h: %i", (i32)camera.x, (i32)camera.y, window.width, window.height);
+  // snprintf(some_text, UI_TEXT_BUFF_SIZE, "Camera x: %i, y: %i\nWin w: %i, h: %i", (i32)camera.x, (i32)camera.y, window.width, window.height);
+  snprintf(some_text, UI_TEXT_BUFF_SIZE, "camera.x: %i, camera.y: %i\n\nwindow.width: %i, window.height: %i, game_state.tick: %i, asldalsd aksld lkajsdkljlkjslajda sdkjalskjdjk THE END", (i32)camera.x, (i32)camera.y, window.width, window.height, game_state.tick);
+#if 0
   render_text(textures[TEXTURE_FONT],
-    10, 10, // x, y
+    10.0f, 10.0f, // x, y
     0.9f, // z
-    280 /* w */, 60 /* h */,
+    200,   // Width
+    400 - (100 * (1 + sin(game_state.tick / 100.0f))),  // Height
     16, // Font size
     0.7f, // Font kerning
+    // 25.0f * (1 + sin(game_state.tick / 80.0f)), // Margin
+    25.0f, // Margin
+    some_text,
+    UI_TEXT_BUFF_SIZE
+  );
+#endif
+
+  render_text(textures[TEXTURE_FONT],
+    10.0f, 10.0f, // x, y
+    0.9f, // z
+    window.mouse_x,
+    window.mouse_y,
+    20 - (4 * (1 + sin(game_state.tick / 100.0f))), // Font size
+    0.7f, // Font kerning
+    10.0f, // Margin
     some_text,
     UI_TEXT_BUFF_SIZE
   );

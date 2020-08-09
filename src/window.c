@@ -19,6 +19,7 @@ void opengl_configure() {
   glDisable(GL_CULL_FACE);
   glShadeModel(GL_FLAT);
   glEnable(GL_TEXTURE_2D);
+  glAlphaFunc(GL_GREATER, 1);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 

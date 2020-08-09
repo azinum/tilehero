@@ -84,12 +84,12 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
 }
 
 // NOTE(lucas): The font texture is ascii
-void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, const char* text, u32 text_length) {
+void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, float margin, const char* text, u32 text_length) {
 
 #if 1
   render_filled_rectangle(x, y, z - 0.005f, w, h,
-    0, 0, 0, 1,
-    0.38f, 0.21f, 0.85f, 1,
+    0, 0, 0, 1.0f,
+    0.38f, 0.21f, 0.85f, 1.0f,
     0, 2.0f / w);
   // render_rect(x, y, z, w, h, 1.0f, 1.0f, 1.0f, 0.8f, 0, 1.0f / w);
 #endif
@@ -108,15 +108,18 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
 
   glBindVertexArray(quad_vao);
 
-  float x_position = x;
-  float y_position = y;
+  float x_position = x + margin;
+  float y_position = y + margin;
   for (u32 text_index = 0;
       text_index < text_length &&
       text_index < strlen(text);
       text_index++) {
 
     char current_char = text[text_index];
-    if (y_position >= (y + h)) {
+    if (y_position >= (y + h - (margin + (size * kerning)))) {
+      break;
+    }
+    if (x_position + (size * kerning) >= (x + w - margin)) {
       break;
     }
     if (current_char >= 32 && current_char < 127 && current_char != '\n') {
@@ -137,8 +140,8 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
 
       x_position += size * kerning;
     }
-    if ((x_position + (size * kerning)) > (x + w) || current_char == '\n') {
-      x_position = x;
+    if ((x_position + (size * kerning)) > (x + w - margin) || current_char == '\n') {
+      x_position = x + margin;
       y_position += (size * (kerning * 2));
     }
   }
