@@ -24,4 +24,8 @@ typedef uint16_t u16;
 typedef int8_t i8;
 typedef uint8_t u8;
 
+#define VEC2(X, Y) ({vec2} {X, Y})
+#define VEC3(X, Y, Z) ({vec3} {X, Y, Z})
+#define MAT4(A) mm_mat4d(A)
+
 #endif

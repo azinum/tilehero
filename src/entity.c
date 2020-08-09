@@ -19,6 +19,8 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->y = y;
   e->w = w;
   e->h = h;
+  e->type = 0;
+  e->tile_type = 0;
   e->sprite_id = rand() % 6;
   e->id = id_count++;
 }

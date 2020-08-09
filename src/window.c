@@ -88,8 +88,6 @@ i32 window_pollevents() {
   return 0;
 }
 
-float a = 1;
-
 i32 window_process_input() {
   if (glfwGetKey(window.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window.window, 1);

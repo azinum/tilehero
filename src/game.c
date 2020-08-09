@@ -45,9 +45,9 @@ void game_init(Game_state* game) {
     }
   }
   camera_init(0, 0);
-  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
+  tilemap_init((struct Entity*)&game_state.tile_map, TILE_COUNT_X * TILE_COUNT_Y);
+  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.05f);
 }
-
 
 void game_run() {
   resources_load();
@@ -59,6 +59,8 @@ void game_run() {
     }
     game_state.tick++;
     camera_update();
+
+    tilemap_render((struct Entity*)&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
     render_rect(0 - camera.x, 0 - camera.y, 0, 250 + 32, 250 + 32, 0.3f, 0.85f, 0.2f, 1.0f, 0, 0.004f);
 
     for (i32 i = 0; i < game_state.entity_count; i++) {

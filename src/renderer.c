@@ -47,8 +47,8 @@ void init_quad_data() {
 
 void renderer_init() {
   init_quad_data();
-  model = mm_mat4d(1.0f);
-  view = mm_mat4d(1.0f);
+  model = MAT4(1.0f);
+  view = MAT4(1.0f);
   projection = mm_orthographic(0, window.width, window.height, 0, -1, 1);
   sprite_shader = shader_compile("resource/shader/sprite");
   rect_shader = shader_compile("resource/shader/rect");
