@@ -25,10 +25,10 @@ void opengl_configure() {
 
 // NOTE(lucas): This callback function is called when resizing the window.
 void framebuffer_size_callback(GLFWwindow* glfw_window, i32 width, i32 height) {
-  (void)glfw_window;
+  glViewport(0, 0, width, height);
+  glfwGetWindowSize(glfw_window, &width, &height);
   window.width = width;
   window.height = height;
-  glViewport(0, 0, width, height);
   projection = mm_orthographic(0, width, height, 0, -1, 1);
 }
 
@@ -45,7 +45,7 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_FOCUSED, GL_TRUE);
-  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+  glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 #if defined(__APPLE__)
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
