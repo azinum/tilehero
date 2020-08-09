@@ -7,21 +7,14 @@ out vec4 color;
 
 uniform vec4 in_color;
 uniform float thickness;
-uniform float aspect;
+uniform vec2 rect_size;
 
 void main() {
-  float max_x = 1.0 - thickness;
-  float min_x = thickness;
-  float max_y = max_x / aspect;
-  float min_y = min_x / aspect;
-
-  if ((TexCoords.x <= thickness) ||
-      (TexCoords.x >= max_x) ||
-      (TexCoords.y <= (thickness * aspect)) ||
-      (TexCoords.y >= (max_y * aspect))) {
-    color = in_color;
-  }
-  else {
-    discard;
-  }
+	if ((TexCoords.x <= thickness || TexCoords.x >= 1.0 - thickness) ||
+		(TexCoords.y <= thickness * (rect_size.x / rect_size.y) || TexCoords.y >= 1.0 - thickness * (rect_size.x / rect_size.y))) {
+		color = in_color;
+	}
+	else {
+		discard;
+	}
 }

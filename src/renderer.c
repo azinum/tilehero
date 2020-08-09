@@ -88,7 +88,7 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
 
 #if 1
   // render_filled_rect(x, y, z - 0.005f, w, h, 0, 0, 0, 0.9f, 0);
-  // render_rect(x, y, z + 0.01f, w, h, 1.0f, 1.0f, 1.0f, 0.8f, 0, 1.0f / (w));
+  render_rect(x, y, z, w, h, 1.0f, 1.0f, 1.0f, 0.8f, 0, 1.0f / w);
 #endif
   float font_size = font_texture.w;
 
@@ -161,7 +161,8 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
 
   glUniform4f(glGetUniformLocation(program, "in_color"), r, g, b, a);
   glUniform1f(glGetUniformLocation(program, "thickness"), thickness);
-  glUniform1f(glGetUniformLocation(program, "aspect"), (float)w / h);
+  // glUniform1f(glGetUniformLocation(program, "aspect"), (float)w / h);
+  glUniform2f(glGetUniformLocation(program, "rect_size"), w, h);
 
   glBindVertexArray(quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
