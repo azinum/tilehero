@@ -7,7 +7,7 @@
 #include "audio.h"
 
 #define MAX_SOUNDS_PLAYING (32)
-#define MASTER_VOLUME (0.4f)
+#define MASTER_VOLUME (1.0f)
 
 enum Channel_type {
   CHANNEL_MUSIC,

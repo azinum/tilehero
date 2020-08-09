@@ -86,7 +86,7 @@ i32 load_wav_from_file(const char* filename, struct Audio_source* source) {
     status = -1;
     goto done;
   }
-#if 1
+#if 0
   print_riff_header(filename, &header);
 #else
   (void)print_riff_header;
@@ -97,7 +97,7 @@ i32 load_wav_from_file(const char* filename, struct Audio_source* source) {
     goto done;
   }
 
-  const i32 sample_count = header.data_size / (header.data_block_size);
+  const i32 sample_count = header.channel_count * (header.data_size / header.data_block_size);
   void* sample_data = malloc(header.data_size);
   i32 sample_data_bytes_read = fread(sample_data, 1, header.data_size, fp);
 

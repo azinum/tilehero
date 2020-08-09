@@ -12,13 +12,23 @@ enum Texture_type {
 };
 
 enum Sound_type {
-  SOUND_HIT_HURT,
   SOUND_RANDOM_1,
-  SOUND_RANDOM_2,
   SOUND_GOOD_MORNING,
 
   SOUND_SONG_METAKING,
   MAX_SOUND,
+};
+
+static const char* texture_filenames[] = {
+  "spritesheet",
+  "font",
+};
+
+static const char* sound_filenames[] = {
+  "random_1",
+  "good_morning",
+
+  "metaking",
 };
 
 struct Texture {

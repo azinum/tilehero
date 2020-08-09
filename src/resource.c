@@ -17,20 +17,6 @@
 struct Texture textures[MAX_TEXTURE];
 struct Audio_source sounds[MAX_SOUND];
 
-static const char* texture_filenames[] = {
-  "spritesheet",
-  "font",
-};
-
-static const char* sound_filenames[] = {
-  "hit_hurt",
-  "random_1",
-  "random_2",
-  "good_morning",
-
-  "metaking",
-};
-
 static u32 load_texture_from_image(struct Image* image);
 
 u32 load_texture_from_image(struct Image* image) {

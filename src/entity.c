@@ -49,7 +49,7 @@ void entity_update(Entity* e) {
   }
 
   if (collision) {
-    audio_play_once(e->sprite_id % MAX_SOUND, 0.3f);
+    audio_play_once(e->sprite_id % (MAX_SOUND - 1), 0.15f);
     renderer_set_tint(15, 15, 15, 1);
   }
   else {

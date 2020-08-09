@@ -45,7 +45,7 @@ void game_init(Game_state* game) {
     }
   }
   camera_init(0, 0);
-  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.5f);
+  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
 }
 
 
