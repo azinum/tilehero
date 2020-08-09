@@ -83,7 +83,7 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
   glBindVertexArray(0);
 }
 
-void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, float margin, const char* text, u32 text_length) {
+void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, float line_spacing, float margin, const char* text, u32 text_length) {
 
 #if 1
   render_filled_rectangle(x, y, z - 0.005f, w, h,
@@ -114,7 +114,7 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
       text_index++) {
 
     char current_char = text[text_index];
-    if (y_position >= (y + h - (margin + (size * kerning)))) {
+    if (y_position >= (y + h - (margin + (size * line_spacing)))) {
       break;
     }
     if (x_position >= (x + w - (margin + (size * kerning)))) {
@@ -140,7 +140,7 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
     }
     if ((x_position + (size * kerning)) > (x + w - margin) || current_char == '\n') {
       x_position = x + margin;
-      y_position += (size * (kerning * 2));
+      y_position += (size * (2 * line_spacing));
     }
   }
 
