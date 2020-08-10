@@ -27,10 +27,6 @@ Entity* add_entity(float x, float y, float w, float h) {
   return e;
 }
 
-inline float random_number(float from, float to) {
-  return (float)rand() / (float)(RAND_MAX / to) + (float)rand() / (float)(RAND_MAX / from);
-}
-
 void game_init(Game_state* game) {
   srand((u32)time(NULL));
   game->is_running = 1;
@@ -44,7 +40,7 @@ void game_init(Game_state* game) {
       e->y_speed = random_number(-1, 1);
     }
   }
-  camera_init(0, 0);
+  camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init((struct Entity*)&game_state.tile_map, TILE_COUNT_X * TILE_COUNT_Y);
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.05f);
 }
@@ -115,6 +111,7 @@ void dev_hud_render() {
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
+  puts("Game execute");
   if (window_open(window_width, window_height, fullscreen, "Tile Hero") != 0) {
     fprintf(stderr, "Failed to open window\n");
     return -1;
@@ -125,7 +122,9 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
     // NOTE(lucas): Run the game without audio?
     game_run();
   }
+  game_run();
   window_close();
   resources_unload();
+  puts("Game exit");
   return 0;
 }

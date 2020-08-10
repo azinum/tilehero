@@ -77,6 +77,9 @@ void resources_load() {
       textures[i] = texture;
     }
   }
+  for (u16 i = 0; i < MAX_SOUND; i++) {
+    resource_load_sound(i);
+  }
 }
 
 void resource_load_sound(i32 sound_id) {
@@ -94,7 +97,7 @@ void resource_load_sound(i32 sound_id) {
 void resources_unload() {
   for (i32 i = 0; i < MAX_SOUND; i++) {
     struct Audio_source* source = &sounds[i];
-    if (source->sample_buffer) {
+    if (source->sample_buffer != NULL) {
       free(source->sample_buffer);
       source->sample_count = 0;
       source->sample_rate = 0;

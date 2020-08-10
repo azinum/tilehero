@@ -111,6 +111,6 @@ i32 window_process_input() {
 void window_close() {
   if (window.window) {
     glfwDestroyWindow(window.window);
+    glfwTerminate();
   }
-  glfwTerminate();
 }
