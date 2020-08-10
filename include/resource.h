@@ -19,18 +19,6 @@ enum Sound_type {
   MAX_SOUND,
 };
 
-static const char* texture_filenames[] = {
-  "spritesheet",
-  "font",
-};
-
-static const char* sound_filenames[] = {
-  "random_1",
-  "good_morning",
-
-  "metaking",
-};
-
 struct Texture {
   u32 id;
   i16 w;

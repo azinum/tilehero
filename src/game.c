@@ -50,7 +50,6 @@ void game_init(Game_state* game) {
 }
 
 void game_run() {
-  resources_load();
   game_init(&game_state);
   while (game_state.is_running) {
     window_pollevents();
@@ -76,8 +75,6 @@ void game_run() {
     window_swapbuffers();
     window_clear();
   }
-  window_close();
-  resources_unload();
 }
 
 #define UI_TEXT_BUFF_SIZE (256)
@@ -122,10 +119,13 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
     fprintf(stderr, "Failed to open window\n");
     return -1;
   }
+  resources_load();
   if (audio_engine_init(SAMPLE_RATE, FRAMES_PER_BUFFER, game_run) != 0) {
     fprintf(stderr, "Failed to initialize audio engine\n");
     // NOTE(lucas): Run the game without audio?
     game_run();
   }
+  window_close();
+  resources_unload();
   return 0;
 }

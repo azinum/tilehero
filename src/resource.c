@@ -14,6 +14,18 @@
 #define TEXTURE_EXT "png"
 #define SOUND_EXT "wav"
 
+static const char* texture_filenames[] = {
+  "spritesheet",
+  "font",
+};
+
+static const char* sound_filenames[] = {
+  "random_1",
+  "good_morning",
+
+  "metaking",
+};
+
 struct Texture textures[MAX_TEXTURE];
 struct Audio_source sounds[MAX_SOUND];
 
@@ -57,7 +69,7 @@ struct Texture load_texture_from_file(const char* path) {
 // Maybe we should load resources when they are needed; when they are requested?
 // But how (or when rather) do we unload the resources?
 void resources_load() {
-  for (i16 i = 0; i < MAX_TEXTURE; i++) {
+  for (u16 i = 0; i < MAX_TEXTURE; i++) {
     char filename[MAX_PATH_LENGTH] = {0};
     snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", TEXTURE_PATH, texture_filenames[i], TEXTURE_EXT);
     struct Texture texture = load_texture_from_file(filename);
@@ -67,10 +79,6 @@ void resources_load() {
   }
 }
 
-// NOTE(lucas): We might want to figure out before-hand which resources we need.
-// What we do now is that we load the resources at the time we need them (audio resources). This might be
-// a bad thing because of the 'blocking' nature of loading resources. At the moment we are loading resources
-// sequentially with the game, so we might get laggy frames because we are waiting for resources to be loaded!
 void resource_load_sound(i32 sound_id) {
   if (sound_id < 0 || sound_id >= MAX_SOUND) {
     fprintf(stderr, "Failed to load sound (no such sound id: %i)\n", sound_id);

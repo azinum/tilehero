@@ -68,6 +68,8 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
     for (u32 i = 0; i < MAX_CHANNEL; i++) {
       struct Sound_state* sound = &audio_engine.channels[i];
       const struct Audio_source* source = &sounds[sound->id];
+      printf("sample buffer: %p, id: %i\n", source->sample_buffer, sound->id);
+      assert(source->sample_buffer != NULL);
       if (sound->sample_index < source->sample_count) {
         if (source->channel_count == 2) {
           l_frame += sound->amp * source->sample_buffer[sound->sample_index++];
@@ -134,8 +136,11 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   if (open_stream() != 0) {
     return -1;
   }
-  if (callback)
+  if (callback) {
     callback();
+  }
+  Pa_CloseStream(audio_engine.stream);
+  Pa_Terminate();
   return 0;
 }
 
