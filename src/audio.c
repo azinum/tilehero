@@ -16,7 +16,7 @@ enum Channel_type {
 };
 
 struct Sound_state {
-  i32 id;
+  u32 id;
   u32 sample_index;
   float amp;
 };
@@ -148,9 +148,9 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   return 0;
 }
 
-void audio_play_once_on_channel(i32 sound_id, u32 channel, float amp) {
+void audio_play_once_on_channel(u32 sound_id, u32 channel, float amp) {
   assert(channel < MAX_CHANNEL);
-  assert(sound_id >= 0 && sound_id < MAX_SOUND);
+  assert(sound_id < MAX_SOUND);
 
   struct Audio_source* source = &sounds[sound_id];
   if (!source->sample_buffer) {
@@ -166,12 +166,12 @@ void audio_play_once_on_channel(i32 sound_id, u32 channel, float amp) {
 }
 
 // NOTE(lucas): We are expecting a valid sound id here.
-void audio_play_once(i32 sound_id, float amp) {
+void audio_play_once(u32 sound_id, float amp) {
   if (audio_engine.sound_count >= MAX_SOUNDS_PLAYING) {
     fprintf(stderr, "[Warning]: Too many sounds playing at once!\n");
     return;
   }
-  assert(sound_id >= 0 && sound_id < MAX_SOUND);
+  assert(sound_id < MAX_SOUND);
 
   struct Audio_source* source = &sounds[sound_id];
   if (!source->sample_buffer) {

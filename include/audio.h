@@ -17,8 +17,8 @@ typedef void (*callback_func)();
 
 i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func callback);
 
-void audio_play_once_on_channel(i32 sound_id, u32 channel, float amp);
+void audio_play_once_on_channel(u32 sound_id, u32 channel, float amp);
 
-void audio_play_once(i32 sound_id, float amp);
+void audio_play_once(u32 sound_id, float amp);
 
 #endif
