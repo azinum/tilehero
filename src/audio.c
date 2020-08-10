@@ -102,6 +102,7 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
         }
       }
     }
+
     *out++ = audio_engine.master_volume * l_frame;
     *out++ = audio_engine.master_volume * r_frame;
     audio_engine.tick++;

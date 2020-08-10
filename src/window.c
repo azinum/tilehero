@@ -10,6 +10,9 @@
 #include "camera.h" // NOTE(lucas): TEMP
 #include "window.h"
 
+i8 key_down[GLFW_KEY_LAST] = {0};
+i8 key_pressed[GLFW_KEY_LAST] = {0};
+
 static void opengl_configure();
 static void framebuffer_size_callback(GLFWwindow* window, i32 width, i32 height);
 
@@ -89,22 +92,21 @@ i32 window_pollevents() {
 }
 
 i32 window_process_input() {
-  if (glfwGetKey(window.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+  glfwGetCursorPos(window.window, &window.mouse_x, &window.mouse_y);
+  for (u16 i = 0; i < GLFW_KEY_LAST; i++) {
+    i32 key_state = glfwGetKey(window.window, i);
+    if (key_state == GLFW_PRESS) {
+      key_pressed[i] = !key_down[i];
+      key_down[i] = 0;
+    }
+    else {
+      key_down[i] = 0;
+      key_pressed[i] = 0;
+    }
+  }
+  if (key_pressed[GLFW_KEY_ESCAPE]) {
     glfwSetWindowShouldClose(window.window, 1);
   }
-  if (glfwGetKey(window.window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera.x -= 5.0f;
-  }
-  if (glfwGetKey(window.window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera.x += 5.0f;
-  }
-  if (glfwGetKey(window.window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera.y -= 5.0f;
-  }
-  if (glfwGetKey(window.window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera.y += 5.0f;
-  }
-  glfwGetCursorPos(window.window, &window.mouse_x, &window.mouse_y);
   return 0;
 }
 

@@ -111,7 +111,6 @@ void dev_hud_render() {
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
-  puts("Game execute");
   if (window_open(window_width, window_height, fullscreen, "Tile Hero") != 0) {
     fprintf(stderr, "Failed to open window\n");
     return -1;
@@ -125,6 +124,5 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
   game_run();
   window_close();
   resources_unload();
-  puts("Game exit");
   return 0;
 }
