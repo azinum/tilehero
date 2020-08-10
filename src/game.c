@@ -40,12 +40,17 @@ void game_init(Game_state* game) {
   for (u32 i = 0; i < 12; i++) {
     Entity* e = add_empty_entity();
     entity_init_tilepos(e, i, i, 32, 32);
-    e->x_dir = 1;
+    if (i > 6) {
+      e->x_dir = 1;
+    }
+    else {
+      e->y_dir = 1;
+    }
   }
 
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.05f);
+  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.2f);
 }
 
 void game_run() {

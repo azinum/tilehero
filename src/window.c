@@ -39,7 +39,10 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   window.title = title;
   window.width = width;
   window.height = height;
+  window.init_width = width;
+  window.init_height = height;
   window.fullscreen = fullscreen;
+  window.windowed_fullscreen = 0;
   window.mouse_x = 0;
   window.mouse_y = 0;
 
@@ -97,7 +100,7 @@ i32 window_process_input() {
     i32 key_state = glfwGetKey(window.window, i);
     if (key_state == GLFW_PRESS) {
       key_pressed[i] = !key_down[i];
-      key_down[i] = 0;
+      key_down[i] = 1;
     }
     else {
       key_down[i] = 0;
@@ -106,6 +109,19 @@ i32 window_process_input() {
   }
   if (key_pressed[GLFW_KEY_ESCAPE]) {
     glfwSetWindowShouldClose(window.window, 1);
+  }
+  if (key_pressed[GLFW_KEY_F]) {
+    window.windowed_fullscreen = !window.windowed_fullscreen;
+    if (window.windowed_fullscreen) {
+      const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+      window.width = mode->width;
+      window.height = mode->height;
+    }
+    else {
+      window.width = window.init_width;
+      window.height = window.init_height;
+    }
+    glfwSetWindowSize(window.window, window.width, window.height);
   }
   return 0;
 }

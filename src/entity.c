@@ -16,9 +16,31 @@ static char temp_text[TEXT_BUFF_SIZE];
 static void entity_move(Entity* e);
 
 void entity_move(Entity* e) {
-  Entity* tile = tilemap_get_tile(&game_state.tile_map, e->x_tile, e->y_tile);
-  if (!tile)
-    return;
+  Entity* tile = tilemap_get_tile(&game_state.tile_map, e->x_tile + e->x_dir, e->y_tile + e->y_dir);
+  u8 collision = 0;
+  if (!tile) {
+    e->x_dir = -e->x_dir;
+    e->y_dir = -e->y_dir;
+    collision = 1;
+  }
+  else if (tile->tile_type == TILE_BRICK) {
+    e->x_dir = -e->x_dir;
+    e->y_dir = -e->y_dir;
+    collision = 1;
+  }
+  else {
+    e->x_tile += e->x_dir;
+    e->y_tile += e->y_dir;
+    e->x = TILE_SIZE * e->x_tile;
+    e->y = TILE_SIZE * e->y_tile;
+  }
+  if (collision) {
+    audio_play_once(SOUND_GOOD_MORNING, 0.2f);
+    renderer_set_tint(15, 15, 15, 1);
+  }
+  else {
+    renderer_set_tint(1, 1, 1, 1);
+  }
 }
 
 void entity_init(Entity* e, float x, float y, float w, float h) {
@@ -44,10 +66,6 @@ void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h) {
 void entity_update_and_render(Entity* e) {
   if (!(game_state.tick % MOVE_INTERVAL)) {
     entity_move(e);
-    e->x_tile += e->x_dir;
-    e->y_tile += e->y_dir;
-    e->x = TILE_SIZE * e->x_tile;
-    e->y = TILE_SIZE * e->y_tile;
   }
 #if 0
   u8 collision = 0;

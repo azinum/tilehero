@@ -8,6 +8,9 @@ struct {
   const char* title;
   i32 width;
   i32 height;
+  i32 init_width;
+  i32 init_height;
+  u8 windowed_fullscreen;
   u8 fullscreen;
   double mouse_x;
   double mouse_y;
