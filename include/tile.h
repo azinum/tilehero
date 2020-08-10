@@ -13,8 +13,17 @@ enum Tile_type {
   MAX_TILE,
 };
 
-void tilemap_init(struct Entity* tile_map, u32 count);
+typedef struct Tile_map {
+  struct Entity map[TILE_COUNT_X * TILE_COUNT_Y];
+  u32 x_count;
+  u32 y_count;
+} Tile_map;
 
-void tilemap_render(struct Entity* tile_map, u32 count_x, u32 count_y);
+
+struct Entity* tilemap_get_tile(struct Tile_map* tile_map, i32 x, i32 y);
+
+void tilemap_init(struct Tile_map* tile_map, u32 x_count, u32 y_count);
+
+void tilemap_render(struct Tile_map* tile_map);
 
 #endif

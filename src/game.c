@@ -17,31 +17,34 @@ static void game_init(Game_state* game);
 static void game_run();
 static void dev_hud_render();
 static Entity* add_entity(float x, float y, float w, float h);
+static Entity* add_empty_entity();
 
 Entity* add_entity(float x, float y, float w, float h) {
-  Entity* e = NULL;
-  if (game_state.entity_count >= ENTITIES_MAX)
-    return NULL;
-  e = &game_state.entities[game_state.entity_count++];
+  Entity* e = add_empty_entity();
   entity_init(e, x, y, w, h);
   return e;
 }
 
+Entity* add_empty_entity() {
+  if (game_state.entity_count >= ENTITIES_MAX)
+    return NULL;
+  return &game_state.entities[game_state.entity_count++];
+}
+
 void game_init(Game_state* game) {
   srand((u32)time(NULL));
+  (void)add_entity;
   game->is_running = 1;
   game->entity_count = 0;
-  for (i32 i = 0; i < 13; i++) {
-    Entity* e = add_entity(3 * (rand() % 32), 4 * i, 32, 32);
-    while (!e->x_speed) {
-      e->x_speed = random_number(-1, 1);
-    }
-    while (!e->y_speed) {
-      e->y_speed = random_number(-1, 1);
-    }
+
+  for (u32 i = 0; i < 12; i++) {
+    Entity* e = add_empty_entity();
+    entity_init_tilepos(e, i, i, 32, 32);
+    e->x_dir = 1;
   }
+
   camera_init(-(window.width / 2), -(window.height / 2));
-  tilemap_init((struct Entity*)&game_state.tile_map, TILE_COUNT_X * TILE_COUNT_Y);
+  tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.05f);
 }
 
@@ -55,13 +58,11 @@ void game_run() {
     game_state.tick++;
     camera_update();
 
-    tilemap_render((struct Entity*)&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-    render_rect(0 - camera.x, 0 - camera.y, 0, 250 + 32, 250 + 32, 0.3f, 0.85f, 0.2f, 1.0f, 0, 0.004f);
+    tilemap_render(&game_state.tile_map);
 
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
-      entity_update(e);
-      entity_render(e);
+      entity_update_and_render(e);
       if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
         entity_render_highlight(e);
       }

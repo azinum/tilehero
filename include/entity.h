@@ -4,8 +4,10 @@
 #define _ENTITY_H
 
 typedef struct Entity {
+  i32 x_tile, y_tile;
   float x, y, w, h;
   float x_speed, y_speed;
+  i8 x_dir, y_dir;
   i32 type;
   i32 tile_type;
   i16 sprite_id;
@@ -14,9 +16,9 @@ typedef struct Entity {
 
 void entity_init(Entity* e, float x, float y, float w, float h);
 
-void entity_update(Entity* e);
+void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h);
 
-void entity_render(Entity* e);
+void entity_update_and_render(Entity* e);
 
 void entity_render_highlight(Entity* e);
 

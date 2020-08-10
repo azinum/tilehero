@@ -12,7 +12,7 @@
 #define ENTITIES_MAX (128)
 
 typedef struct Game_state {
-  struct Entity tile_map[TILE_COUNT_X * TILE_COUNT_Y];
+  struct Tile_map tile_map;
   struct Entity entities[ENTITIES_MAX];
   i32 entity_count;
   i32 tick;
