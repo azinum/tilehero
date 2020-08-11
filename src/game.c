@@ -58,6 +58,8 @@ void game_init(Game_state* game) {
   (void)add_entity;
   game->is_running = 1;
   game->entity_count = 0;
+  game->tick = 0;
+  game->is_running = 1;
 
   for (u32 i = 0; i < 8; i++) {
     add_living_entity(i, i, 32, 32, 5, 5);
@@ -81,6 +83,9 @@ void game_run() {
         add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 5, 5);
         audio_play_once(SOUND_0F, 0.2f);
       }
+    }
+    if (key_pressed[GLFW_KEY_0]) {
+      game_restart();
     }
 
     camera_update();
@@ -172,3 +177,10 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
   resources_unload();
   return 0;
 }
+
+void game_restart() {
+  game_init(&game_state);
+  is_fading_out = 1;
+  fade_value = 1.0f;
+}
+

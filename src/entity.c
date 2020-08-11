@@ -9,7 +9,7 @@
 #include "entity.h"
 
 #define TEXT_BUFF_SIZE (96)
-#define MOVE_INTERVAL (28)
+#define MOVE_INTERVAL (20)
 
 static i16 id_count = 0;
 static char temp_text[TEXT_BUFF_SIZE];

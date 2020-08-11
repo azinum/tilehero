@@ -25,4 +25,6 @@ extern struct Game_state game_state;
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen);
 
+void game_restart();
+
 #endif
