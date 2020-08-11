@@ -110,7 +110,7 @@ i32 window_process_input() {
   if (key_pressed[GLFW_KEY_ESCAPE]) {
     glfwSetWindowShouldClose(window.window, 1);
   }
-  if (key_pressed[GLFW_KEY_F12]) {
+  if (key_pressed[GLFW_KEY_F11]) {
     window.windowed_fullscreen = !window.windowed_fullscreen;
     if (window.windowed_fullscreen) {
       const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());

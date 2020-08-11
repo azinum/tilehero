@@ -12,6 +12,9 @@
 
 Game_state game_state;
 
+static float fade_value = 1.0f;
+static i32 is_fading_out = 1;
+
 static void game_init(Game_state* game);
 static void game_run();
 static void dev_hud_render();
@@ -80,6 +83,8 @@ void game_run() {
       }
     }
 
+    camera_update();
+
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
       entity_update_and_render(e);
@@ -94,10 +99,11 @@ void game_run() {
       }
     }
 
-    camera_update();
     tilemap_render(&game_state.tile_map);
     dev_hud_render();
-    fade_out();
+    if (is_fading_out) {
+      fade_out();
+    }
     window_swapbuffers();
     window_clear();
   }
@@ -106,9 +112,9 @@ void game_run() {
 #define UI_TEXT_BUFF_SIZE (256)
 
 void dev_hud_render() {
-  char some_text[UI_TEXT_BUFF_SIZE] = {0};
+  char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 
-  snprintf(some_text, UI_TEXT_BUFF_SIZE, "camera x: %i, y: %i\nwindow size: %ix%i\ntick: %i\nentity count: %i/%i", (i32)camera.x, (i32)camera.y, window.width, window.height, game_state.tick, game_state.entity_count, ENTITIES_MAX);
+  snprintf(ui_text, UI_TEXT_BUFF_SIZE, "camera x: %i, y: %i\nwindow size: %ix%i\ntick: %i\nentity count: %i/%i", (i32)camera.x, (i32)camera.y, window.width, window.height, game_state.tick, game_state.entity_count, ENTITIES_MAX);
 #if 1
   render_text(textures[TEXTURE_FONT],
     10, window.height - 10 - 90, // x, y
@@ -119,24 +125,35 @@ void dev_hud_render() {
     0.7f, // Font kerning
     0.7f, // Line spacing
     12.0f, // Margin
-    some_text,
+    ui_text,
     UI_TEXT_BUFF_SIZE
   );
+
+  if (camera.has_target) {
+    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[camera locked]");
+    render_text(textures[TEXTURE_FONT],
+      window.width - 10 - 160, window.height - 10 - 35, // x, y
+      0.9f, // z
+      160,   // Width
+      35, // Height
+      12, // Font size
+      0.7f, // Font kerning
+      0.7f, // Line spacing
+      12.0f, // Margin
+      ui_text,
+      UI_TEXT_BUFF_SIZE
+    );
+  }
 #else
 #endif
 }
 
-static float fade_value = 1.0f;
-static i32 is_fading_out = 1;
-
 void fade_out() {
-  if (is_fading_out) {
-    fade_value = lerp(fade_value, 0.0f, 0.025f);
-    render_filled_rect(0, 0, 1, window.width, window.height, 0, 0, 0, fade_value, 0);
-    if (fade_value < 0.01f) {
-      fade_value = 0;
-      is_fading_out = 0;
-    }
+  fade_value = lerp(fade_value, 0.0f, 0.05f);
+  render_filled_rect(0, 0, 1, window.width, window.height, 0, 0, 0, fade_value, 0);
+  if (fade_value < 0.01f) {
+    fade_value = 0;
+    is_fading_out = 0;
   }
 }
 
