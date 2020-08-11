@@ -14,6 +14,8 @@ enum Texture_type {
 enum Sound_type {
   SOUND_RANDOM_1,
   SOUND_GOOD_MORNING,
+  SOUND_HIT,
+  SOUND_0F,
 
   SOUND_SONG_METAKING,
   MAX_SOUND,

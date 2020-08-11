@@ -3,15 +3,30 @@
 #ifndef _ENTITY_H
 #define _ENTITY_H
 
+enum Entity_state {
+  STATE_NONE = 0,
+  STATE_ALIVE,
+  STATE_DEAD,
+};
+
+enum Entity_flag {
+  ENTITY_FLAG_NONE         = 1 << 0,
+  ENTITY_FLAG_DRAW_HEALTH  = 1 << 1,
+};
+
 typedef struct Entity {
   i32 x_tile, y_tile;
   float x, y, w, h;
   float x_speed, y_speed;
   i8 x_dir, y_dir;
-  i32 type;
-  i32 tile_type;
+  i32 state;
+  i32 e_flags;
+  i16 type;
+  i16 tile_type;
   i16 sprite_id;
   i16 id;
+  i16 health;
+  i16 max_health;
 } Entity;
 
 void entity_init(Entity* e, float x, float y, float w, float h);

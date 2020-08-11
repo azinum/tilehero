@@ -6,6 +6,7 @@
 #include "audio.h"
 #include "entity.h"
 #include "renderer.h"
+#include "renderer_common.h"
 #include "resource.h"
 #include "game.h"
 
@@ -18,6 +19,7 @@ static void game_run();
 static void dev_hud_render();
 static Entity* add_entity(float x, float y, float w, float h);
 static Entity* add_empty_entity();
+static Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, i16 max_health);
 
 Entity* add_entity(float x, float y, float w, float h) {
   Entity* e = add_empty_entity();
@@ -31,21 +33,32 @@ Entity* add_empty_entity() {
   return &game_state.entities[game_state.entity_count++];
 }
 
+Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, i16 max_health) {
+  Entity* e = add_empty_entity();
+  if (!e)
+    return NULL;
+  entity_init_tilepos(e, x_tile, y_tile, w, h);
+  if (x_tile > 6) {
+    e->x_dir = 1;
+  }
+  else {
+    e->y_dir = 1;
+  }
+  e->state = STATE_ALIVE;
+  e->e_flags |= ENTITY_FLAG_DRAW_HEALTH;
+  e->health = health;
+  e->max_health = max_health;
+  return e;
+}
+
 void game_init(Game_state* game) {
   srand((u32)time(NULL));
   (void)add_entity;
   game->is_running = 1;
   game->entity_count = 0;
 
-  for (u32 i = 0; i < 12; i++) {
-    Entity* e = add_empty_entity();
-    entity_init_tilepos(e, i, i, 32, 32);
-    if (i > 6) {
-      e->x_dir = 1;
-    }
-    else {
-      e->y_dir = 1;
-    }
+  for (u32 i = 0; i < 8; i++) {
+    add_living_entity(i, i, 32, 32, 5, 5);
   }
 
   camera_init(-(window.width / 2), -(window.height / 2));
@@ -55,24 +68,29 @@ void game_init(Game_state* game) {
 
 void game_run() {
   game_init(&game_state);
-  while (game_state.is_running) {
+  while (game_state.is_running && !window_process_input() && !window_should_close()) {
     window_pollevents();
-    if (window_process_input() != 0 || window_should_close()) {
-      break;
-    }
     game_state.tick++;
-    camera_update();
-
     tilemap_render(&game_state.tile_map);
+
+    if (key_pressed[GLFW_KEY_T]) {
+      i32 x_tile = (i32)((window.mouse_x + camera.x) / TILE_SIZE);
+      i32 y_tile = (i32)((window.mouse_y + camera.y) / TILE_SIZE);
+      add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 5, 5);
+      audio_play_once(SOUND_0F, 0.1f);
+    }
 
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
       entity_update_and_render(e);
+      if (e->state == STATE_NONE)
+        continue;
       if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
         entity_render_highlight(e);
       }
     }
 
+    camera_update();
     dev_hud_render();
     window_swapbuffers();
     window_clear();
@@ -84,30 +102,16 @@ void game_run() {
 void dev_hud_render() {
   char some_text[UI_TEXT_BUFF_SIZE] = {0};
 
-  snprintf(some_text, UI_TEXT_BUFF_SIZE, "camera.x: %i, camera.y: %i\n\nwindow.width: %i, window.height: %i, game_state.tick: %i, asldalsd aksld lkajsdkljlkjslajda sdkjalskjdjk THE END", (i32)camera.x, (i32)camera.y, window.width, window.height, game_state.tick);
+  snprintf(some_text, UI_TEXT_BUFF_SIZE, "camera x: %i, y: %i\nwindow size: %ix%i\ntick: %i\nentity count: %i/%i", (i32)camera.x, (i32)camera.y, window.width, window.height, game_state.tick, game_state.entity_count, ENTITIES_MAX);
 #if 1
   render_text(textures[TEXTURE_FONT],
-    10.0f, 10.0f, // x, y
+    10, window.height - 10 - 90, // x, y
     0.9f, // z
-    200,   // Width
-    350 - (100 * (1 + sin(game_state.tick / 100.0f))),  // Height
-    16, // Font size
+    230,   // Width
+    90, // Height
+    12, // Font size
     0.7f, // Font kerning
-    0.6f, // Line spacing
-    12.0f, // Margin
-    some_text,
-    UI_TEXT_BUFF_SIZE
-  );
-
-  snprintf(some_text, UI_TEXT_BUFF_SIZE, "You have (2) unread messages...");
-  render_text(textures[TEXTURE_FONT],
-    window.width - (10.0f + 300), 10.0f, // x, y
-    0.9f, // z
-    300,   // Width
-    80,  // Height
-    16, // Font size
-    0.7f, // Font kerning
-    0.6f, // Line spacing
+    0.7f, // Line spacing
     12.0f, // Margin
     some_text,
     UI_TEXT_BUFF_SIZE

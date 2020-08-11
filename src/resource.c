@@ -22,6 +22,8 @@ static const char* texture_filenames[] = {
 static const char* sound_filenames[] = {
   "random_1",
   "good_morning",
+  "hit",
+  "0F",
 
   "metaking",
 };
@@ -77,9 +79,11 @@ void resources_load() {
       textures[i] = texture;
     }
   }
+#if 0
   for (u16 i = 0; i < MAX_SOUND; i++) {
     resource_load_sound(i);
   }
+#endif
 }
 
 void resource_load_sound(i32 sound_id) {

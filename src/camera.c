@@ -11,16 +11,16 @@ void camera_init(float x, float y) {
 }
 
 void camera_update() {
-  if (key_pressed[GLFW_KEY_A]) {
+  if (key_down[GLFW_KEY_A]) {
     camera.x -= 5.0f;
   }
-  if (key_pressed[GLFW_KEY_D]) {
+  if (key_down[GLFW_KEY_D]) {
     camera.x += 5.0f;
   }
-  if (key_pressed[GLFW_KEY_W]) {
+  if (key_down[GLFW_KEY_W]) {
     camera.y -= 5.0f;
   }
-  if (key_pressed[GLFW_KEY_S]) {
+  if (key_down[GLFW_KEY_S]) {
     camera.y += 5.0f;
   }
 }

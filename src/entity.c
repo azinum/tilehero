@@ -8,7 +8,7 @@
 #include "entity.h"
 
 #define TEXT_BUFF_SIZE (96)
-#define MOVE_INTERVAL (30)
+#define MOVE_INTERVAL (28)
 
 static i16 id_count = 0;
 static char temp_text[TEXT_BUFF_SIZE];
@@ -35,7 +35,15 @@ void entity_move(Entity* e) {
     e->y = TILE_SIZE * e->y_tile;
   }
   if (collision) {
-    audio_play_once(SOUND_GOOD_MORNING, 0.2f);
+    e->health--;
+    if (e->health <= 0) {
+      e->health = 0;
+      e->state = STATE_NONE;
+      audio_play_once(SOUND_HIT, 0.5f);
+    }
+    else {
+      audio_play_once(SOUND_GOOD_MORNING, 0.4f);
+    }
     renderer_set_tint(15, 15, 15, 1);
   }
   else {
@@ -51,6 +59,8 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->h = h;
   e->x_dir = 0;
   e->y_dir = 0;
+  e->state = STATE_ALIVE;
+  e->e_flags = 0;
   e->type = 0;
   e->tile_type = 0;
   e->sprite_id = rand() % 6;
@@ -64,51 +74,29 @@ void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h) {
 }
 
 void entity_update_and_render(Entity* e) {
+  if (e->state == STATE_NONE) {
+    return;
+  }
   if (!(game_state.tick % MOVE_INTERVAL)) {
     entity_move(e);
   }
-#if 0
-  u8 collision = 0;
-  e->x += e->x_speed;
-  e->y += e->y_speed;
-  if (e->x < 0) {
-    e->x_speed = -e->x_speed;
-    e->x = 0;
-    collision = 1;
+  if (e->e_flags & ENTITY_FLAG_DRAW_HEALTH) {
+    i32 w = e->w * 1.2f;
+    i32 h = 6;
+    i32 x_pos = (e->x + (e->w / 2.0f)) - (w / 2.0f),
+      y_pos = e->y - 10;
+    render_filled_rectangle(x_pos - camera.x, y_pos - camera.y, 0.15f, (w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0.2f, 0.2f, 0.5f, 1.0f, 0, 1.0f / w);
+    render_filled_rectangle(x_pos - camera.x, y_pos - camera.y, 0.15f, w, h, 0.85f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
   }
-  if (e->x > 250) {
-    e->x_speed = -e->x_speed;
-    e->x = 250;
-    collision = 1;
-  }
-  if (e->y < 0) {
-    e->y_speed = -e->y_speed;
-    e->y = 0;
-    collision = 1;
-  }
-  if (e->y > 250) {
-    e->y_speed = -e->y_speed;
-    e->y = 250;
-    collision = 1;
-  }
-
-  if (collision) {
-    audio_play_once(e->sprite_id % (MAX_SOUND - 1), 0.15f);
-    renderer_set_tint(15, 15, 15, 1);
-  }
-  else {
-    renderer_set_tint(1, 1, 1, 1);
-  }
-#endif
   render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
 }
 
 void entity_render_highlight(Entity* e) {
   render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 1.0f, 0, 1.0f / (e->w));
-  snprintf(temp_text, TEXT_BUFF_SIZE, "id=%i\nx=%i\ny=%i", e->id, (i32)e->x, (i32)e->y);
+  snprintf(temp_text, TEXT_BUFF_SIZE, "id=%i\nx=%i\ny=%i\nhp: %i/%i", e->id, (i32)e->x, (i32)e->y, e->health, e->max_health);
   render_text(textures[TEXTURE_FONT],
-    e->x - camera.x + 32,
-    e->y - camera.y + 32, 0.1f, 100, 76, e->w / 2, 0.7f, 0.5f, 6, temp_text, TEXT_BUFF_SIZE);
+    e->x - camera.x + e->w + 2,
+    e->y - camera.y + e->h + 2, 0.2f, 130, 90, 14, 0.7f, 0.5f, 6, temp_text, TEXT_BUFF_SIZE);
 }
 
 void entity_render_highlight_color(Entity* e, float r, float g, float b) {
