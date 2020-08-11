@@ -65,7 +65,7 @@ void game_init(Game_state* game) {
 
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.2f);
+  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
 }
 
 void game_run() {
@@ -79,7 +79,7 @@ void game_run() {
       i32 y_tile = (i32)((window.mouse_y + camera.y) / TILE_SIZE);
       if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
         add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 5, 5);
-        audio_play_once(SOUND_0F, 0.1f);
+        audio_play_once(SOUND_0F, 0.2f);
       }
     }
 

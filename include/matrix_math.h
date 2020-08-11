@@ -6,20 +6,6 @@
 
 #include <math.h>
 
-#ifndef NO_SSE
-
-#if __SSE__
-#define USE_SSE 1
-#endif
-
-#endif
-
-#if USE_SSE
-#include <xmmintrin.h>
-#endif
-
-#define PI32 3.14159265359f
-
 typedef struct vec4 {
   float x, y, z, w;
 } vec4;

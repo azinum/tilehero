@@ -79,7 +79,7 @@ void resources_load() {
       textures[i] = texture;
     }
   }
-#if 0
+#if 1
   for (u16 i = 0; i < MAX_SOUND; i++) {
     resource_load_sound(i);
   }

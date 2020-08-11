@@ -41,7 +41,7 @@ void entity_move(Entity* e) {
       audio_play_once(SOUND_HIT, 0.5f);
     }
     else {
-      audio_play_once(SOUND_GOOD_MORNING, 0.4f);
+      audio_play_once(SOUND_GOOD_MORNING, 0.5f);
     }
     renderer_set_tint(15, 15, 15, 1);
   }
