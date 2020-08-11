@@ -4,10 +4,10 @@
 
 #include "common.h"
 #include "resource.h"
+#include "config.h"
 #include "audio.h"
 
-#define MAX_SOUNDS_PLAYING (32)
-#define MASTER_VOLUME (1.0f)
+#define MAX_SOUNDS_PLAYING (64)
 
 enum Channel_type {
   CHANNEL_MUSIC,

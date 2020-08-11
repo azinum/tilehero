@@ -10,8 +10,6 @@
 #include "resource.h"
 #include "game.h"
 
-#define mouse_over(M_X, M_Y, X, Y, W, H) (M_X >= X && M_X <= X + W && M_Y >= Y && M_Y <= Y + H)
-
 Game_state game_state;
 
 static void game_init(Game_state* game);
@@ -137,7 +135,6 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
     // NOTE(lucas): Run the game without audio?
     game_run();
   }
-  game_run();
   window_close();
   resources_unload();
   return 0;

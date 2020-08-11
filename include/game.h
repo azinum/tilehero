@@ -5,12 +5,13 @@
 
 #include "common.h"
 #include "game_common.h"
+#include "config.h"
 #include "camera.h"
 #include "entity.h"
 #include "resource.h"
 #include "tile.h"
 
-#define ENTITIES_MAX (128)
+#define ENTITIES_MAX (256)
 
 typedef struct Game_state {
   struct Tile_map tile_map;
