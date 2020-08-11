@@ -76,8 +76,10 @@ void game_run() {
     if (key_pressed[GLFW_KEY_T]) {
       i32 x_tile = (i32)((window.mouse_x + camera.x) / TILE_SIZE);
       i32 y_tile = (i32)((window.mouse_y + camera.y) / TILE_SIZE);
-      add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 5, 5);
-      audio_play_once(SOUND_0F, 0.1f);
+      if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
+        add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 5, 5);
+        audio_play_once(SOUND_0F, 0.1f);
+      }
     }
 
     for (i32 i = 0; i < game_state.entity_count; i++) {
@@ -87,6 +89,10 @@ void game_run() {
         continue;
       if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
         entity_render_highlight(e);
+        if (key_pressed[GLFW_KEY_F]) {
+          camera.target = e;
+          camera.has_target = 1;
+        }
       }
     }
 

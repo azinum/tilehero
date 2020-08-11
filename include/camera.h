@@ -6,6 +6,10 @@
 struct {
   float x;
   float y;
+  float x_target;
+  float y_target;
+  struct Entity* target;
+  u8 has_target;
 } camera;
 
 void camera_init(float x, float y);

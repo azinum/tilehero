@@ -4,6 +4,7 @@
 #define _GAME_H
 
 #include "common.h"
+#include "game_common.h"
 #include "camera.h"
 #include "entity.h"
 #include "resource.h"

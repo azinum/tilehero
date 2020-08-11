@@ -1,6 +1,7 @@
 // entity.c
 
 #include "common.h"
+#include "game_common.h"
 #include "renderer.h"
 #include "game.h"
 #include "resource.h"
@@ -14,10 +15,6 @@ static i16 id_count = 0;
 static char temp_text[TEXT_BUFF_SIZE];
 
 static void entity_move(Entity* e);
-
-inline float lerp(float v0, float v1, float t) {
-  return (1 - t) * v0 + t * v1;
-}
 
 void entity_move(Entity* e) {
   Entity* tile = tilemap_get_tile(&game_state.tile_map, e->x_tile + e->x_dir, e->y_tile + e->y_dir);
