@@ -15,6 +15,10 @@ static char temp_text[TEXT_BUFF_SIZE];
 
 static void entity_move(Entity* e);
 
+inline float lerp(float v0, float v1, float t) {
+  return (1 - t) * v0 + t * v1;
+}
+
 void entity_move(Entity* e) {
   Entity* tile = tilemap_get_tile(&game_state.tile_map, e->x_tile + e->x_dir, e->y_tile + e->y_dir);
   u8 collision = 0;
@@ -31,8 +35,6 @@ void entity_move(Entity* e) {
   else {
     e->x_tile += e->x_dir;
     e->y_tile += e->y_dir;
-    e->x = TILE_SIZE * e->x_tile;
-    e->y = TILE_SIZE * e->y_tile;
   }
   if (collision) {
     e->health--;
@@ -73,6 +75,8 @@ void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h) {
   e->y_tile = y_tile;
 }
 
+#define INTERP_MOVEMENT 1
+
 void entity_update_and_render(Entity* e) {
   if (e->state == STATE_NONE) {
     return;
@@ -80,9 +84,16 @@ void entity_update_and_render(Entity* e) {
   if (!(game_state.tick % MOVE_INTERVAL)) {
     entity_move(e);
   }
+#if INTERP_MOVEMENT
+  e->x = lerp(e->x, TILE_SIZE * e->x_tile, 0.25f);
+  e->y = lerp(e->y, TILE_SIZE * e->y_tile, 0.25f);
+#else
+  e->x = TILE_SIZE * e->x_tile;
+  e->y = TILE_SIZE * e->y_tile;
+#endif
   if (e->e_flags & ENTITY_FLAG_DRAW_HEALTH) {
-    i32 w = e->w * 1.2f;
-    i32 h = 6;
+    i32 w = e->w * 0.8f;
+    i32 h = 8;
     i32 x_pos = (e->x + (e->w / 2.0f)) - (w / 2.0f),
       y_pos = e->y - 10;
     render_filled_rectangle(x_pos - camera.x, y_pos - camera.y, 0.15f, (w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0.2f, 0.2f, 0.5f, 1.0f, 0, 1.0f / w);
