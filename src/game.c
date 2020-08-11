@@ -15,6 +15,7 @@ Game_state game_state;
 static void game_init(Game_state* game);
 static void game_run();
 static void dev_hud_render();
+static void fade_out();
 static Entity* add_entity(float x, float y, float w, float h);
 static Entity* add_empty_entity();
 static Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, i16 max_health);
@@ -69,7 +70,6 @@ void game_run() {
   while (game_state.is_running && !window_process_input() && !window_should_close()) {
     window_pollevents();
     game_state.tick++;
-    tilemap_render(&game_state.tile_map);
 
     if (key_pressed[GLFW_KEY_T]) {
       i32 x_tile = (i32)((window.mouse_x + camera.x) / TILE_SIZE);
@@ -95,7 +95,9 @@ void game_run() {
     }
 
     camera_update();
+    tilemap_render(&game_state.tile_map);
     dev_hud_render();
+    fade_out();
     window_swapbuffers();
     window_clear();
   }
@@ -122,6 +124,20 @@ void dev_hud_render() {
   );
 #else
 #endif
+}
+
+static float fade_value = 1.0f;
+static i32 is_fading_out = 1;
+
+void fade_out() {
+  if (is_fading_out) {
+    fade_value = lerp(fade_value, 0.0f, 0.025f);
+    render_filled_rect(0, 0, 1, window.width, window.height, 0, 0, 0, fade_value, 0);
+    if (fade_value < 0.01f) {
+      fade_value = 0;
+      is_fading_out = 0;
+    }
+  }
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
