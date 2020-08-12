@@ -11,7 +11,7 @@
 #include "resource.h"
 #include "tile.h"
 
-#define ENTITIES_MAX (4096)
+#define MAX_ENTITY (4096)
 
 enum Game_mode {
   MODE_GAME,
@@ -20,7 +20,7 @@ enum Game_mode {
 
 typedef struct Game_state {
   struct Tile_map tile_map;
-  struct Entity entities[ENTITIES_MAX];
+  struct Entity entities[MAX_ENTITY];
   i32 entity_count;
   i32 tick;
   u8 is_running;

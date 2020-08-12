@@ -3,6 +3,6 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
-#define MASTER_VOLUME (0.9f)
+#define MASTER_VOLUME (0.95f)
 
 #endif

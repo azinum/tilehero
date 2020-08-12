@@ -11,6 +11,8 @@
 #include <math.h>
 #include <time.h>
 
+#define NO_SSE
+
 #ifndef NO_SSE
 
 #if __SSE__

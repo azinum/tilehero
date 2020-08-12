@@ -30,7 +30,7 @@ Entity* add_entity(float x, float y, float w, float h) {
 }
 
 Entity* add_empty_entity() {
-  if (game_state.entity_count >= ENTITIES_MAX)
+  if (game_state.entity_count >= MAX_ENTITY)
     return NULL;
   return &game_state.entities[game_state.entity_count++];
 }
@@ -70,7 +70,7 @@ void game_init(Game_state* game) {
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
+  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 1.0f);
 }
 
 void game_run() {
@@ -129,13 +129,30 @@ void game_run() {
 void dev_hud_render() {
   char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 
-  snprintf(ui_text, UI_TEXT_BUFF_SIZE, "camera x: %i, y: %i\nwindow size: %ix%i\ntick: %i\nentity count: %i/%i", (i32)camera.x, (i32)camera.y, window.width, window.height, game_state.tick, game_state.entity_count, ENTITIES_MAX);
+  i32 w = 230;
+  i32 h = 140;
+  snprintf(
+    ui_text,
+    UI_TEXT_BUFF_SIZE,
+    "camera x: %i, y: %i\n"
+    "window size: %ix%i\n"
+    "tick: %i\n"
+    "entity count: %i/%i\n"
+    "master volume: %.3g\n"
+    "active sounds: %i/%i\n"
+    ,
+    (i32)camera.x, (i32)camera.y,
+    window.width, window.height,
+    game_state.tick,
+    game_state.entity_count, MAX_ENTITY,
+    audio_engine.master_volume,
+    audio_engine.sound_count, MAX_ACTIVE_SOUNDS);
 #if 1
   render_text(textures[TEXTURE_FONT],
-    10, window.height - 10 - 90, // x, y
+    10, window.height - 10 - h, // x, y
     0.9f, // z
-    230,   // Width
-    90, // Height
+    w,   // Width
+    h, // Height
     12, // Font size
     0.7f, // Font kerning
     0.7f, // Line spacing

@@ -7,41 +7,19 @@
 #include "config.h"
 #include "audio.h"
 
-#define MAX_SOUNDS_PLAYING (128)
+Audio_engine audio_engine;
 
-enum Channel_type {
-  CHANNEL_MUSIC,
-  CHANNEL_AMBIENCE,
-  MAX_CHANNEL,
-};
-
-struct Sound_state {
-  u32 id;
-  u32 sample_index;
-  float amp;
-};
-
-typedef struct Audio_engine {
-  i32 sample_rate;
-  i32 frames_per_buffer;
-  i32 tick;
-  struct Sound_state sounds[MAX_SOUNDS_PLAYING];
-  u32 sound_count;
-  float master_volume;
-  PaStream* stream;
-  PaStreamParameters in_port, out_port;
-} Audio_engine;
-
-static Audio_engine audio_engine;
+static PaStream* stream;
+static PaStreamParameters out_port;
 
 static i32 open_stream();
 static i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info, PaStreamCallbackFlags flags, void* user_data);
 
 i32 open_stream() {
   PaError err = Pa_OpenStream(
-    &audio_engine.stream,
+    &stream,
     NULL,
-    &audio_engine.out_port,
+    &out_port,
     audio_engine.sample_rate,
     audio_engine.frames_per_buffer,
     0,
@@ -53,7 +31,7 @@ i32 open_stream() {
     fprintf(stderr, "[PortAudio error]: %s\n", Pa_GetErrorText(err));
     return -1;
   }
-  Pa_StartStream(audio_engine.stream);
+  Pa_StartStream(stream);
   return 0;
 }
 
@@ -62,7 +40,7 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
   float* out = (float*)out_buff;
 
 // TODO(lucas): Compare SSE vs no SSE!
-#if USE_SSE && 1
+#if USE_SSE
   __m128* dest = (__m128*)out;
   __m128 zero = _mm_set1_ps(0.0f);
   (void)zero;
@@ -137,8 +115,10 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
         }
       }
     }
-    *out++ = audio_engine.master_volume * l_frame;
-    *out++ = audio_engine.master_volume * r_frame;
+    l_frame *= audio_engine.master_volume;
+    r_frame *= audio_engine.master_volume;
+    *out++ = l_frame;
+    *out++ = r_frame;
     audio_engine.tick++;
   }
 #endif  // No SSE
@@ -146,9 +126,16 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
   for (u32 i = MAX_CHANNEL; i < audio_engine.sound_count; i++) {
     struct Sound_state* sound = &audio_engine.sounds[i];
     const struct Audio_source* source = &sounds[sound->id];
+#if USE_SSE
+    u32 chunk_size = (4 * source->channel_count);
+    if (sound->sample_index + chunk_size >= source->sample_count) {
+      audio_engine.sounds[i] = audio_engine.sounds[MAX_CHANNEL + (--audio_engine.sound_count)];
+    }
+#else
     if (sound->sample_index >= source->sample_count) {
       audio_engine.sounds[i] = audio_engine.sounds[MAX_CHANNEL + (--audio_engine.sound_count)];
     }
+#endif
   }
   return paContinue;
 }
@@ -168,23 +155,24 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   memset(audio_engine.sounds, 0, sizeof(struct Sound_state) * MAX_CHANNEL);
 
   i32 output_device = Pa_GetDefaultOutputDevice();
-  audio_engine.out_port.device = output_device;
-  audio_engine.out_port.channelCount = 2;
-  audio_engine.out_port.sampleFormat = paFloat32;
-  audio_engine.out_port.suggestedLatency = Pa_GetDeviceInfo(audio_engine.out_port.device)->defaultHighOutputLatency;
-  audio_engine.out_port.hostApiSpecificStreamInfo = NULL;
+  out_port.device = output_device;
+  out_port.channelCount = 2;
+  out_port.sampleFormat = paFloat32;
+  out_port.suggestedLatency = Pa_GetDeviceInfo(out_port.device)->defaultHighOutputLatency;
+  out_port.hostApiSpecificStreamInfo = NULL;
   if (open_stream() != 0) {
     return -1;
   }
   if (callback) {
     callback();
   }
-  Pa_CloseStream(audio_engine.stream);
+  Pa_CloseStream(stream);
   Pa_Terminate();
   return 0;
 }
 
-// NOTE(lucas): There are some slots that are reserved just for channels.
+// NOTE(lucas): There are some slots that are reserved just for channels where you would play things like
+// music, ambience, voice-overs e.t.c. This allows for the ability to play and pause the channels at any given moment.
 void audio_play_once_on_channel(u32 sound_id, u32 channel, float amp) {
   assert(channel < MAX_CHANNEL);
   assert(sound_id < MAX_SOUND);
@@ -204,7 +192,7 @@ void audio_play_once_on_channel(u32 sound_id, u32 channel, float amp) {
 
 // NOTE(lucas): We are expecting a valid sound id here.
 void audio_play_once(u32 sound_id, float amp) {
-  if ((audio_engine.sound_count + MAX_CHANNEL) >= MAX_SOUNDS_PLAYING) {
+  if ((audio_engine.sound_count + MAX_CHANNEL) >= MAX_ACTIVE_SOUNDS) {
     fprintf(stderr, "[Warning]: Too many sounds playing at once!\n");
     return;
   }
