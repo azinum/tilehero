@@ -31,6 +31,7 @@ typedef struct Entity {
   i16 health;
   i16 max_health;
   i16 attack;
+  i16 xp;
 } Entity;
 
 void entity_init(Entity* e, float x, float y, float w, float h);

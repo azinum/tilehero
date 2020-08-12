@@ -63,7 +63,7 @@ void game_init(Game_state* game) {
   game->is_running = 1;
   game->mode = MODE_GAME;
 
-  for (u32 i = 0; i < 4; i++) {
+  for (u32 i = 0; i < 2; i++) {
     i16 health = 5 + rand() % 10;
     i16 attack = 1 + rand() % 3;
     add_living_entity(i, i, 32, 32, health, health, attack);
@@ -101,6 +101,22 @@ void game_run() {
         e->e_flags |= ENTITY_FLAG_FRIENDLY;
         e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
         audio_play_once(SOUND_0F, 0.2f);
+      }
+    }
+    if (key_pressed[GLFW_KEY_R]) {
+      i32 x_tile = (i32)((window.mouse_x + camera.x) / TILE_SIZE);
+      i32 y_tile = (i32)((window.mouse_y + camera.y) / TILE_SIZE);
+      if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
+        Tile* tile = tilemap_get_tile(&game_state.tile_map, x_tile, y_tile);
+        if (tile) {
+          if (tile->tile_type != TILE_BRICK) {
+            tile->tile_type = TILE_BRICK;
+          }
+          else {
+            tile->tile_type = 0;
+          }
+          audio_play_once(SOUND_0F, 0.2f);
+        }
       }
     }
     if (key_pressed[GLFW_KEY_0]) {
@@ -192,6 +208,21 @@ void dev_hud_render() {
       window.width - 10 - 160, window.height - 10 - 35, // x, y
       0.9f, // z
       160,   // Width
+      35, // Height
+      12, // Font size
+      0.7f, // Font kerning
+      0.7f, // Line spacing
+      12.0f, // Margin
+      ui_text,
+      UI_TEXT_BUFF_SIZE
+    );
+  }
+  if (game_state.mode == MODE_PAUSE) {
+    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[game paused]");
+    render_text(textures[TEXTURE_FONT],
+      10, 10, // x, y
+      0.9f, // z
+      140,   // Width
       35, // Height
       12, // Font size
       0.7f, // Font kerning

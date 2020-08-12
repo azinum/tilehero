@@ -3,8 +3,8 @@
 #ifndef _TILE_H
 #define _TILE_H
 
-#define TILE_COUNT_X (40)
-#define TILE_COUNT_Y (24)
+#define TILE_COUNT_X (12)
+#define TILE_COUNT_Y (12)
 #define TILE_SIZE (32)
 
 #include "entity.h"

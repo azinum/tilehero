@@ -37,6 +37,9 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->tile_type = 0;
   e->sprite_id = rand() % 6;
   e->id = id_count++;
+  e->health = e->max_health = 0;
+  e->attack = 0;
+  e->xp = 0;
 }
 
 void entity_tiled_move(struct Entity* e) {
@@ -80,11 +83,17 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
       e->x_dir = -e->x_dir;
       e->y_dir = -e->y_dir;
       if (target) {
+        if (e->e_flags & ENTITY_FLAG_FRIENDLY && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
+          e->x_dir = -target->y_dir;
+          e->y_dir = -target->x_dir;
+        }
         if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
           e->health -= target->attack;
           if (e->health <= 0) {
             e->health = 0;
             e->state = STATE_DEAD;
+            target->xp += e->max_health * 4;
+            target->health++;
             audio_play_once(SOUND_HIT, 0.5f);
           }
           else {
@@ -136,15 +145,16 @@ void entity_update_and_render(Entity* e) {
     render_filled_rectangle(x_pos - camera.x, y_pos - camera.y, 0.15f, (w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0.2f, 0.2f, 0.5f, 1.0f, 0, 1.0f / w);
     render_filled_rectangle(x_pos - camera.x, y_pos - camera.y, 0.15f, w, h, 0.85f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
   }
-  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
+  // render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
+  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, (e->e_flags + 1) * 8, 0, 8, 8);
 }
 
 void entity_render_highlight(Entity* e) {
   render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 1.0f, 0, 1.0f / (e->w));
-  snprintf(temp_text, TEXT_BUFF_SIZE, "id=%i\nx=%i\ny=%i\nhp: %i/%i\nattack: %i", e->id, (i32)e->x, (i32)e->y, e->health, e->max_health, e->attack);
+  snprintf(temp_text, TEXT_BUFF_SIZE, "id=%i\nx=%i\ny=%i\nhp: %i/%i\nattack: %i\nxp: %i", e->id, (i32)e->x, (i32)e->y, e->health, e->max_health, e->attack, e->xp);
   render_text(textures[TEXTURE_FONT],
     e->x - camera.x + e->w + 2,
-    e->y - camera.y + e->h + 2, 0.2f, 130, 90, 14, 0.7f, 0.5f, 6, temp_text, TEXT_BUFF_SIZE);
+    e->y - camera.y + e->h + 2, 0.2f, 130, 105, 14, 0.7f, 0.5f, 6, temp_text, TEXT_BUFF_SIZE);
 }
 
 void entity_render_highlight_color(Entity* e, float r, float g, float b) {
