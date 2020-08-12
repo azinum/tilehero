@@ -12,8 +12,9 @@ enum Entity_state {
 };
 
 enum Entity_flag {
-  ENTITY_FLAG_NONE         = 1 << 0,
-  ENTITY_FLAG_DRAW_HEALTH  = 1 << 1,
+  ENTITY_FLAG_NONE          = 0 << 0,
+  ENTITY_FLAG_DRAW_HEALTH   = 1 << 0,
+  ENTITY_FLAG_FRIENDLY      = 1 << 1,
 };
 
 typedef struct Entity {

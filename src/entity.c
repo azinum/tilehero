@@ -23,42 +23,6 @@ static i32 move_count;
 static i16 id_count = 0;
 static char temp_text[TEXT_BUFF_SIZE];
 
-static void entity_move(Entity* e);
-
-void entity_move(Entity* e) {
-  Tile* tile = tilemap_get_tile(&game_state.tile_map, e->x_tile + e->x_dir, e->y_tile + e->y_dir);
-  u8 collision = 0;
-  if (!tile) {
-    e->x_dir = -e->x_dir;
-    e->y_dir = -e->y_dir;
-    collision = 1;
-  }
-  else if (tile->tile_type == TILE_BRICK) {
-    e->x_dir = -e->x_dir;
-    e->y_dir = -e->y_dir;
-    collision = 1;
-  }
-  else {
-    e->x_tile += e->x_dir;
-    e->y_tile += e->y_dir;
-  }
-  if (collision) {
-    e->health--;
-    if (e->health <= 0) {
-      e->health = 0;
-      e->state = STATE_DEAD;
-      audio_play_once(SOUND_HIT, 0.5f);
-    }
-    else {
-      audio_play_once(SOUND_GOOD_MORNING, 0.5f);
-    }
-    renderer_set_tint(15, 15, 15, 1);
-  }
-  else {
-    renderer_set_tint(1, 1, 1, 1);
-  }
-}
-
 void entity_init(Entity* e, float x, float y, float w, float h) {
   memset(e, 0, sizeof(Entity));
   e->x = x;
@@ -75,7 +39,6 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->id = id_count++;
 }
 
-// TODO(lucas): Think about how entities should move in relation to each other and the tile map!
 void entity_tiled_move(struct Entity* e) {
   if (move_count >= MAX_MOVES) {
     assert(0);
@@ -117,16 +80,18 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
       e->x_dir = -e->x_dir;
       e->y_dir = -e->y_dir;
       if (target) {
-        e->health -= target->attack;
-        if (e->health <= 0) {
-          e->health = 0;
-          e->state = STATE_DEAD;
-          audio_play_once(SOUND_HIT, 0.5f);
+        if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
+          e->health -= target->attack;
+          if (e->health <= 0) {
+            e->health = 0;
+            e->state = STATE_DEAD;
+            audio_play_once(SOUND_HIT, 0.5f);
+          }
+          else {
+            audio_play_once(SOUND_GOOD_MORNING, 0.5f);
+          }
+          renderer_set_tint(15, 15, 15, 1);
         }
-        else {
-          audio_play_once(SOUND_GOOD_MORNING, 0.5f);
-        }
-        renderer_set_tint(15, 15, 15, 1);
       }
     }
     else {  // No collision, let's move to this tile!
@@ -153,8 +118,6 @@ void entity_update_and_render(Entity* e) {
       return;
     }
     if (!(game_state.tick % MOVE_INTERVAL)) {
-      // entity_move(e);
-      (void)entity_move;
       entity_tiled_move(e);
     }
 #if INTERP_MOVEMENT

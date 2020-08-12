@@ -91,6 +91,18 @@ void game_run() {
         audio_play_once(SOUND_0F, 0.2f);
       }
     }
+    if (key_pressed[GLFW_KEY_Y]) {
+      i32 x_tile = (i32)((window.mouse_x + camera.x) / TILE_SIZE);
+      i32 y_tile = (i32)((window.mouse_y + camera.y) / TILE_SIZE);
+      if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
+        i16 health = 5 + rand() % 10;
+        i16 attack = 1 + rand() % 3;
+        Entity* e = add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, health, health, attack);
+        e->e_flags |= ENTITY_FLAG_FRIENDLY;
+        e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
+        audio_play_once(SOUND_0F, 0.2f);
+      }
+    }
     if (key_pressed[GLFW_KEY_0]) {
       game_restart();
     }
