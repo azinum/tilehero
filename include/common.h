@@ -29,6 +29,7 @@
 
 #define VEC2(X, Y) ((vec2) {X, Y})
 #define VEC3(X, Y, Z) ((vec3) {X, Y, Z})
+#define VEC4(X, Y, Z, W) ((vec4) {X, Y, Z, W})
 #define MAT4(A) mm_mat4d(A)
 
 typedef int64_t i64;

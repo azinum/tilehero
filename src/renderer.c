@@ -12,12 +12,26 @@ mat4 model, view, projection;
 
 static vec4 tint = (vec4) {1, 1, 1, 1};
 static u32 quad_vao = 0;
-static u32 sprite_shader,
-  rect_shader,
+static u32 rect_shader,
   filled_rect_shader,
   text_shader;
 
+struct Texture_program {
+  u32 handle;
+  // Uniform locations:
+  u32 projection;
+  u32 view;
+  u32 model;
+
+  u32 uv_offset;
+  u32 uv_range;
+  u32 tint;
+};
+
+static struct Texture_program texture_program;
+
 static void init_quad_data();
+static void load_texture_shader(struct Texture_program* program, const char* path);
 
 void init_quad_data() {
   float vertices[] = {
@@ -45,20 +59,32 @@ void init_quad_data() {
   glBindVertexArray(0);
 }
 
+void load_texture_shader(struct Texture_program* program, const char* path) {
+  program->handle = shader_compile(path);
+
+  program->projection = glGetUniformLocation(program->handle, "projection");
+  program->view = glGetUniformLocation(program->handle, "view");
+  program->model = glGetUniformLocation(program->handle, "model");
+
+  program->uv_offset = glGetUniformLocation(program->handle, "uv_offset");
+  program->uv_range = glGetUniformLocation(program->handle, "uv_range");
+  program->tint = glGetUniformLocation(program->handle, "tint");
+}
+
 void renderer_init() {
   init_quad_data();
   model = MAT4(1.0f);
   view = MAT4(1.0f);
   projection = mm_orthographic(0, window.width, window.height, 0, -1, 1);
-  sprite_shader = shader_compile("resource/shader/sprite");
+  load_texture_shader(&texture_program, "resource/shader/texture");
   rect_shader = shader_compile("resource/shader/rect");
   filled_rect_shader = shader_compile("resource/shader/filled_rect");
   text_shader = shader_compile("resource/shader/text");
 }
 
 void render_texture_region(struct Texture texture, float x, float y, float z, float w, float h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range) {
-  const u32 program = sprite_shader;
-  glUseProgram(program);
+  const struct Texture_program* program = &texture_program;
+  glUseProgram(program->handle);
 
   model = mm_translate((vec3) {x, y, z});
 
@@ -67,13 +93,13 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
   translate(model, -0.5f * w, -0.5f * h);
   scale(model, w, h);
 
-  glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
-  glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
-  glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
+  glUniformMatrix4fv(program->projection, 1, GL_FALSE, (float*)&projection);
+  glUniformMatrix4fv(program->view, 1, GL_FALSE, (float*)&view);
+  glUniformMatrix4fv(program->model, 1, GL_FALSE, (float*)&model);
 
-  glUniform2f(glGetUniformLocation(program, "uv_offset"), (float)x_offset / texture.w, (float)y_offset / texture.h);
-  glUniform2f(glGetUniformLocation(program, "uv_range"), (float)x_range / texture.w, (float)y_range / texture.h);
-  glUniform4f(glGetUniformLocation(program, "tint"), tint.x, tint.y, tint.z, tint.w);
+  glUniform2f(program->uv_offset, (float)x_offset / texture.w, (float)y_offset / texture.h);
+  glUniform2f(program->uv_range, (float)x_range / texture.w, (float)y_range / texture.h);
+  glUniform4f(program->tint, tint.x, tint.y, tint.z, tint.w);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture.id);
@@ -201,16 +227,11 @@ void render_filled_rectangle(float x, float y, float z, float w, float h, float 
 }
 
 void renderer_set_tint(float r, float g, float b, float a) {
-  tint = (vec4) {
-    .x = r,
-    .y = g,
-    .z = b,
-    .w = a,
-  };
+  tint = VEC4(r, g, b, a);
 }
 
 void renderer_free() {
-  shader_delete(sprite_shader);
+  shader_delete(texture_program.handle);
   shader_delete(rect_shader);
   glDeleteVertexArrays(1, &quad_vao);
 }
