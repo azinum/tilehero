@@ -88,10 +88,10 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
 
   model = mm_translate((vec3) {x, y, z});
 
-  translate(model, 0.5f * w, 0.5f * h);
-  rotate(model, angle);
-  translate(model, -0.5f * w, -0.5f * h);
-  scale(model, w, h);
+  translate2d(model, 0.5f * w, 0.5f * h);
+  rotate2d(model, angle);
+  translate2d(model, -0.5f * w, -0.5f * h);
+  scale2d(model, w, h);
 
   glUniformMatrix4fv(program->projection, 1, GL_FALSE, (float*)&projection);
   glUniformMatrix4fv(program->view, 1, GL_FALSE, (float*)&view);
@@ -155,7 +155,7 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
 
       model = mm_translate((vec3) {x_position, y_position, z});
 
-      scale(model, size, size);
+      scale2d(model, size, size);
 
       glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, (float*)&model);
       glUniform2f(glGetUniformLocation(program, "uv_offset"), (float)x_offset / font_texture.w, (float)y_offset / font_texture.h);
@@ -180,11 +180,11 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
 
   model = mm_translate((vec3) {x, y, z});
 
-  translate(model, 0.5f * w, 0.5f * h);
-  rotate(model, angle);
-  translate(model, -0.5f * w, -0.5f * h);
+  translate2d(model, 0.5f * w, 0.5f * h);
+  rotate2d(model, angle);
+  translate2d(model, -0.5f * w, -0.5f * h);
 
-  scale(model, w, h);
+  scale2d(model, w, h);
 
   glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
   glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
@@ -205,11 +205,11 @@ void render_filled_rectangle(float x, float y, float z, float w, float h, float 
 
   model = mm_translate((vec3) {x, y, z});
 
-  translate(model, 0.5f * w, 0.5f * h);
-  rotate(model, angle);
-  translate(model, -0.5f * w, -0.5f * h);
+  translate2d(model, 0.5f * w, 0.5f * h);
+  rotate2d(model, angle);
+  translate2d(model, -0.5f * w, -0.5f * h);
 
-  scale(model, w, h);
+  scale2d(model, w, h);
 
   glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, (float*)&projection);
   glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, (float*)&view);
@@ -223,7 +223,6 @@ void render_filled_rectangle(float x, float y, float z, float w, float h, float 
   glBindVertexArray(quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
-
 }
 
 void renderer_set_tint(float r, float g, float b, float a) {

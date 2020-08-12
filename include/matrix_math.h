@@ -4,8 +4,6 @@
 #ifndef _MMATH_H
 #define _MMATH_H
 
-#include <math.h>
-
 typedef struct vec4 {
   float x, y, z, w;
 } vec4;
@@ -25,13 +23,13 @@ typedef union mat4 {
 #endif
 } mat4;
 
-#define translate(MODEL, X, Y) { \
+#define translate2d(MODEL, X, Y) { \
   MODEL = mm_multiply_mat4(MODEL, mm_translate((vec3) {X, Y, 0})); \
 }
-#define scale(MODEL, X, Y) { \
+#define scale2d(MODEL, X, Y) { \
   MODEL = mm_multiply_mat4(MODEL, mm_scale((vec3) {X, Y, 1})); \
 }
-#define rotate(MODEL, ANGLE) { \
+#define rotate2d(MODEL, ANGLE) { \
   MODEL = mm_multiply_mat4(MODEL, mm_rotate(ANGLE, (vec3) {0, 0, 1})); \
 }
 
