@@ -3,6 +3,8 @@
 #ifndef _ENTITY_H
 #define _ENTITY_H
 
+#define MOVE_INTERVAL (16)
+
 enum Entity_state {
   STATE_NONE = 0,
   STATE_ALIVE,
@@ -27,11 +29,14 @@ typedef struct Entity {
   i16 id;
   i16 health;
   i16 max_health;
+  i16 attack;
 } Entity;
 
 void entity_init(Entity* e, float x, float y, float w, float h);
 
-void entity_tiled_move(struct Entity* e);
+void entity_tiled_move(Entity* e);
+
+void entity_do_tiled_move(Entity* entities, i32 entity_count);
 
 void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h);
 

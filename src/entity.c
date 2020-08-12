@@ -9,13 +9,12 @@
 #include "entity.h"
 
 #define TEXT_BUFF_SIZE (96)
-#define MOVE_INTERVAL (15)
-#define MAX_MOVES (128)
+#define MAX_MOVES (256)
 
 struct Tile_move {
   i32 x_tile;
   i32 y_tile;
-  i32 entity_location;
+  struct Entity* entity;
 };
 
 static struct Tile_move tile_moves[MAX_MOVES];
@@ -82,13 +81,61 @@ void entity_tiled_move(struct Entity* e) {
     assert(0);
     return;
   }
-  i32 location = e - &game_state.entities[0];
   struct Tile_move move = {
     .x_tile = e->x_tile + e->x_dir,
     .y_tile = e->y_tile + e->y_dir,
-    .entity_location = location
+    .entity = e
   };
   tile_moves[move_count++] = move;
+}
+
+void entity_do_tiled_move(Entity* entities, i32 entity_count) {
+  for (i32 i = 0; i < move_count; i++) {
+    struct Tile_move* move = &tile_moves[i];
+    Entity* e = move->entity;
+    Entity* target = NULL;
+    u8 collision = 0;
+    for (i32 entity_index = 0; entity_index < entity_count; entity_index++) {
+      Entity* current = &entities[entity_index];
+      if (current == e)
+        continue;
+      if (move->x_tile == current->x_tile && move->y_tile == current->y_tile) {
+        target = current;
+        collision = 1;
+        break;  
+      }
+    }
+    Tile* tile = tilemap_get_tile(&game_state.tile_map, move->x_tile, move->y_tile);
+    if (!tile) {  // Outside the map
+      collision = 1;
+    }
+    else if (tile->tile_type == TILE_BRICK) { // We hit a block
+      collision = 1;
+    }
+
+    if (collision) {
+      e->x_dir = -e->x_dir;
+      e->y_dir = -e->y_dir;
+      if (target) {
+        e->health -= target->attack;
+        if (e->health <= 0) {
+          e->health = 0;
+          e->state = STATE_DEAD;
+          audio_play_once(SOUND_HIT, 0.5f);
+        }
+        else {
+          audio_play_once(SOUND_GOOD_MORNING, 0.5f);
+        }
+        renderer_set_tint(15, 15, 15, 1);
+      }
+    }
+    else {  // No collision, let's move to this tile!
+      e->x_tile = move->x_tile;
+      e->y_tile = move->y_tile;
+      renderer_set_tint(1, 1, 1, 1);
+    }
+  }
+  move_count = 0;
 }
 
 void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h) {
@@ -106,7 +153,9 @@ void entity_update_and_render(Entity* e) {
       return;
     }
     if (!(game_state.tick % MOVE_INTERVAL)) {
-      entity_move(e);
+      // entity_move(e);
+      (void)entity_move;
+      entity_tiled_move(e);
     }
 #if INTERP_MOVEMENT
     e->x = lerp(e->x, TILE_SIZE * e->x_tile, 0.25f);
@@ -129,7 +178,7 @@ void entity_update_and_render(Entity* e) {
 
 void entity_render_highlight(Entity* e) {
   render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 1.0f, 0, 1.0f / (e->w));
-  snprintf(temp_text, TEXT_BUFF_SIZE, "id=%i\nx=%i\ny=%i\nhp: %i/%i", e->id, (i32)e->x, (i32)e->y, e->health, e->max_health);
+  snprintf(temp_text, TEXT_BUFF_SIZE, "id=%i\nx=%i\ny=%i\nhp: %i/%i\nattack: %i", e->id, (i32)e->x, (i32)e->y, e->health, e->max_health, e->attack);
   render_text(textures[TEXTURE_FONT],
     e->x - camera.x + e->w + 2,
     e->y - camera.y + e->h + 2, 0.2f, 130, 90, 14, 0.7f, 0.5f, 6, temp_text, TEXT_BUFF_SIZE);

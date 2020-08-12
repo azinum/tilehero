@@ -21,7 +21,7 @@ static void dev_hud_render();
 static void fade_out();
 static Entity* add_entity(float x, float y, float w, float h);
 static Entity* add_empty_entity();
-static Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, i16 max_health);
+static Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, i16 max_health, i16 attack);
 
 Entity* add_entity(float x, float y, float w, float h) {
   Entity* e = add_empty_entity();
@@ -35,7 +35,7 @@ Entity* add_empty_entity() {
   return &game_state.entities[game_state.entity_count++];
 }
 
-Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, i16 max_health) {
+Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, i16 max_health, i16 attack) {
   Entity* e = add_empty_entity();
   if (!e)
     return NULL;
@@ -50,6 +50,7 @@ Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, 
   e->e_flags |= ENTITY_FLAG_DRAW_HEALTH;
   e->health = health;
   e->max_health = max_health;
+  e->attack = attack;
   return e;
 }
 
@@ -63,7 +64,9 @@ void game_init(Game_state* game) {
   game->mode = MODE_GAME;
 
   for (u32 i = 0; i < 4; i++) {
-    add_living_entity(i, i, 32, 32, 5, 5);
+    i16 health = 5 + rand() % 10;
+    i16 attack = 1 + rand() % 3;
+    add_living_entity(i, i, 32, 32, health, health, attack);
   }
 
   is_fading_out = 1;
@@ -82,7 +85,9 @@ void game_run() {
       i32 x_tile = (i32)((window.mouse_x + camera.x) / TILE_SIZE);
       i32 y_tile = (i32)((window.mouse_y + camera.y) / TILE_SIZE);
       if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-        add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 5, 5);
+        i16 health = 5 + rand() % 10;
+        i16 attack = 1 + rand() % 3;
+        add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, health, health, attack);
         audio_play_once(SOUND_0F, 0.2f);
       }
     }
@@ -116,6 +121,10 @@ void game_run() {
           audio_play_once(SOUND_HIT, 0.5f);
         }
       }
+    }
+
+    if (!(game_state.tick % MOVE_INTERVAL)) {
+      entity_do_tiled_move(game_state.entities, game_state.entity_count);
     }
 
     tilemap_render(&game_state.tile_map);
