@@ -10,6 +10,7 @@
 
 #define TEXT_BUFF_SIZE (96)
 #define MAX_MOVES (256)
+#define INTERP_MOVEMENT 1
 
 struct Tile_move {
   i32 x_tile;
@@ -75,7 +76,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
     if (!tile) {  // Outside the map
       collision = 1;
     }
-    else if (tile->tile_type == TILE_BRICK) { // We hit a block
+    else if (tile->tile_type == TILE_BRICK) { // We hit a tile
       collision = 1;
     }
 
@@ -86,6 +87,10 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
         if (e->e_flags & ENTITY_FLAG_FRIENDLY && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
           e->x_dir = -target->y_dir;
           e->y_dir = -target->x_dir;
+          i16 health = 5 + rand() % 10;
+          i16 attack = 1 + rand() % 3;
+          game_add_living_entity(e->x_tile, e->y_tile, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
+          audio_play_once(SOUND_RANDOM_1, 0.2f);
         }
         if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
           e->health -= target->attack;
@@ -93,7 +98,9 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
             e->health = 0;
             e->state = STATE_DEAD;
             target->xp += e->max_health * 4;
-            target->health++;
+            target->max_health += 0.3215f * e->max_health;
+            target->health += e->max_health / 4;
+            target->attack += (0.5f * e->attack) + (rand() % 2);
             audio_play_once(SOUND_HIT, 0.5f);
           }
           else {
@@ -117,8 +124,6 @@ void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h) {
   e->x_tile = x_tile;
   e->y_tile = y_tile;
 }
-
-#define INTERP_MOVEMENT 1
 
 void entity_update_and_render(Entity* e) {
   if (game_state.mode == MODE_GAME) { // @TEMP

@@ -31,6 +31,12 @@ extern struct Game_state game_state;
 
 void game_entity_remove(struct Entity* e);
 
+Entity* game_add_entity(float x, float y, float w, float h);
+
+Entity* game_add_empty_entity();
+
+Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_dir, i8 y_dir, i16 health, i16 max_health, i16 attack);
+
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen);
 
 void game_restart();

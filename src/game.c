@@ -19,33 +19,26 @@ static void game_init(Game_state* game);
 static void game_run();
 static void dev_hud_render();
 static void fade_out();
-static Entity* add_entity(float x, float y, float w, float h);
-static Entity* add_empty_entity();
-static Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, i16 max_health, i16 attack);
 
-Entity* add_entity(float x, float y, float w, float h) {
-  Entity* e = add_empty_entity();
+Entity* game_add_entity(float x, float y, float w, float h) {
+  Entity* e = game_add_empty_entity();
   entity_init(e, x, y, w, h);
   return e;
 }
 
-Entity* add_empty_entity() {
+Entity* game_add_empty_entity() {
   if (game_state.entity_count >= MAX_ENTITY)
     return NULL;
   return &game_state.entities[game_state.entity_count++];
 }
 
-Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, i16 max_health, i16 attack) {
-  Entity* e = add_empty_entity();
+Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_dir, i8 y_dir, i16 health, i16 max_health, i16 attack) {
+  Entity* e = game_add_empty_entity();
   if (!e)
     return NULL;
   entity_init_tilepos(e, x_tile, y_tile, w, h);
-  if (x_tile > 6) {
-    e->x_dir = 1;
-  }
-  else {
-    e->y_dir = 1;
-  }
+  e->x_dir = x_dir;
+  e->y_dir = y_dir;
   e->state = STATE_ALIVE;
   e->e_flags |= ENTITY_FLAG_DRAW_HEALTH;
   e->health = health;
@@ -56,7 +49,6 @@ Entity* add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i16 health, 
 
 void game_init(Game_state* game) {
   srand((u32)time(NULL));
-  (void)add_entity;
   game->is_running = 1;
   game->entity_count = 0;
   game->tick = 0;
@@ -66,14 +58,14 @@ void game_init(Game_state* game) {
   for (u32 i = 0; i < 2; i++) {
     i16 health = 5 + rand() % 10;
     i16 attack = 1 + rand() % 3;
-    add_living_entity(i, i, 32, 32, health, health, attack);
+    game_add_living_entity(i, i, 32, 32, 0, 1, health, health, attack);
   }
 
   is_fading_out = 1;
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.1f);
+  // audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.1f);
 }
 
 void game_run() {
@@ -87,7 +79,7 @@ void game_run() {
       if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
         i16 health = 5 + rand() % 10;
         i16 attack = 1 + rand() % 3;
-        add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, health, health, attack);
+        game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
         audio_play_once(SOUND_0F, 0.2f);
       }
     }
@@ -97,7 +89,7 @@ void game_run() {
       if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
         i16 health = 5 + rand() % 10;
         i16 attack = 1 + rand() % 3;
-        Entity* e = add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, health, health, attack);
+        Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 1, 0, health, health, attack);
         e->e_flags |= ENTITY_FLAG_FRIENDLY;
         e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
         audio_play_once(SOUND_0F, 0.2f);
@@ -170,6 +162,7 @@ void game_run() {
 void dev_hud_render() {
   char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 
+#if 1
   i32 w = 230;
   i32 h = 140;
   snprintf(
@@ -188,7 +181,6 @@ void dev_hud_render() {
     game_state.entity_count, MAX_ENTITY,
     audio_engine.master_volume,
     audio_engine.sound_count, MAX_ACTIVE_SOUNDS);
-#if 1
   render_text(textures[TEXTURE_FONT],
     10, window.height - 10 - h, // x, y
     0.9f, // z
