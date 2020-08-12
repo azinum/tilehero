@@ -84,14 +84,6 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
       e->x_dir = -e->x_dir;
       e->y_dir = -e->y_dir;
       if (target) {
-        if (e->e_flags & ENTITY_FLAG_FRIENDLY && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
-          e->x_dir = -target->y_dir;
-          e->y_dir = -target->x_dir;
-          i16 health = 5 + rand() % 10;
-          i16 attack = 1 + rand() % 3;
-          game_add_living_entity(e->x_tile, e->y_tile, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
-          audio_play_once(SOUND_RANDOM_1, 0.2f);
-        }
         if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
           e->health -= target->attack;
           if (e->health <= 0) {
@@ -151,7 +143,7 @@ void entity_update_and_render(Entity* e) {
     render_filled_rectangle(x_pos - camera.x, y_pos - camera.y, 0.15f, w, h, 0.85f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
   }
   // render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
-  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, (e->e_flags + 1) * 8, 0, 8, 8);
+  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, ((e->e_flags-1) << 1) * 8, 0, 8, 8);
 }
 
 void entity_render_highlight(Entity* e) {
