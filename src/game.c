@@ -61,13 +61,13 @@ void game_init(Game_state* game) {
   game->tick = 0;
   game->is_running = 1;
 
-  for (u32 i = 0; i < 8; i++) {
+  for (u32 i = 0; i < 4; i++) {
     add_living_entity(i, i, 32, 32, 5, 5);
   }
 
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
+  // audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
 }
 
 void game_run() {
@@ -93,8 +93,6 @@ void game_run() {
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
       entity_update_and_render(e);
-      if (e->state == STATE_NONE)
-        continue;
       if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
         entity_render_highlight(e);
         if (key_pressed[GLFW_KEY_F]) {
@@ -134,8 +132,8 @@ void dev_hud_render() {
     UI_TEXT_BUFF_SIZE
   );
 
-  if (camera.has_target) {
-    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[camera locked]");
+  if (camera.has_target && camera.target != NULL) {
+    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "target: %lu, id: %i", camera.target - game_state.entities, camera.target->id);
     render_text(textures[TEXTURE_FONT],
       window.width - 10 - 160, window.height - 10 - 35, // x, y
       0.9f, // z
@@ -160,6 +158,23 @@ void fade_out() {
     fade_value = 0;
     is_fading_out = 0;
   }
+}
+
+void game_entity_remove(Entity* e) {
+  // @TEMP!
+  if (e == camera.target) {
+    camera.target = NULL;
+    camera.has_target = 0;
+  }
+  if (game_state.entity_count > 0) {
+    Entity* top = &game_state.entities[--game_state.entity_count];
+    if (top == camera.target) {
+      camera.target = e;
+    }
+    *e = *top;
+    return;
+  }
+  assert(0);
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {

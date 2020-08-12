@@ -9,7 +9,7 @@
 #include "entity.h"
 
 #define TEXT_BUFF_SIZE (96)
-#define MOVE_INTERVAL (20)
+#define MOVE_INTERVAL (15)
 
 static i16 id_count = 0;
 static char temp_text[TEXT_BUFF_SIZE];
@@ -37,7 +37,7 @@ void entity_move(Entity* e) {
     e->health--;
     if (e->health <= 0) {
       e->health = 0;
-      e->state = STATE_NONE;
+      e->state = STATE_DEAD;
       audio_play_once(SOUND_HIT, 0.5f);
     }
     else {
@@ -75,7 +75,9 @@ void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h) {
 #define INTERP_MOVEMENT 1
 
 void entity_update_and_render(Entity* e) {
-  if (e->state == STATE_NONE) {
+  if (e->state == STATE_DEAD) {
+    game_entity_remove(e);
+    e->state = STATE_NONE;
     return;
   }
   if (!(game_state.tick % MOVE_INTERVAL)) {

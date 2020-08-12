@@ -28,7 +28,7 @@ void camera_update() {
   if (key_down[GLFW_KEY_S]) {
     camera.y_target += 5.0f;
   }
-  if (key_pressed[GLFW_KEY_Q]) {
+  if (key_pressed[GLFW_KEY_Q] && camera.target != NULL) {
     camera.has_target = !camera.has_target;
   }
   if (camera.target != NULL && camera.has_target) {

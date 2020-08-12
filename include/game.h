@@ -23,6 +23,8 @@ typedef struct Game_state {
 
 extern struct Game_state game_state;
 
+void game_entity_remove(struct Entity* e);
+
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen);
 
 void game_restart();
