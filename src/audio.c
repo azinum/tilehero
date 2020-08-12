@@ -28,7 +28,6 @@ typedef struct Audio_engine {
   struct Sound_state sounds[MAX_SOUNDS_PLAYING];
   u32 sound_count;
   float master_volume;
-  struct Sound_state channels[MAX_CHANNEL];
   PaStream* stream;
   PaStreamParameters in_port, out_port;
 } Audio_engine;
@@ -166,7 +165,7 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   audio_engine.tick = 0;
   audio_engine.sound_count = 0;
   audio_engine.master_volume = MASTER_VOLUME;
-  memset(audio_engine.channels, 0, sizeof(struct Sound_state) * MAX_CHANNEL);
+  memset(audio_engine.sounds, 0, sizeof(struct Sound_state) * MAX_CHANNEL);
 
   i32 output_device = Pa_GetDefaultOutputDevice();
   audio_engine.out_port.device = output_device;

@@ -17,7 +17,7 @@ static char temp_text[TEXT_BUFF_SIZE];
 static void entity_move(Entity* e);
 
 void entity_move(Entity* e) {
-  Entity* tile = tilemap_get_tile(&game_state.tile_map, e->x_tile + e->x_dir, e->y_tile + e->y_dir);
+  Tile* tile = tilemap_get_tile(&game_state.tile_map, e->x_tile + e->x_dir, e->y_tile + e->y_dir);
   u8 collision = 0;
   if (!tile) {
     e->x_dir = -e->x_dir;
