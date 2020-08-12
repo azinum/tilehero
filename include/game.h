@@ -13,12 +13,18 @@
 
 #define ENTITIES_MAX (256)
 
+enum Game_mode {
+  MODE_GAME,
+  MODE_PAUSE,
+};
+
 typedef struct Game_state {
   struct Tile_map tile_map;
   struct Entity entities[ENTITIES_MAX];
   i32 entity_count;
   i32 tick;
   u8 is_running;
+  u8 mode;
 } Game_state;
 
 extern struct Game_state game_state;

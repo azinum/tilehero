@@ -60,6 +60,7 @@ void game_init(Game_state* game) {
   game->entity_count = 0;
   game->tick = 0;
   game->is_running = 1;
+  game->mode = MODE_GAME;
 
   for (u32 i = 0; i < 4; i++) {
     add_living_entity(i, i, 32, 32, 5, 5);
@@ -69,14 +70,13 @@ void game_init(Game_state* game) {
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  // audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
+  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
 }
 
 void game_run() {
   game_init(&game_state);
   while (game_state.is_running && !window_process_input() && !window_should_close()) {
     window_pollevents();
-    game_state.tick++;
 
     if (key_pressed[GLFW_KEY_T]) {
       i32 x_tile = (i32)((window.mouse_x + camera.x) / TILE_SIZE);
@@ -89,7 +89,17 @@ void game_run() {
     if (key_pressed[GLFW_KEY_0]) {
       game_restart();
     }
+    if (key_pressed[GLFW_KEY_P]) {
+      if (game_state.mode == MODE_GAME)
+        game_state.mode = MODE_PAUSE;
+      else {
+        game_state.mode = MODE_GAME;
+      }
+    }
 
+    if (game_state.mode == MODE_GAME) {
+      game_state.tick++;
+    }
     camera_update();
 
     for (i32 i = 0; i < game_state.entity_count; i++) {

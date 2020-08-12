@@ -31,6 +31,8 @@ typedef struct Entity {
 
 void entity_init(Entity* e, float x, float y, float w, float h);
 
+void entity_tiled_move(struct Entity* e);
+
 void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h);
 
 void entity_update_and_render(Entity* e);
