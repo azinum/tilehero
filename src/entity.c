@@ -76,7 +76,7 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->id = id_count++;
 }
 
-// TODO(lucas): Think about how entities should move in relation the each other and the tilemap!
+// TODO(lucas): Think about how entities should move in relation to each other and the tile map!
 void entity_tiled_move(struct Entity* e) {
   if (move_count >= MAX_MOVES) {
     assert(0);
@@ -103,7 +103,6 @@ void entity_update_and_render(Entity* e) {
   if (game_state.mode == MODE_GAME) { // @TEMP
     if (e->state == STATE_DEAD) {
       game_entity_remove(e);
-      e->state = STATE_NONE;
       return;
     }
     if (!(game_state.tick % MOVE_INTERVAL)) {

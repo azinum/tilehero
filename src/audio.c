@@ -7,7 +7,7 @@
 #include "config.h"
 #include "audio.h"
 
-#define MAX_SOUNDS_PLAYING (64)
+#define MAX_SOUNDS_PLAYING (128)
 
 enum Channel_type {
   CHANNEL_MUSIC,

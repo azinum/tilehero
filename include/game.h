@@ -11,7 +11,7 @@
 #include "resource.h"
 #include "tile.h"
 
-#define ENTITIES_MAX (256)
+#define ENTITIES_MAX (4096)
 
 enum Game_mode {
   MODE_GAME,
