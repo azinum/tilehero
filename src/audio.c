@@ -45,7 +45,6 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
   __m128 zero = _mm_set1_ps(0.0f);
   (void)zero;
   __m128 master_volume = _mm_set1_ps(audio_engine.master_volume);
-
   u32 chunk_count = frames_per_buffer / 4;
   for (u32 chunk_index = 0; chunk_index < chunk_count; chunk_index++) {
     audio_engine.tick++;
@@ -62,19 +61,19 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
       if (sound_state_chunk_count < source_chunk_count) {
         __m128 amp = _mm_set1_ps(sound->amp);
         __m128 sample_value0 = _mm_setr_ps(
-          sound->amp * source->sample_buffer[(sound->sample_index) + 0],
-          sound->amp * source->sample_buffer[(sound->sample_index) + 1],
-          sound->amp * source->sample_buffer[(sound->sample_index) + 2],
-          sound->amp * source->sample_buffer[(sound->sample_index) + 3]
+          source->sample_buffer[(sound->sample_index) + 0],
+          source->sample_buffer[(sound->sample_index) + 1],
+          source->sample_buffer[(sound->sample_index) + 2],
+          source->sample_buffer[(sound->sample_index) + 3]
         );
         sample_value0 = _mm_mul_ps(sample_value0, amp);
 
         if (source->channel_count == 2) {
           __m128 sample_value1 = _mm_setr_ps(
-            sound->amp * source->sample_buffer[(sound->sample_index) + 4],
-            sound->amp * source->sample_buffer[(sound->sample_index) + 5],
-            sound->amp * source->sample_buffer[(sound->sample_index) + 6],
-            sound->amp * source->sample_buffer[(sound->sample_index) + 7]
+            source->sample_buffer[(sound->sample_index) + 4],
+            source->sample_buffer[(sound->sample_index) + 5],
+            source->sample_buffer[(sound->sample_index) + 6],
+            source->sample_buffer[(sound->sample_index) + 7]
           );
           sample_value1 = _mm_mul_ps(sample_value1, amp);
           frame0 = _mm_add_ps(frame0, sample_value0);

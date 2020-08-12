@@ -70,7 +70,7 @@ void game_init(Game_state* game) {
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 1.0f);
+  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.1f);
 }
 
 void game_run() {
@@ -110,6 +110,10 @@ void game_run() {
         if (key_pressed[GLFW_KEY_F]) {
           camera.target = e;
           camera.has_target = 1;
+        }
+        if (key_pressed[GLFW_KEY_X]) {
+          game_entity_remove(e);
+          audio_play_once(SOUND_HIT, 0.5f);
         }
       }
     }
