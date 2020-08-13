@@ -4,5 +4,6 @@
 #define _CONFIG_H
 
 #define MASTER_VOLUME (0.95f)
+#define MUSIC_VOLUME (0.0f)
 
 #endif

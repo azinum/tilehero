@@ -11,6 +11,7 @@
 #define TEXT_BUFF_SIZE (96)
 #define MAX_MOVES (256)
 #define INTERP_MOVEMENT 1
+#define INTERP_SPEED (20.0f)
 
 struct Tile_move {
   i32 x_tile;
@@ -123,12 +124,12 @@ void entity_update_and_render(Entity* e) {
       game_entity_remove(e);
       return;
     }
-    if (!(game_state.tick % MOVE_INTERVAL)) {
+    if (game_state.time >= game_state.move_timer) {
       entity_tiled_move(e);
     }
 #if INTERP_MOVEMENT
-    e->x = lerp(e->x, TILE_SIZE * e->x_tile, 0.5f);
-    e->y = lerp(e->y, TILE_SIZE * e->y_tile, 0.5f);
+    e->x = lerp(e->x, TILE_SIZE * e->x_tile, INTERP_SPEED * game_state.delta_time);
+    e->y = lerp(e->y, TILE_SIZE * e->y_tile, INTERP_SPEED * game_state.delta_time);
 #else
     e->x = TILE_SIZE * e->x_tile;
     e->y = TILE_SIZE * e->y_tile;

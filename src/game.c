@@ -10,6 +10,8 @@
 #include "resource.h"
 #include "game.h"
 
+#define MAX_DELTA_TIME (0.2f)
+
 Game_state game_state;
 
 static float fade_value;
@@ -17,6 +19,7 @@ static i32 is_fading_out;
 
 static void game_init(Game_state* game);
 static void game_run();
+static void game_editor_update();
 static void dev_hud_render();
 static void fade_out();
 
@@ -51,7 +54,9 @@ void game_init(Game_state* game) {
   srand((u32)time(NULL));
   game->is_running = 1;
   game->entity_count = 0;
-  game->tick = 0;
+  game->time = 0;
+  game->move_timer = 0;
+  game->delta_time = 0;
   game->is_running = 1;
   game->mode = MODE_GAME;
 #if 0
@@ -68,68 +73,38 @@ void game_init(Game_state* game) {
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  // audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
+  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
 }
 
 void game_run() {
   game_init(&game_state);
+  struct timeval time_now;
+  struct timeval time_last;
+
   while (game_state.is_running && !window_process_input() && !window_should_close()) {
+    time_last = time_now;
+    gettimeofday(&time_now, NULL);
+    game_state.delta_time = ((((time_now.tv_sec - time_last.tv_sec) * 1000000) + time_now.tv_usec) - (time_last.tv_usec)) / (1000000.0f);
+    if (game_state.delta_time > MAX_DELTA_TIME)
+      game_state.delta_time = MAX_DELTA_TIME;
+
     window_pollevents();
     camera_update();
 
-    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
-    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-    if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-      tilemap_render_tile_highlight(&game_state.tile_map, x_tile, y_tile);
-    }
-    if (key_pressed[GLFW_KEY_T]) {
-      i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
-      i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-      if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-        i16 health = 5 + rand() % 10;
-        i16 attack = 1 + rand() % 3;
-        game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
-        audio_play_once(SOUND_0F, 0.2f);
-      }
-    }
-    if (key_pressed[GLFW_KEY_Y]) {
-      i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
-      i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-      if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-        i16 health = 5 + rand() % 10;
-        i16 attack = 1 + rand() % 3;
-        Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 1, 0, health, health, attack);
-        e->sprite_id = 2;
-        e->e_flags |= ENTITY_FLAG_FRIENDLY;
-        e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
-        audio_play_once(SOUND_0F, 0.2f);
-      }
-    }
-    if (key_pressed[GLFW_KEY_R]) {
-      i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
-      i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-      if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-        Tile* tile = tilemap_get_tile(&game_state.tile_map, x_tile, y_tile);
-        if (tile) {
-          tile->tile_type = (tile->tile_type + 1) % MAX_TILE;
-          audio_play_once(SOUND_0F, 0.2f);
-        }
-      }
-    }
-    if (key_pressed[GLFW_KEY_0]) {
-      game_restart();
+    if (game_state.mode == MODE_GAME) {
+      game_state.time += game_state.delta_time;
     }
     if (key_pressed[GLFW_KEY_P]) {
       if (game_state.mode == MODE_GAME)
         game_state.mode = MODE_PAUSE;
-      else {
+      else
         game_state.mode = MODE_GAME;
-      }
     }
 
-    if (game_state.mode == MODE_GAME) {
-      game_state.tick++;
+    if (key_pressed[GLFW_KEY_0]) {
+      game_restart();
     }
+    game_editor_update();
 
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
@@ -147,8 +122,9 @@ void game_run() {
       }
     }
 
-    if (!(game_state.tick % MOVE_INTERVAL)) {
+    if (game_state.time >= game_state.move_timer) {
       entity_do_tiled_move(game_state.entities, game_state.entity_count);
+      game_state.move_timer = game_state.time + MOVE_INTERVAL;
     }
 
     tilemap_render(&game_state.tile_map);
@@ -158,6 +134,48 @@ void game_run() {
     }
     window_swapbuffers();
     window_clear();
+  }
+}
+
+void game_editor_update() {
+  i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+  i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+  if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
+    tilemap_render_tile_highlight(&game_state.tile_map, x_tile, y_tile);
+  }
+  if (key_pressed[GLFW_KEY_T]) {
+    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+    if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
+      i16 health = 5 + rand() % 10;
+      i16 attack = 1 + rand() % 3;
+      game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
+      audio_play_once(SOUND_0F, 0.2f);
+    }
+  }
+  if (key_pressed[GLFW_KEY_Y]) {
+    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+    if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
+      i16 health = 5 + rand() % 10;
+      i16 attack = 1 + rand() % 3;
+      Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 1, 0, health, health, attack);
+      e->sprite_id = 2;
+      e->e_flags |= ENTITY_FLAG_FRIENDLY;
+      e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
+      audio_play_once(SOUND_0F, 0.2f);
+    }
+  }
+  if (key_pressed[GLFW_KEY_R]) {
+    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+    if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
+      Tile* tile = tilemap_get_tile(&game_state.tile_map, x_tile, y_tile);
+      if (tile) {
+        tile->tile_type = (tile->tile_type + 1) % MAX_TILE;
+        audio_play_once(SOUND_0F, 0.2f);
+      }
+    }
   }
 }
 
@@ -174,14 +192,16 @@ void dev_hud_render() {
     UI_TEXT_BUFF_SIZE,
     "camera x: %i, y: %i\n"
     "window size: %ix%i\n"
-    "tick: %i\n"
+    "time: %.4g\n"
+    "fps: %i\n"
     "entity count: %i/%i\n"
     "master volume: %.3g\n"
     "active sounds: %i/%i\n"
     ,
     (i32)camera.x, (i32)camera.y,
     window.width, window.height,
-    game_state.tick,
+    game_state.time,
+    (i32)(1.0f / game_state.delta_time),
     game_state.entity_count, MAX_ENTITY,
     audio_engine.master_volume,
     audio_engine.sound_count, MAX_ACTIVE_SOUNDS);
