@@ -11,6 +11,7 @@
 #include "game.h"
 
 #define MAX_DELTA_TIME (0.2f)
+#define USE_EDITOR 1
 
 Game_state game_state;
 
@@ -65,6 +66,7 @@ void game_init(Game_state* game) {
   game->delta_time = 0;
   game->is_running = 1;
   game->mode = MODE_GAME;
+
 #if 0
   for (i32 y = 1; y < TILE_COUNT_Y - 1; y++) {
     for (i32 x = 1; x < TILE_COUNT_X - 1; x++) {
@@ -144,6 +146,7 @@ void game_run() {
 }
 
 void game_editor_update() {
+#if USE_EDITOR
   i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
   i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
   if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
@@ -172,7 +175,7 @@ void game_editor_update() {
       audio_play_once(SOUND_0F, 0.5f);
     }
   }
-  if (key_pressed[GLFW_KEY_Q]) {
+  if (key_pressed[GLFW_KEY_E]) {
     editor.tile_type = (editor.tile_type + 1) % MAX_TILE;
   }
 
@@ -187,23 +190,26 @@ void game_editor_update() {
       }
     }
   }
+#endif
 }
 
 #define UI_TEXT_BUFF_SIZE (256)
 
 void editor_hud_render() {
+#if USE_EDITOR
   char ui_text[UI_TEXT_BUFF_SIZE] = {0};
-
-#if 1
 {
   i32 x = 10;
   i32 y = 10;
   i32 w = TILE_SIZE * 2;
   i32 h = w;
-  render_rect(x, y, 0.9f, w, h, 0.7f, 0.3f, 0.2f, 1, 0, 1.0f / TILE_SIZE);
+  render_rect(x, y, 0.9f, w, h, 0.75f, 0.25f, 0.25f, 1, 0, 1.0f / TILE_SIZE);
   if (editor.tile_type != TILE_NONE) {
     render_texture_region(textures[TEXTURE_SPRITES],
               x, y, 0.9f, w, h, 0, (editor.tile_type + 4) * 8, 0, 8, 8);
+  }
+  else {
+    render_filled_rect(x, y, 0.9f, w, h, 0, 0, 0, 1, 0);
   }
 }
   i32 w = 230;
@@ -254,13 +260,20 @@ void editor_hud_render() {
       UI_TEXT_BUFF_SIZE
     );
   }
+#else
+#endif
+{
+  i32 w = 140;
+  i32 h = 35;
+  i32 x = window.width - (w + 10);
+  i32 y = 10;
   if (game_state.mode == MODE_PAUSE) {
     snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[game paused]");
     render_text(textures[TEXTURE_FONT],
-      10, 10, // x, y
+      x, y, // x, y
       0.9f, // z
-      140,   // Width
-      35, // Height
+      w,   // Width
+      h, // Height
       12, // Font size
       0.7f, // Font kerning
       0.7f, // Line spacing
@@ -269,8 +282,7 @@ void editor_hud_render() {
       UI_TEXT_BUFF_SIZE
     );
   }
-#else
-#endif
+}
 }
 
 void fade_out() {

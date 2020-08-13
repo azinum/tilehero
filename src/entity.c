@@ -86,6 +86,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
       e->y_dir = -e->y_dir;
       if (target) {
         if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
+#if 0
           target->health -= e->attack;
           if (target->health <= 0) {
             target->health = 0;
@@ -99,14 +100,23 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
           else {
             audio_play_once(SOUND_GOOD_MORNING, 0.5f);
           }
-          renderer_set_tint(15, 15, 15, 1);
+#endif
         }
       }
     }
     else {  // No collision, let's move to this tile!
       e->x_tile = move->x_tile;
       e->y_tile = move->y_tile;
-      renderer_set_tint(1, 1, 1, 1);
+      if (tile->tile_type == TILE_DUNGEON) {
+        if (abs(e->x_dir) == 1) {
+          e->y_dir = e->x_dir;
+          e->x_dir = 0;
+        }
+        else if (abs(e->y_dir) == 1) {
+          e->x_dir = e->y_dir;
+          e->y_dir = 0;
+        }
+      }
     }
   }
   move_count = 0;

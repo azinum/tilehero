@@ -6,7 +6,8 @@
 #include "renderer_common.h"
 #include "camera.h"
 
-#define CAMERA_MOVE_SPEED (400.0f)
+#define CAMERA_MOVE_SPEED (500.0f)
+#define CAMERA_TARGET_SPEED (5.0f)
 
 void camera_init(float x, float y) {
   camera.x = x;
@@ -36,7 +37,11 @@ void camera_update() {
   if (camera.target != NULL && camera.has_target) {
     camera.x_target = camera.target->x - (window.width / 2);
     camera.y_target = camera.target->y - (window.height / 2);
+    camera.x = lerp(camera.x, camera.x_target, CAMERA_TARGET_SPEED * game_state.delta_time);
+    camera.y = lerp(camera.y, camera.y_target, CAMERA_TARGET_SPEED * game_state.delta_time);
   }
-  camera.x = camera.x_target;
-  camera.y = camera.y_target;
+  else {
+    camera.x = camera.x_target;
+    camera.y = camera.y_target;
+  }
 }
