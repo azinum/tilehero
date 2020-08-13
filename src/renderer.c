@@ -86,7 +86,7 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
   const struct Texture_program* program = &texture_program;
   glUseProgram(program->handle);
 
-  model = mm_translate((vec3) {x, y, z});
+  model = mm_translate(VEC3(x, y, z));
 
   translate2d(model, 0.5f * w, 0.5f * h);
   rotate2d(model, angle);
@@ -153,7 +153,7 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
       float x_range = font_size;
       float y_range = font_size;
 
-      model = mm_translate((vec3) {x_position, y_position, z});
+      model = mm_translate(VEC3(x_position, y_position, z));
 
       scale2d(model, size, size);
 
@@ -178,7 +178,7 @@ void render_rect(float x, float y, float z, float w, float h, float r, float g, 
   const u32 program = rect_shader;
   glUseProgram(program);
 
-  model = mm_translate((vec3) {x, y, z});
+  model = mm_translate(VEC3(x, y, z));
 
   translate2d(model, 0.5f * w, 0.5f * h);
   rotate2d(model, angle);
@@ -203,7 +203,7 @@ void render_filled_rectangle(float x, float y, float z, float w, float h, float 
   const u32 program = filled_rect_shader;
   glUseProgram(program);
 
-  model = mm_translate((vec3) {x, y, z});
+  model = mm_translate(VEC3(x, y, z));
 
   translate2d(model, 0.5f * w, 0.5f * h);
   rotate2d(model, angle);

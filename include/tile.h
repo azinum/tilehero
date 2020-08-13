@@ -5,13 +5,14 @@
 
 #include "entity.h"
 
-#define TILE_COUNT_X (16)
-#define TILE_COUNT_Y (8)
-#define TILE_SIZE (38)
+#define TILE_COUNT_X (12)
+#define TILE_COUNT_Y (12)
+#define TILE_SIZE (42)
 #define PIXEL_TO_TILE_POS(PX) (PX >= 0 ? (i32)((PX) / TILE_SIZE) : -1)
 
 enum Tile_type {
   TILE_NONE,
+  TILE_DEFAULT,
   TILE_BRICK_1,
   TILE_BRICK_2,
   TILE_DUNGEON,

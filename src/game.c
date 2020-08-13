@@ -54,13 +54,16 @@ void game_init(Game_state* game) {
   game->tick = 0;
   game->is_running = 1;
   game->mode = MODE_GAME;
-
-  // for (u32 i = 0; i < 2; i++) {
-  //   i16 health = 5 + rand() % 10;
-  //   i16 attack = 1 + rand() % 3;
-  //   game_add_living_entity(i + 1, i + 1, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
-  // }
-
+#if 0
+  for (i32 y = 1; y < TILE_COUNT_Y - 1; y++) {
+    for (i32 x = 1; x < TILE_COUNT_X - 1; x++) {
+      Entity* e = game_add_living_entity(x, y, TILE_SIZE, TILE_SIZE, 0, 1, 1, 1, 0);
+      e->e_flags |= ENTITY_FLAG_FRIENDLY;
+      e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
+      e->sprite_id = 2;
+    }
+  }
+#endif
   is_fading_out = 1;
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));

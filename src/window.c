@@ -7,7 +7,6 @@
 #include "matrix_math.h"
 #include "renderer.h"
 #include "shader.h"
-#include "camera.h" // NOTE(lucas): TEMP
 #include "window.h"
 
 i8 key_down[GLFW_KEY_LAST] = {0};

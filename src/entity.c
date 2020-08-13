@@ -76,7 +76,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
     if (!tile) {  // Outside the map
       collision = 1;
     }
-    else if (tile->tile_type != TILE_NONE && tile->tile_type != TILE_DUNGEON) { // We hit a tile
+    else if (tile->tile_type != TILE_DEFAULT && tile->tile_type != TILE_DUNGEON) { // We hit a tile
       collision = 1;
     }
 
@@ -85,14 +85,14 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
       e->y_dir = -e->y_dir;
       if (target) {
         if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
-          e->health -= target->attack;
-          if (e->health <= 0) {
-            e->health = 0;
-            e->state = STATE_DEAD;
-            target->xp += e->max_health * 4;
-            target->max_health += 0.3215f * e->max_health;
-            target->health += e->max_health / 4;
-            target->attack += (0.5f * e->attack) + (rand() % 2);
+          target->health -= e->attack;
+          if (target->health <= 0) {
+            target->health = 0;
+            target->state = STATE_DEAD;
+            e->xp += target->max_health * 4;
+            e->max_health += 0.1756f * target->max_health;
+            e->health += target->max_health / 4;
+            e->attack++;
             audio_play_once(SOUND_HIT, 0.5f);
           }
           else {
@@ -127,8 +127,8 @@ void entity_update_and_render(Entity* e) {
       entity_tiled_move(e);
     }
 #if INTERP_MOVEMENT
-    e->x = lerp(e->x, TILE_SIZE * e->x_tile, 0.25f);
-    e->y = lerp(e->y, TILE_SIZE * e->y_tile, 0.25f);
+    e->x = lerp(e->x, TILE_SIZE * e->x_tile, 0.5f);
+    e->y = lerp(e->y, TILE_SIZE * e->y_tile, 0.5f);
 #else
     e->x = TILE_SIZE * e->x_tile;
     e->y = TILE_SIZE * e->y_tile;
