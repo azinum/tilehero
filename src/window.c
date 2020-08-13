@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "common.h"
+#include "config.h"
 #include "renderer_common.h"
 #include "matrix_math.h"
 #include "renderer.h"
@@ -69,7 +70,7 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
     fprintf(stderr, "Failed to initialize GLEW: %s\n", glewGetErrorString(glew_err));
     return -1;
   }
-  glfwSwapInterval(1);
+  glfwSwapInterval(VSYNC);
   opengl_configure();
   renderer_init();
   return 0;

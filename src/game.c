@@ -14,13 +14,19 @@
 
 Game_state game_state;
 
+struct {
+  i32 tile_type;
+} editor = {
+  .tile_type = TILE_NONE,
+};
+
 static float fade_value;
 static i32 is_fading_out;
 
 static void game_init(Game_state* game);
 static void game_run();
 static void game_editor_update();
-static void dev_hud_render();
+static void editor_hud_render();
 static void fade_out();
 
 Entity* game_add_entity(float x, float y, float w, float h) {
@@ -128,7 +134,7 @@ void game_run() {
     }
 
     tilemap_render(&game_state.tile_map);
-    dev_hud_render();
+    editor_hud_render();
     if (is_fading_out) {
       fade_out();
     }
@@ -150,7 +156,7 @@ void game_editor_update() {
       i16 health = 5 + rand() % 10;
       i16 attack = 1 + rand() % 3;
       game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
-      audio_play_once(SOUND_0F, 0.2f);
+      audio_play_once(SOUND_0F, 0.5f);
     }
   }
   if (key_pressed[GLFW_KEY_Y]) {
@@ -163,17 +169,21 @@ void game_editor_update() {
       e->sprite_id = 2;
       e->e_flags |= ENTITY_FLAG_FRIENDLY;
       e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
-      audio_play_once(SOUND_0F, 0.2f);
+      audio_play_once(SOUND_0F, 0.5f);
     }
   }
+  if (key_pressed[GLFW_KEY_Q]) {
+    editor.tile_type = (editor.tile_type + 1) % MAX_TILE;
+  }
+
   if (key_pressed[GLFW_KEY_R]) {
     i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
     i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
     if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
       Tile* tile = tilemap_get_tile(&game_state.tile_map, x_tile, y_tile);
       if (tile) {
-        tile->tile_type = (tile->tile_type + 1) % MAX_TILE;
-        audio_play_once(SOUND_0F, 0.2f);
+        tile->tile_type = editor.tile_type;
+        audio_play_once(SOUND_0F, 0.5f);
       }
     }
   }
@@ -181,10 +191,21 @@ void game_editor_update() {
 
 #define UI_TEXT_BUFF_SIZE (256)
 
-void dev_hud_render() {
+void editor_hud_render() {
   char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 
 #if 1
+{
+  i32 x = 10;
+  i32 y = 10;
+  i32 w = TILE_SIZE * 2;
+  i32 h = w;
+  render_rect(x, y, 0.9f, w, h, 0.7f, 0.3f, 0.2f, 1, 0, 1.0f / TILE_SIZE);
+  if (editor.tile_type != TILE_NONE) {
+    render_texture_region(textures[TEXTURE_SPRITES],
+              x, y, 0.9f, w, h, 0, (editor.tile_type + 4) * 8, 0, 8, 8);
+  }
+}
   i32 w = 230;
   i32 h = 140;
   snprintf(
