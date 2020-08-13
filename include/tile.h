@@ -3,11 +3,12 @@
 #ifndef _TILE_H
 #define _TILE_H
 
+#include "entity.h"
+
 #define TILE_COUNT_X (16)
 #define TILE_COUNT_Y (8)
 #define TILE_SIZE (38)
-
-#include "entity.h"
+#define PIXEL_TO_TILE_POS(PX) (PX >= 0 ? (i32)((PX) / TILE_SIZE) : -1)
 
 enum Tile_type {
   TILE_NONE,
@@ -40,5 +41,7 @@ Tile* tilemap_get_tile(struct Tile_map* tile_map, i32 x, i32 y);
 void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count);
 
 void tilemap_render(struct Tile_map* tile_map);
+
+void tilemap_render_tile_highlight(struct Tile_map* tile_map, i32 x_tile, i32 y_tile);
 
 #endif

@@ -77,7 +77,7 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
 }
 
 void window_clear() {
-  glClearColor(0.03f, 0.11f, 0.19f, 1.0f);
+  glClearColor(0, 0, 0, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

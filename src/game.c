@@ -55,11 +55,11 @@ void game_init(Game_state* game) {
   game->is_running = 1;
   game->mode = MODE_GAME;
 
-  for (u32 i = 0; i < 2; i++) {
-    i16 health = 5 + rand() % 10;
-    i16 attack = 1 + rand() % 3;
-    game_add_living_entity(i + 1, i + 1, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
-  }
+  // for (u32 i = 0; i < 2; i++) {
+  //   i16 health = 5 + rand() % 10;
+  //   i16 attack = 1 + rand() % 3;
+  //   game_add_living_entity(i + 1, i + 1, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
+  // }
 
   is_fading_out = 1;
   fade_value = 1.0f;
@@ -72,10 +72,16 @@ void game_run() {
   game_init(&game_state);
   while (game_state.is_running && !window_process_input() && !window_should_close()) {
     window_pollevents();
+    camera_update();
 
+    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+    if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
+      tilemap_render_tile_highlight(&game_state.tile_map, x_tile, y_tile);
+    }
     if (key_pressed[GLFW_KEY_T]) {
-      i32 x_tile = (i32)((window.mouse_x + camera.x) / TILE_SIZE);
-      i32 y_tile = (i32)((window.mouse_y + camera.y) / TILE_SIZE);
+      i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+      i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
       if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
         i16 health = 5 + rand() % 10;
         i16 attack = 1 + rand() % 3;
@@ -84,20 +90,21 @@ void game_run() {
       }
     }
     if (key_pressed[GLFW_KEY_Y]) {
-      i32 x_tile = (i32)((window.mouse_x + camera.x) / TILE_SIZE);
-      i32 y_tile = (i32)((window.mouse_y + camera.y) / TILE_SIZE);
+      i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+      i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
       if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
         i16 health = 5 + rand() % 10;
         i16 attack = 1 + rand() % 3;
         Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 1, 0, health, health, attack);
+        e->sprite_id = 2;
         e->e_flags |= ENTITY_FLAG_FRIENDLY;
         e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
         audio_play_once(SOUND_0F, 0.2f);
       }
     }
     if (key_pressed[GLFW_KEY_R]) {
-      i32 x_tile = (i32)((window.mouse_x + camera.x) / TILE_SIZE);
-      i32 y_tile = (i32)((window.mouse_y + camera.y) / TILE_SIZE);
+      i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+      i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
       if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
         Tile* tile = tilemap_get_tile(&game_state.tile_map, x_tile, y_tile);
         if (tile) {
@@ -120,7 +127,6 @@ void game_run() {
     if (game_state.mode == MODE_GAME) {
       game_state.tick++;
     }
-    camera_update();
 
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];

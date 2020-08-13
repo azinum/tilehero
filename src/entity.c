@@ -36,7 +36,7 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->e_flags = 0;
   e->type = 0;
   e->tile_type = 0;
-  e->sprite_id = rand() % 6;
+  e->sprite_id = 0;
   e->id = id_count++;
   e->health = e->max_health = 0;
   e->attack = 0;
@@ -143,7 +143,7 @@ void entity_update_and_render(Entity* e) {
     render_filled_rectangle(x_pos - camera.x, y_pos - camera.y, 0.15f, w, h, 0.85f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
   }
   // render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
-  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, ((e->e_flags-1) << 1) * 8, 0, 8, 8);
+  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
 }
 
 void entity_render_highlight(Entity* e) {

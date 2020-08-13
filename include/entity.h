@@ -3,7 +3,7 @@
 #ifndef _ENTITY_H
 #define _ENTITY_H
 
-#define MOVE_INTERVAL (16)
+#define MOVE_INTERVAL (12)
 
 enum Entity_state {
   STATE_NONE = 0,
