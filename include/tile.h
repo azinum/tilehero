@@ -3,15 +3,17 @@
 #ifndef _TILE_H
 #define _TILE_H
 
-#define TILE_COUNT_X (12)
-#define TILE_COUNT_Y (12)
-#define TILE_SIZE (32)
+#define TILE_COUNT_X (16)
+#define TILE_COUNT_Y (8)
+#define TILE_SIZE (38)
 
 #include "entity.h"
 
 enum Tile_type {
   TILE_NONE,
-  TILE_BRICK,
+  TILE_BRICK_1,
+  TILE_BRICK_2,
+  TILE_DUNGEON,
   MAX_TILE,
 };
 

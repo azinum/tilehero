@@ -58,14 +58,14 @@ void game_init(Game_state* game) {
   for (u32 i = 0; i < 2; i++) {
     i16 health = 5 + rand() % 10;
     i16 attack = 1 + rand() % 3;
-    game_add_living_entity(i, i, 32, 32, 0, 1, health, health, attack);
+    game_add_living_entity(i + 1, i + 1, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
   }
 
   is_fading_out = 1;
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
+  // audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
 }
 
 void game_run() {
@@ -101,12 +101,7 @@ void game_run() {
       if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
         Tile* tile = tilemap_get_tile(&game_state.tile_map, x_tile, y_tile);
         if (tile) {
-          if (tile->tile_type != TILE_BRICK) {
-            tile->tile_type = TILE_BRICK;
-          }
-          else {
-            tile->tile_type = 0;
-          }
+          tile->tile_type = (tile->tile_type + 1) % MAX_TILE;
           audio_play_once(SOUND_0F, 0.2f);
         }
       }

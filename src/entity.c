@@ -76,7 +76,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
     if (!tile) {  // Outside the map
       collision = 1;
     }
-    else if (tile->tile_type == TILE_BRICK) { // We hit a tile
+    else if (tile->tile_type != TILE_NONE && tile->tile_type != TILE_DUNGEON) { // We hit a tile
       collision = 1;
     }
 
