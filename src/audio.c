@@ -39,15 +39,21 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
   (void)in_buff; (void)time_info; (void)flags; (void)user_data;
   float* out = (float*)out_buff;
 
+  audio_engine.pan = (0.5f * sin(audio_engine.tick / 5000.0f)) + 0.5f;
 // TODO(lucas): Compare SSE vs no SSE!
 #if USE_SSE
   __m128* dest = (__m128*)out;
   __m128 zero = _mm_set1_ps(0.0f);
   (void)zero;
-  __m128 master_volume = _mm_set1_ps(audio_engine.master_volume);
+  __m128 master_volume = _mm_setr_ps(
+    1.0f - audio_engine.pan,
+    audio_engine.pan,
+    1.0f - audio_engine.pan,
+    audio_engine.pan
+  );
   u32 chunk_count = frames_per_buffer / 4;
   for (u32 chunk_index = 0; chunk_index < chunk_count; chunk_index++) {
-    audio_engine.tick++;
+    audio_engine.tick += 4;
     __m128 frame0 = _mm_set1_ps(0.0f);
     __m128 frame1 = _mm_set1_ps(0.0f);
     for (u32 i = 0; i < MAX_CHANNEL + audio_engine.sound_count; i++) {
@@ -116,8 +122,8 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
     }
     l_frame *= audio_engine.master_volume;
     r_frame *= audio_engine.master_volume;
-    *out++ = l_frame;
-    *out++ = r_frame;
+    *out++ = l_frame * (1.0f - audio_engine.pan);
+    *out++ = r_frame * audio_engine.pan;
     audio_engine.tick++;
   }
 #endif  // No SSE
@@ -151,6 +157,7 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   audio_engine.tick = 0;
   audio_engine.sound_count = 0;
   audio_engine.master_volume = MASTER_VOLUME;
+  audio_engine.pan = 0.5f;
   memset(audio_engine.sounds, 0, sizeof(struct Sound_state) * MAX_CHANNEL);
 
   i32 output_device = Pa_GetDefaultOutputDevice();

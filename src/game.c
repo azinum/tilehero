@@ -65,7 +65,7 @@ void game_init(Game_state* game) {
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  // audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.1f);
+  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, 0.4f);
 }
 
 void game_run() {
