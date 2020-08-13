@@ -23,6 +23,7 @@ typedef struct Game_state {
   struct Entity entities[MAX_ENTITY];
   i32 entity_count;
   float time;
+  float time_scale;
   float delta_time;
   float move_timer;
   u8 is_running;

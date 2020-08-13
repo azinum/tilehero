@@ -86,14 +86,16 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
       e->y_dir = -e->y_dir;
       if (target) {
         if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
-#if 0
+#if 1
           target->health -= e->attack;
           if (target->health <= 0) {
             target->health = 0;
             target->state = STATE_DEAD;
             e->xp += target->max_health * 4;
             e->max_health += 0.1756f * target->max_health;
-            e->health += target->max_health / 4;
+            e->health += target->max_health * 0.8f;
+            if (e->health >= e->max_health)
+              e->health = e->max_health;
             e->attack++;
             audio_play_once(SOUND_HIT, 0.5f);
           }
@@ -129,7 +131,6 @@ void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h) {
 }
 
 void entity_update_and_render(Entity* e) {
-  if (game_state.mode == MODE_GAME) { // @TEMP
     if (e->state == STATE_DEAD) {
       game_entity_remove(e);
       return;
@@ -138,13 +139,12 @@ void entity_update_and_render(Entity* e) {
       entity_tiled_move(e);
     }
 #if INTERP_MOVEMENT
-    e->x = lerp(e->x, TILE_SIZE * e->x_tile, INTERP_SPEED * game_state.delta_time);
-    e->y = lerp(e->y, TILE_SIZE * e->y_tile, INTERP_SPEED * game_state.delta_time);
+    e->x = lerp(e->x, TILE_SIZE * e->x_tile, INTERP_SPEED * game_state.delta_time * game_state.time_scale);
+    e->y = lerp(e->y, TILE_SIZE * e->y_tile, INTERP_SPEED * game_state.delta_time * game_state.time_scale);
 #else
     e->x = TILE_SIZE * e->x_tile;
     e->y = TILE_SIZE * e->y_tile;
 #endif
-  }
   if (e->e_flags & ENTITY_FLAG_DRAW_HEALTH) {
     i32 w = e->w * 0.8f;
     i32 h = 8;

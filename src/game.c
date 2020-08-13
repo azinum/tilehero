@@ -12,6 +12,8 @@
 
 #define MAX_DELTA_TIME (0.2f)
 #define USE_EDITOR 1
+#define TIME_SCALING_MIN (0)
+#define TIME_SCALING_MAX (10.0f)
 
 Game_state game_state;
 
@@ -62,6 +64,7 @@ void game_init(Game_state* game) {
   game->is_running = 1;
   game->entity_count = 0;
   game->time = 0;
+  game->time_scale = 1;
   game->move_timer = 0;
   game->delta_time = 0;
   game->is_running = 1;
@@ -100,7 +103,7 @@ void game_run() {
     camera_update();
 
     if (game_state.mode == MODE_GAME) {
-      game_state.time += game_state.delta_time;
+      game_state.time += game_state.delta_time * game_state.time_scale;
     }
     if (key_pressed[GLFW_KEY_P]) {
       if (game_state.mode == MODE_GAME)
@@ -179,6 +182,20 @@ void game_editor_update() {
     editor.tile_type = (editor.tile_type + 1) % MAX_TILE;
   }
 
+  if (key_pressed[GLFW_KEY_1]) {
+    game_state.time_scale *= 0.9f;;
+    if (game_state.time_scale <= TIME_SCALING_MIN)
+      game_state.time_scale = TIME_SCALING_MIN;
+  }
+  if (key_pressed[GLFW_KEY_2]) {
+    game_state.time_scale *= 1.1f;
+    if (game_state.time_scale >= TIME_SCALING_MAX)
+      game_state.time_scale = TIME_SCALING_MAX;
+  }
+  if (key_pressed[GLFW_KEY_3]) {
+    game_state.time_scale = 1;
+  }
+
   if (key_pressed[GLFW_KEY_R]) {
     i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
     i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
@@ -219,15 +236,17 @@ void editor_hud_render() {
     UI_TEXT_BUFF_SIZE,
     "camera x: %i, y: %i\n"
     "window size: %ix%i\n"
-    "time: %.4g\n"
+    "time: %.3f\n"
+    "time scale: %i %%\n"
     "fps: %i\n"
     "entity count: %i/%i\n"
-    "master volume: %.3g\n"
+    "master volume: %.2f\n"
     "active sounds: %i/%i\n"
     ,
     (i32)camera.x, (i32)camera.y,
     window.width, window.height,
     game_state.time,
+    (i32)(100 * game_state.time_scale),
     (i32)(1.0f / game_state.delta_time),
     game_state.entity_count, MAX_ENTITY,
     audio_engine.master_volume,
