@@ -12,6 +12,8 @@
 #include "tile.h"
 
 #define MAX_ENTITY (1024)
+#define TIME_SCALING_MIN (0)
+#define TIME_SCALING_MAX (5.0f)
 
 enum Game_mode {
   MODE_GAME,
