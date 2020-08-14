@@ -84,6 +84,7 @@ void game_init(Game_state* game) {
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
+  tilemap_load(&game_state.tile_map, TILEMAP_STORAGE_FILE);
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
 }
 
@@ -211,16 +212,20 @@ void game_editor_update() {
       }
     }
   }
+  if (key_pressed[GLFW_KEY_N]) {
+    tilemap_store(&game_state.tile_map, TILEMAP_STORAGE_FILE);
+  }
+  if (key_pressed[GLFW_KEY_M]) {
+    tilemap_load(&game_state.tile_map, TILEMAP_STORAGE_FILE);
+  }
 #endif
 }
 
 #define UI_TEXT_BUFF_SIZE (256)
-#define UI_MOVE_LIST_TEXT_BUFF_SIZE (512)
-char move_list_text[UI_MOVE_LIST_TEXT_BUFF_SIZE] = {0};
+char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 
 void editor_hud_render() {
 #if USE_EDITOR
-  char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 {
   i32 x = 10;
   i32 y = 10;
@@ -286,35 +291,6 @@ void editor_hud_render() {
     );
   }
 
-{
-  if (game_state.time >= game_state.move_timer) {
-    i32 bytes_written = 0;
-    for (i32 current_move = 0; current_move < move_count; current_move++) {
-      if (bytes_written >= UI_MOVE_LIST_TEXT_BUFF_SIZE)
-        break;
-
-      struct Tile_move* move = &tile_moves[current_move];
-      i32 n = snprintf(&move_list_text[bytes_written], UI_MOVE_LIST_TEXT_BUFF_SIZE, "%i: {%i -> %i, %i -> %i}\n", move->entity->id, move->entity->x_tile, move->x_tile, move->entity->y_tile, move->y_tile);
-      bytes_written += n;
-    }
-  }
-  i32 w = 230;
-  i32 h = 300;
-  i32 x = 10;
-  i32 y = 130;
-  render_text(textures[TEXTURE_FONT],
-    x, y,
-    0.9f, // z
-    w,   // Width
-    h, // Height
-    12, // Font size
-    0.7f, // Font kerning
-    0.7f, // Line spacing
-    12.0f, // Margin
-    move_list_text,
-    UI_MOVE_LIST_TEXT_BUFF_SIZE
-  );
-}
 #else
 #endif
 {
@@ -376,6 +352,7 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
     // NOTE(lucas): Run the game without audio?
     game_run();
   }
+  tilemap_store(&game_state.tile_map, TILEMAP_STORAGE_FILE_BACKUP);
   window_close();
   resources_unload();
   return 0;

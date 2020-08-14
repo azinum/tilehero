@@ -5,15 +5,6 @@
 
 #define MOVE_INTERVAL (1.0f / 5.0f)
 
-struct Tile_move {
-  i32 x_tile;
-  i32 y_tile;
-  struct Entity* entity;
-};
-
-extern struct Tile_move tile_moves[];
-extern i32 move_count;
-
 enum Entity_state {
   STATE_NONE = 0,
   STATE_ALIVE,

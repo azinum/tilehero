@@ -5,8 +5,8 @@
 
 #include "entity.h"
 
-#define TILE_COUNT_X (12)
-#define TILE_COUNT_Y (12)
+#define TILE_COUNT_X (32)
+#define TILE_COUNT_Y (18)
 #define TILE_SIZE (42)
 #define PIXEL_TO_TILE_POS(PX) (PX >= 0 ? (i32)((PX) / TILE_SIZE) : -1)
 
@@ -32,14 +32,18 @@ typedef struct Tile_info Tile;
 #endif
 
 typedef struct Tile_map {
-  Tile map[TILE_COUNT_X * TILE_COUNT_Y];
   i32 x_count;
   i32 y_count;
+  Tile map[TILE_COUNT_X * TILE_COUNT_Y];
 } Tile_map;
 
 Tile* tilemap_get_tile(struct Tile_map* tile_map, i32 x, i32 y);
 
 void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count);
+
+i32 tilemap_store(struct Tile_map* tile_map, const char* path);
+
+i32 tilemap_load(struct Tile_map* tile_map, const char* path);
 
 void tilemap_render(struct Tile_map* tile_map);
 

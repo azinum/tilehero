@@ -13,6 +13,12 @@
 #define INTERP_MOVEMENT 1
 #define INTERP_SPEED (20.0f)
 
+struct Tile_move {
+  i32 x_tile;
+  i32 y_tile;
+  struct Entity* entity;
+};
+
 // TODO(lucas): Move this elsewhere?
 struct Tile_move tile_moves[MAX_MOVES];
 i32 move_count;
