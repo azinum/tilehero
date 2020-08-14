@@ -150,10 +150,9 @@ void entity_update_and_render(Entity* e) {
     i32 h = 8;
     i32 x_pos = (e->x + (e->w / 2.0f)) - (w / 2.0f),
       y_pos = e->y - 10;
-    render_filled_rectangle(x_pos - camera.x, y_pos - camera.y, 0.15f, (w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0.2f, 0.2f, 0.5f, 1.0f, 0, 1.0f / w);
-    render_filled_rectangle(x_pos - camera.x, y_pos - camera.y, 0.15f, w, h, 0.85f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
+    render_filled_rectangle((i32)(x_pos - camera.x), (i32)(y_pos - camera.y), 0.15f, (i32)(w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0.2f, 0.2f, 0.5f, 1.0f, 0, 1.0f / w);
+    render_filled_rectangle((i32)(x_pos - camera.x), (i32)(y_pos - camera.y), 0.15f, w, h, 0.85f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
   }
-  // render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
   render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, e->sprite_id * 8, 0, 8, 8);
 }
 

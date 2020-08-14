@@ -5,6 +5,6 @@
 
 int main(void) {
   // game_execute(1440, 900, 1);
-  game_execute(800, 600, 0);
+  game_execute(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_FULLSCREEN);
   return 0;
 }

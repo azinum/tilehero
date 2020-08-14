@@ -89,8 +89,8 @@ void game_init(Game_state* game) {
 
 void game_run() {
   game_init(&game_state);
-  struct timeval time_now;
-  struct timeval time_last;
+  struct timeval time_now = {0};
+  struct timeval time_last = {0};
 
   while (game_state.is_running && !window_process_input() && !window_should_close()) {
     time_last = time_now;
