@@ -60,14 +60,14 @@ void game_init(Game_state* game) {
   game->is_running = 1;
   game->mode = MODE_GAME;
 
-#if 0
-  for (i32 y = 1; y < TILE_COUNT_Y - 1; y++) {
-    for (i32 x = 1; x < TILE_COUNT_X - 1; x++) {
-      Entity* e = game_add_living_entity(x, y, TILE_SIZE, TILE_SIZE, 0, 1, 1, 1, 0);
-      e->e_flags |= ENTITY_FLAG_FRIENDLY;
-      e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
-      e->sprite_id = 2;
-    }
+#if 1
+  for (i32 x = 1; x < 4; x++) {
+    Entity* e = game_add_living_entity(x + rand() % 2, x + rand() % 2, TILE_SIZE, TILE_SIZE, 0, 1, 5, 5, 1);
+    e->sprite_id = SPRITE_RED_MONSTER;
+  }
+  for (i32 x = 1; x < 4; x++) {
+    Entity* e = game_add_living_entity(12 + x + rand() % 5, 2 + x + rand() % 5, TILE_SIZE, TILE_SIZE, 0, 1, 5, 5, 1);
+    e->sprite_id = SPRITE_MAD_SCIENTIST;
   }
 #endif
   is_fading_out = 1;

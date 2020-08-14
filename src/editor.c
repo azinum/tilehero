@@ -90,14 +90,10 @@ void editor_hud_render() {
   i32 y = 10;
   i32 w = TILE_SIZE * 2;
   i32 h = w;
+  struct Sprite_info sprite = sprite_info[editor.tile_type + MAX_SPRITE];
   render_rect(x, y, 0.9f, w, h, 0.75f, 0.25f, 0.25f, 1, 0, 1.0f / TILE_SIZE);
-  if (editor.tile_type != TILE_NONE) {
-    render_texture_region(textures[TEXTURE_SPRITES],
-              x, y, 0.9f, w, h, 0, (editor.tile_type + 4) * 8, 0, 8, 8);
-  }
-  else {
-    render_filled_rect(x, y, 0.9f, w, h, 0, 0, 0, 1, 0);
-  }
+  render_texture_region(textures[TEXTURE_SPRITES],
+    x, y, 0.9f, w, h, 0, sprite.x_offset, sprite.y_offset, sprite.x_range, sprite.y_range);
 }
   i32 w = 230;
   i32 h = 140;
@@ -134,24 +130,9 @@ void editor_hud_render() {
     UI_TEXT_BUFF_SIZE
   );
 
-  if (camera.has_target && camera.target != NULL) {
-    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[camera locked]");
-    render_text(textures[TEXTURE_FONT],
-      window.width - 10 - 160, window.height - 10 - 35, // x, y
-      0.9f, // z
-      160,   // Width
-      35, // Height
-      12, // Font size
-      0.7f, // Font kerning
-      0.7f, // Line spacing
-      12.0f, // Margin
-      ui_text,
-      UI_TEXT_BUFF_SIZE
-    );
-  }
-
 #else
 #endif
+
 {
   i32 w = 140;
   i32 h = 35;
@@ -173,5 +154,20 @@ void editor_hud_render() {
     );
   }
 }
+  if (camera.has_target && camera.target != NULL) {
+    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[camera locked]");
+    render_text(textures[TEXTURE_FONT],
+      window.width - 10 - 160, window.height - 10 - 35, // x, y
+      0.9f, // z
+      160,   // Width
+      35, // Height
+      12, // Font size
+      0.7f, // Font kerning
+      0.7f, // Line spacing
+      12.0f, // Margin
+      ui_text,
+      UI_TEXT_BUFF_SIZE
+    );
+  }
 }
 
