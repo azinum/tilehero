@@ -115,11 +115,13 @@ void game_run() {
     if (key_pressed[GLFW_KEY_0]) {
       game_restart();
     }
-    game_editor_update();
 
     for (i32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
-      entity_update_and_render(e);
+      if (game_state.mode == MODE_GAME) {
+        entity_update(e);
+      }
+      entity_render(e);
       if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
         entity_render_highlight(e);
         if (key_pressed[GLFW_KEY_F]) {
@@ -133,13 +135,15 @@ void game_run() {
       }
     }
 
+    game_editor_update();
+    editor_hud_render();
+
     if (game_state.time >= game_state.move_timer) {
       entity_do_tiled_move(game_state.entities, game_state.entity_count);
       game_state.move_timer = game_state.time + MOVE_INTERVAL;
     }
 
     tilemap_render(&game_state.tile_map);
-    editor_hud_render();
     if (is_fading_out) {
       fade_out();
     }
@@ -211,6 +215,8 @@ void game_editor_update() {
 }
 
 #define UI_TEXT_BUFF_SIZE (256)
+#define UI_MOVE_LIST_TEXT_BUFF_SIZE (512)
+char move_list_text[UI_MOVE_LIST_TEXT_BUFF_SIZE] = {0};
 
 void editor_hud_render() {
 #if USE_EDITOR
@@ -279,6 +285,36 @@ void editor_hud_render() {
       UI_TEXT_BUFF_SIZE
     );
   }
+
+{
+  if (game_state.time >= game_state.move_timer) {
+    i32 bytes_written = 0;
+    for (i32 current_move = 0; current_move < move_count; current_move++) {
+      if (bytes_written >= UI_MOVE_LIST_TEXT_BUFF_SIZE)
+        break;
+
+      struct Tile_move* move = &tile_moves[current_move];
+      i32 n = snprintf(&move_list_text[bytes_written], UI_MOVE_LIST_TEXT_BUFF_SIZE, "%i: {%i -> %i, %i -> %i}\n", move->entity->id, move->entity->x_tile, move->x_tile, move->entity->y_tile, move->y_tile);
+      bytes_written += n;
+    }
+  }
+  i32 w = 230;
+  i32 h = 300;
+  i32 x = 10;
+  i32 y = 130;
+  render_text(textures[TEXTURE_FONT],
+    x, y,
+    0.9f, // z
+    w,   // Width
+    h, // Height
+    12, // Font size
+    0.7f, // Font kerning
+    0.7f, // Line spacing
+    12.0f, // Margin
+    move_list_text,
+    UI_MOVE_LIST_TEXT_BUFF_SIZE
+  );
+}
 #else
 #endif
 {

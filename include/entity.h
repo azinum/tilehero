@@ -5,6 +5,15 @@
 
 #define MOVE_INTERVAL (1.0f / 5.0f)
 
+struct Tile_move {
+  i32 x_tile;
+  i32 y_tile;
+  struct Entity* entity;
+};
+
+extern struct Tile_move tile_moves[];
+extern i32 move_count;
+
 enum Entity_state {
   STATE_NONE = 0,
   STATE_ALIVE,
@@ -42,7 +51,9 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count);
 
 void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h);
 
-void entity_update_and_render(Entity* e);
+void entity_update(Entity* e);
+
+void entity_render(Entity* e);
 
 void entity_render_highlight(Entity* e);
 

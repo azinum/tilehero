@@ -13,14 +13,9 @@
 #define INTERP_MOVEMENT 1
 #define INTERP_SPEED (20.0f)
 
-struct Tile_move {
-  i32 x_tile;
-  i32 y_tile;
-  struct Entity* entity;
-};
-
-static struct Tile_move tile_moves[MAX_MOVES];
-static i32 move_count;
+// TODO(lucas): Move this elsewhere?
+struct Tile_move tile_moves[MAX_MOVES];
+i32 move_count;
 
 static i16 id_count = 0;
 static char temp_text[TEXT_BUFF_SIZE];
@@ -130,21 +125,24 @@ void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h) {
   e->y_tile = y_tile;
 }
 
-void entity_update_and_render(Entity* e) {
-    if (e->state == STATE_DEAD) {
-      game_entity_remove(e);
-      return;
-    }
-    if (game_state.time >= game_state.move_timer) {
-      entity_tiled_move(e);
-    }
+void entity_update(Entity* e) {
+  if (e->state == STATE_DEAD) {
+    game_entity_remove(e);
+    return;
+  }
+  if (game_state.time >= game_state.move_timer) {
+    entity_tiled_move(e);
+  }
 #if INTERP_MOVEMENT
-    e->x = lerp(e->x, TILE_SIZE * e->x_tile, INTERP_SPEED * game_state.delta_time * game_state.time_scale);
-    e->y = lerp(e->y, TILE_SIZE * e->y_tile, INTERP_SPEED * game_state.delta_time * game_state.time_scale);
+  e->x = lerp(e->x, TILE_SIZE * e->x_tile, INTERP_SPEED * game_state.delta_time * game_state.time_scale);
+  e->y = lerp(e->y, TILE_SIZE * e->y_tile, INTERP_SPEED * game_state.delta_time * game_state.time_scale);
 #else
-    e->x = TILE_SIZE * e->x_tile;
-    e->y = TILE_SIZE * e->y_tile;
+  e->x = TILE_SIZE * e->x_tile;
+  e->y = TILE_SIZE * e->y_tile;
 #endif
+}
+
+void entity_render(Entity* e) {
   if (e->e_flags & ENTITY_FLAG_DRAW_HEALTH) {
     i32 w = e->w * 0.8f;
     i32 h = 8;
