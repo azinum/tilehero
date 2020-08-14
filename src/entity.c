@@ -78,7 +78,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
     if (!tile) {  // Outside the map
       collision = 1;
     }
-    else if (tile->tile_type != TILE_DEFAULT && tile->tile_type != TILE_DUNGEON) { // We hit a tile
+    else if (tile->tile_type != TILE_DEFAULT && tile->tile_type != TILE_FLIPPER && tile->tile_type != TILE_DUNGEON) { // We hit a tile
       collision = 1;
     }
 
@@ -110,14 +110,34 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
     else {  // No collision, let's move to this tile!
       e->x_tile = move->x_tile;
       e->y_tile = move->y_tile;
-      if (tile->tile_type == TILE_DUNGEON) {
-        if (abs(e->x_dir) == 1) {
-          e->y_dir = e->x_dir;
-          e->x_dir = 0;
+      switch (tile->tile_type) {
+        case TILE_DUNGEON: {
+          if (abs(e->x_dir) == 1) {
+            e->y_dir = e->x_dir;
+            e->x_dir = 0;
+          }
+          else if (abs(e->y_dir) == 1) {
+            e->x_dir = e->y_dir;
+            e->y_dir = 0;
+          }
+          break;
         }
-        else if (abs(e->y_dir) == 1) {
-          e->x_dir = e->y_dir;
-          e->y_dir = 0;
+        // TODO(lucas): Find a way to do this more elegantly!
+        case TILE_FLIPPER: {
+          Tile* l = tilemap_get_tile(&game_state.tile_map, move->x_tile - 1, move->y_tile);
+          Tile* r = tilemap_get_tile(&game_state.tile_map, move->x_tile + 1, move->y_tile);
+          Tile* t = tilemap_get_tile(&game_state.tile_map, move->x_tile, move->y_tile - 1);
+          Tile* b = tilemap_get_tile(&game_state.tile_map, move->x_tile, move->y_tile + 1);
+          if (l)
+            l->tile_type = (l->tile_type * 2) % MAX_TILE;
+          if (r)
+            r->tile_type = (r->tile_type * 2) % MAX_TILE;
+          if (t)
+            t->tile_type = (t->tile_type * 2) % MAX_TILE;
+          if (b)
+            b->tile_type = (b->tile_type * 2) % MAX_TILE;
+          audio_play_once(SOUND_RANDOM_1, 0.5f);
+          break;
         }
       }
     }
