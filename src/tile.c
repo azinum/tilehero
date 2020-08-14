@@ -1,10 +1,9 @@
 // tile.c
 
-#include "common.h"
+#include "game.h"
 #include "renderer.h"
 #include "entity.h"
 #include "camera.h"
-#include "game.h"
 #include "tile.h"
 
 Tile* tilemap_get_tile(struct Tile_map* tile_map, i32 x, i32 y) {
@@ -39,7 +38,7 @@ void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count) {
   }
 }
 
-// TODO(lucas): Rework storing and loading of tilemaps
+// TODO(lucas): Rework storing and loading of tilemaps to allow for variable sized tilemaps!
 i32 tilemap_store(struct Tile_map* tile_map, const char* path) {
   FILE* fp = fopen(path, "wb");
   if (!fp) {
@@ -80,7 +79,15 @@ void tilemap_render(struct Tile_map* tile_map) {
       Tile* tile = &tile_map->map[x + (y * tile_map->x_count)];
       if (tile->tile_type != TILE_NONE) {
         render_rect((x * TILE_SIZE) - camera.x, (y * TILE_SIZE) - camera.y, -0.1f, TILE_SIZE, TILE_SIZE, 0, 0, 0, 1, 0, 1.0f / TILE_SIZE);
-        render_texture_region(textures[TEXTURE_SPRITES], (x * TILE_SIZE) - camera.x, (y * TILE_SIZE) - camera.y, -0.1f, TILE_SIZE, TILE_SIZE, 0, (tile->tile_type + 4) * 8, 0, 8, 8);
+        struct Sprite_info sprite = sprite_info[TILE_SPRITE_VOID + tile->tile_type];
+        render_texture_region(
+          textures[TEXTURE_SPRITES],
+          (x * TILE_SIZE) - camera.x,
+          (y * TILE_SIZE) - camera.y,
+          -0.1f,
+          TILE_SIZE, TILE_SIZE,
+        0,
+        sprite.x_offset, sprite.y_offset, sprite.x_range, sprite.y_range);
       }
     }
   }

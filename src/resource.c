@@ -31,6 +31,24 @@ static const char* sound_filenames[] = {
 struct Texture textures[MAX_TEXTURE];
 struct Audio_source sounds[MAX_SOUND];
 
+// TODO(lucas): Think about how spritesheets should be stored,
+// in terms how how the spritesheets look (dimentions and what not) and also
+// where we store the spritesheet meta-data.
+struct Sprite_info sprite_info[] = {
+  {0, 0, 8, 8},
+  {8, 0, 8, 8},
+  {16, 0, 8, 8},
+  {24, 0, 8, 8},
+  {32, 0, 8, 8},
+
+  {40, 0, 8, 8},
+  {48, 0, 8, 8},
+  {56, 0, 8, 8},
+  {64, 0, 8, 8},
+  {72, 0, 8, 8},
+  {80, 0, 8, 8},
+};
+
 static u32 load_texture_from_image(struct Image* image);
 
 u32 load_texture_from_image(struct Image* image) {
