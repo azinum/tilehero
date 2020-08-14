@@ -25,7 +25,8 @@ void editor_update() {
     if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
       i16 health = 5 + rand() % 10;
       i16 attack = 1 + rand() % 3;
-      game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
+      Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
+      e->sprite_id = SPRITE_RED_MONSTER;
       audio_play_once(SOUND_0F, 0.5f);
     }
   }
@@ -36,7 +37,7 @@ void editor_update() {
       i16 health = 5 + rand() % 10;
       i16 attack = 1 + rand() % 3;
       Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 1, 0, health, health, attack);
-      e->sprite_id = 2;
+      e->sprite_id = SPRITE_WIZARD;
       e->e_flags |= ENTITY_FLAG_FRIENDLY;
       e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
       audio_play_once(SOUND_0F, 0.5f);
@@ -58,6 +59,10 @@ void editor_update() {
   }
   if (key_pressed[GLFW_KEY_3]) {
     game_state.time_scale = 1;
+  }
+
+  if (key_pressed[GLFW_KEY_9]) {
+    tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
 
   if (key_pressed[GLFW_KEY_R]) {

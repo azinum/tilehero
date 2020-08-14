@@ -16,7 +16,7 @@ enum Tile_type {
   TILE_BRICK_1,
   TILE_BRICK_2,
   TILE_DUNGEON,
-  TILE_FLIPPER,
+  TILE_SWAPPER,
   MAX_TILE,
 };
 

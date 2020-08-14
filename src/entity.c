@@ -78,7 +78,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
     if (!tile) {  // Outside the map
       collision = 1;
     }
-    else if (tile->tile_type != TILE_DEFAULT && tile->tile_type != TILE_FLIPPER && tile->tile_type != TILE_DUNGEON) { // We hit a tile
+    else if (tile->tile_type != TILE_DEFAULT && tile->tile_type != TILE_SWAPPER && tile->tile_type != TILE_DUNGEON) { // Make sure we don't hit a walkable tile
       collision = 1;
     }
 
@@ -123,19 +123,21 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
           break;
         }
         // TODO(lucas): Find a way to do this more elegantly!
-        case TILE_FLIPPER: {
-          Tile* l = tilemap_get_tile(&game_state.tile_map, move->x_tile - 1, move->y_tile);
-          Tile* r = tilemap_get_tile(&game_state.tile_map, move->x_tile + 1, move->y_tile);
-          Tile* t = tilemap_get_tile(&game_state.tile_map, move->x_tile, move->y_tile - 1);
-          Tile* b = tilemap_get_tile(&game_state.tile_map, move->x_tile, move->y_tile + 1);
-          if (l)
-            l->tile_type = (l->tile_type * 2) % MAX_TILE;
-          if (r)
-            r->tile_type = (r->tile_type * 2) % MAX_TILE;
-          if (t)
-            t->tile_type = (t->tile_type * 2) % MAX_TILE;
-          if (b)
-            b->tile_type = (b->tile_type * 2) % MAX_TILE;
+        case TILE_SWAPPER: {
+          Tile* l = tilemap_get_tile(&game_state.tile_map, move->x_tile - 1, move->y_tile); // Left
+          Tile* r = tilemap_get_tile(&game_state.tile_map, move->x_tile + 1, move->y_tile); // Right
+          Tile* t = tilemap_get_tile(&game_state.tile_map, move->x_tile, move->y_tile - 1); // Top
+          Tile* b = tilemap_get_tile(&game_state.tile_map, move->x_tile, move->y_tile + 1); // Bottom
+          if (l && r) {
+            Tile l_tmp = *l;
+            *l = *r;
+            *r = l_tmp;
+          }
+          if (t && b) {
+            Tile t_tmp = *t;
+            *t = *b;
+            *b = t_tmp;
+          }
           audio_play_once(SOUND_RANDOM_1, 0.5f);
           break;
         }
