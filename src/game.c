@@ -60,16 +60,6 @@ void game_init(Game_state* game) {
   game->is_running = 1;
   game->mode = MODE_GAME;
 
-#if 0
-  for (i32 x = 1; x < 4; x++) {
-    Entity* e = game_add_living_entity(x + rand() % 2, x + rand() % 2, TILE_SIZE, TILE_SIZE, 0, 1, 5, 5, 1);
-    e->sprite_id = SPRITE_RED_MONSTER;
-  }
-  for (i32 x = 1; x < 4; x++) {
-    Entity* e = game_add_living_entity(12 + x + rand() % 5, 2 + x + rand() % 5, TILE_SIZE, TILE_SIZE, 0, 1, 5, 5, 1);
-    e->sprite_id = SPRITE_MAD_SCIENTIST;
-  }
-#endif
   is_fading_out = 1;
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));

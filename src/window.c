@@ -10,6 +10,7 @@
 #include "shader.h"
 #include "window.h"
 
+i8 mouse_state = 0;
 i8 key_down[GLFW_KEY_LAST] = {0};
 i8 key_pressed[GLFW_KEY_LAST] = {0};
 
@@ -107,6 +108,15 @@ i32 window_process_input() {
       key_pressed[i] = 0;
     }
   }
+
+  i32 left_mouse_button_state = glfwGetMouseButton(window.window, 0);
+  i32 right_mouse_button_state = glfwGetMouseButton(window.window, 1);
+
+  (left_mouse_button_state && !(mouse_state & (1 << 7))) ? mouse_state |= (1 << 6) : (mouse_state &= ~(1 << 6));
+  left_mouse_button_state ? mouse_state |= (1 << 7) : (mouse_state &= ~(1 << 7));
+  (right_mouse_button_state && !(mouse_state & (1 << 5))) ? mouse_state |= (1 << 4) : (mouse_state &= ~(1 << 4));
+  right_mouse_button_state ? mouse_state |= (1 << 5) : (mouse_state &= ~(1 << 5));
+
   if (key_pressed[GLFW_KEY_ESCAPE]) {
     glfwSetWindowShouldClose(window.window, 1);
   }

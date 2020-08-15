@@ -65,7 +65,7 @@ void editor_update() {
     tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
 
-  if (key_pressed[GLFW_KEY_R]) {
+  if (left_mouse_pressed) {
     i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
     i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
     if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
