@@ -78,9 +78,11 @@ void editor_update() {
   }
   if (key_pressed[GLFW_KEY_N]) {
     tilemap_store(&game_state.tile_map, TILEMAP_STORAGE_FILE);
+    entity_store(game_state.entities, game_state.entity_count, ENTITY_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_M]) {
     tilemap_load(&game_state.tile_map, TILEMAP_STORAGE_FILE);
+    entity_load(game_state.entities, &game_state.entity_count, ENTITY_STORAGE_FILE);
   }
 #endif
 }

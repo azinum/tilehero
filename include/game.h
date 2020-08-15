@@ -23,7 +23,7 @@ enum Game_mode {
 typedef struct Game_state {
   struct Tile_map tile_map;
   struct Entity entities[MAX_ENTITY];
-  i32 entity_count;
+  u32 entity_count;
   float time;
   float time_scale;
   float delta_time;

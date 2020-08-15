@@ -60,7 +60,7 @@ void game_init(Game_state* game) {
   game->is_running = 1;
   game->mode = MODE_GAME;
 
-#if 1
+#if 0
   for (i32 x = 1; x < 4; x++) {
     Entity* e = game_add_living_entity(x + rand() % 2, x + rand() % 2, TILE_SIZE, TILE_SIZE, 0, 1, 5, 5, 1);
     e->sprite_id = SPRITE_RED_MONSTER;
@@ -75,6 +75,7 @@ void game_init(Game_state* game) {
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   tilemap_load(&game_state.tile_map, TILEMAP_STORAGE_FILE);
+  entity_load(game_state.entities, &game_state.entity_count, ENTITY_STORAGE_FILE);
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
 }
 
@@ -107,7 +108,7 @@ void game_run() {
       game_restart();
     }
 
-    for (i32 i = 0; i < game_state.entity_count; i++) {
+    for (u32 i = 0; i < game_state.entity_count; i++) {
       Entity* e = &game_state.entities[i];
       if (game_state.mode == MODE_GAME) {
         entity_update(e);

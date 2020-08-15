@@ -13,5 +13,6 @@
 
 #define TILEMAP_STORAGE_FILE "resource/map/test.map"
 #define TILEMAP_STORAGE_FILE_BACKUP "resource/map/test.map.backup"
+#define ENTITY_STORAGE_FILE "resource/map/test.entity"
 
 #endif
