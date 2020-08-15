@@ -1,6 +1,7 @@
-.DS_Store
 build/
+tools/fontgen/fontgen
+profile/
+.DS_Store
+tags
 *.swp
 *.swo
-tags
-tools/fontgen/fontgen
