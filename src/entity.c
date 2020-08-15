@@ -124,7 +124,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
                 break;  
             }
         }
-        Tile* tile = tilemap_get_tile(&game_state.tile_map, move->x_tile, move->y_tile);
+        Tile* tile = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile, move->y_tile);
         if (!tile) {  // Outside the map
             collision = 1;
         }
@@ -174,10 +174,10 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
                 }
                 // TODO(lucas): Find a way to do this more elegantly!
                 case TILE_SWAPPER: {
-                    Tile* l = tilemap_get_tile(&game_state.tile_map, move->x_tile - 1, move->y_tile); // Left
-                    Tile* r = tilemap_get_tile(&game_state.tile_map, move->x_tile + 1, move->y_tile); // Right
-                    Tile* t = tilemap_get_tile(&game_state.tile_map, move->x_tile, move->y_tile - 1); // Top
-                    Tile* b = tilemap_get_tile(&game_state.tile_map, move->x_tile, move->y_tile + 1); // Bottom
+                    Tile* l = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile - 1, move->y_tile); // Left
+                    Tile* r = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile + 1, move->y_tile); // Right
+                    Tile* t = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile, move->y_tile - 1); // Top
+                    Tile* b = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile, move->y_tile + 1); // Bottom
                     if (l && r) {
                         Tile l_tmp = *l;
                         *l = *r;

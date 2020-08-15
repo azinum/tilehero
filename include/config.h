@@ -11,8 +11,7 @@
 #define WINDOW_FULLSCREEN 0
 #define VSYNC 1
 
-#define TILEMAP_STORAGE_FILE "resource/map/test.map"
-#define TILEMAP_STORAGE_FILE_BACKUP "resource/map/test.map.backup"
-#define ENTITY_STORAGE_FILE "resource/map/test.entity"
+#define WORLD_STORAGE_FILE "resource/map/world.data"
+#define WORLD_STORAGE_FILE_BACKUP "resource/map/world.data.backup"
 
 #endif

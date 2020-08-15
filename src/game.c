@@ -29,9 +29,9 @@ Entity* game_add_entity(float x, float y, float w, float h) {
 }
 
 Entity* game_add_empty_entity() {
-  if (game_state.entity_count >= MAX_ENTITY)
+  if (game_state.world_chunk.entity_count >= MAX_ENTITY)
     return NULL;
-  return &game_state.entities[game_state.entity_count++];
+  return &game_state.world_chunk.entities[game_state.world_chunk.entity_count++];
 }
 
 Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_dir, i8 y_dir, i16 health, i16 max_health, i16 attack) {
@@ -51,21 +51,21 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
 
 void game_init(Game_state* game) {
   srand((u32)time(NULL));
-  game->is_running = 1;
-  game->entity_count = 0;
+
+  World_chunk* world_chunk = &game->world_chunk;
+  world_chunk->entity_count = 0;
   game->time = 0;
   game->time_scale = 1;
-  game->move_timer = 0;
   game->delta_time = 0;
+  game->move_timer = 0;
   game->is_running = 1;
   game->mode = MODE_GAME;
 
   is_fading_out = 1;
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
-  tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  tilemap_load(&game_state.tile_map, TILEMAP_STORAGE_FILE);
-  entity_load(game_state.entities, &game_state.entity_count, ENTITY_STORAGE_FILE);
+  tilemap_init(&world_chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
+  game_load_world_chunk(world_chunk, WORLD_STORAGE_FILE);
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
 }
 
@@ -73,6 +73,7 @@ void game_run() {
   game_init(&game_state);
   struct timeval time_now = {0};
   struct timeval time_last = {0};
+  struct World_chunk* world_chunk = &game_state.world_chunk;
 
   while (game_state.is_running && !window_process_input() && !window_should_close()) {
     time_last = time_now;
@@ -98,8 +99,8 @@ void game_run() {
       game_restart();
     }
 
-    for (u32 i = 0; i < game_state.entity_count; i++) {
-      Entity* e = &game_state.entities[i];
+    for (u32 i = 0; i < world_chunk->entity_count; i++) {
+      Entity* e = &world_chunk->entities[i];
       if (game_state.mode == MODE_GAME) {
         entity_update(e);
       }
@@ -121,11 +122,11 @@ void game_run() {
     editor_hud_render();
 
     if (game_state.time >= game_state.move_timer) {
-      entity_do_tiled_move(game_state.entities, game_state.entity_count);
+      entity_do_tiled_move(world_chunk->entities, world_chunk->entity_count);
       game_state.move_timer = game_state.time + MOVE_INTERVAL;
     }
 
-    tilemap_render(&game_state.tile_map);
+    tilemap_render(&world_chunk->tile_map);
     if (is_fading_out) {
       fade_out();
     }
@@ -143,15 +144,63 @@ void fade_out() {
   }
 }
 
+i32 game_store_world_chunk(struct World_chunk* chunk, const char* world_storage_file) {
+  FILE* fp = fopen(world_storage_file, "wb");
+  if (!fp) {
+    fprintf(stderr, "Failed to open file '%s'\n", world_storage_file);
+    return -1;
+  }
+
+  fwrite(chunk, 1, sizeof(struct World_chunk), fp);
+  fclose(fp);
+  return 0;
+}
+
+i32 game_load_world_chunk(struct World_chunk* chunk, const char* world_storage_file) {
+  FILE* fp = fopen(world_storage_file, "rb");
+  const u32 chunk_index = 0;
+
+  if (!fp) {
+    fprintf(stderr, "Failed to open file '%s'\n", world_storage_file);
+    return -1;
+  }
+
+  fseek(fp, 0, SEEK_END);
+  u32 size = ftell(fp);
+  fseek(fp, 0, SEEK_SET);
+  if (size < sizeof(struct World_chunk)) {
+    fprintf(stderr, "Invalid world storage file '%s'\n", world_storage_file);
+    fclose(fp);
+    return -1;
+  }
+  if ((chunk_index * sizeof(struct World_chunk)) > size) {
+    fprintf(stderr, "Failed to load chunk (id: %u)\n", chunk_index);
+    fclose(fp);
+    return -1;
+  }
+  u32 bytes_read = fread(chunk, 1, sizeof(struct World_chunk), fp);
+  if (bytes_read != sizeof(struct World_chunk)) {
+    fprintf(stderr, "Failed to read world chunk (id: %u)\n", chunk_index);
+    fclose(fp);
+    return -1;
+  }
+  fclose(fp);
+
+  return 0;
+}
+
 void game_entity_remove(Entity* e) {
-  if (game_state.entity_count > 0) {
-    Entity* top = &game_state.entities[--game_state.entity_count];
+  if (game_state.world_chunk.entity_count > 0) {
+    Entity* top = &game_state.world_chunk.entities[--game_state.world_chunk.entity_count];
     if (e == camera.target) {
       camera.target = NULL;
       camera.has_target = 0;
     }
     if (top == camera.target) {
       camera.target = e;
+    }
+    if (game_state.world_chunk.entity_count == 0) {
+      return;
     }
     *e = *top;
     return;
@@ -170,7 +219,7 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
     // NOTE(lucas): Run the game without audio?
     game_run();
   }
-  tilemap_store(&game_state.tile_map, TILEMAP_STORAGE_FILE_BACKUP);
+  game_store_world_chunk(&game_state.world_chunk, WORLD_STORAGE_FILE_BACKUP);
   window_close();
   resources_unload();
   return 0;

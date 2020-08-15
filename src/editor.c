@@ -17,7 +17,7 @@ void editor_update() {
   i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
   i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
   if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-    tilemap_render_tile_highlight(&game_state.tile_map, x_tile, y_tile);
+    tilemap_render_tile_highlight(&game_state.world_chunk.tile_map, x_tile, y_tile);
   }
   if (key_pressed[GLFW_KEY_T]) {
     i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
@@ -43,6 +43,17 @@ void editor_update() {
       audio_play_once(SOUND_0F, 0.5f);
     }
   }
+  if (key_pressed[GLFW_KEY_U]) {
+    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+    if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
+      Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 0, 1, 1, 1);
+      e->sprite_id = TILE_SPRITE_BRICK;
+      e->e_flags |= ENTITY_FLAG_FRIENDLY;
+      e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
+      audio_play_once(SOUND_0F, 0.5f);
+    }
+  }
   if (key_pressed[GLFW_KEY_E]) {
     editor.tile_type = (editor.tile_type + 1) % MAX_TILE;
   }
@@ -62,14 +73,14 @@ void editor_update() {
   }
 
   if (key_pressed[GLFW_KEY_9]) {
-    tilemap_init(&game_state.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
+    tilemap_init(&game_state.world_chunk.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
 
   if (left_mouse_pressed) {
     i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
     i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
     if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-      Tile* tile = tilemap_get_tile(&game_state.tile_map, x_tile, y_tile);
+      Tile* tile = tilemap_get_tile(&game_state.world_chunk.tile_map, x_tile, y_tile);
       if (tile) {
         tile->tile_type = editor.tile_type;
         audio_play_once(SOUND_0F, 0.5f);
@@ -77,13 +88,12 @@ void editor_update() {
     }
   }
   if (key_pressed[GLFW_KEY_N]) {
-    tilemap_store(&game_state.tile_map, TILEMAP_STORAGE_FILE);
-    entity_store(game_state.entities, game_state.entity_count, ENTITY_STORAGE_FILE);
+    game_store_world_chunk(&game_state.world_chunk, WORLD_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_M]) {
-    tilemap_load(&game_state.tile_map, TILEMAP_STORAGE_FILE);
-    entity_load(game_state.entities, &game_state.entity_count, ENTITY_STORAGE_FILE);
+    game_load_world_chunk(&game_state.world_chunk, WORLD_STORAGE_FILE);
   }
+
 #endif
 }
 
@@ -121,7 +131,7 @@ void editor_hud_render() {
     game_state.time,
     (i32)(100 * game_state.time_scale),
     (i32)(1.0f / game_state.delta_time),
-    game_state.entity_count, MAX_ENTITY,
+    game_state.world_chunk.entity_count, MAX_ENTITY,
     audio_engine.master_volume,
     audio_engine.sound_count, MAX_ACTIVE_SOUNDS);
   render_text(textures[TEXTURE_FONT],

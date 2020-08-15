@@ -11,7 +11,7 @@
 #include "resource.h"
 #include "tile.h"
 
-#define MAX_ENTITY (1024)
+#define MAX_ENTITY (256)
 #define TIME_SCALING_MIN (0)
 #define TIME_SCALING_MAX (4.0f)
 
@@ -20,10 +20,19 @@ enum Game_mode {
   MODE_PAUSE,
 };
 
-typedef struct Game_state {
+typedef struct World_chunk {
   struct Tile_map tile_map;
-  struct Entity entities[MAX_ENTITY];
   u32 entity_count;
+  struct Entity entities[MAX_ENTITY];
+} World_chunk;
+
+struct World {
+  u32 chunk_count;
+  struct World_chunk* chunks;
+};
+
+typedef struct Game_state {
+  struct World_chunk world_chunk;
   float time;
   float time_scale;
   float delta_time;
@@ -33,6 +42,10 @@ typedef struct Game_state {
 } Game_state;
 
 extern struct Game_state game_state;
+
+i32 game_store_world_chunk(struct World_chunk* chunk, const char* world_storage_file);
+
+i32 game_load_world_chunk(struct World_chunk* chunk, const char* world_storage_file);
 
 void game_entity_remove(struct Entity* e);
 
