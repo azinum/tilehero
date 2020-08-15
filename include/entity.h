@@ -34,10 +34,6 @@ typedef struct Entity {
   i16 xp;
 } Entity;
 
-i32 entity_store(Entity* entities, u32 count, const char* path);
-
-i32 entity_load(Entity* entities, u32* count, const char* path);
-
 void entity_init(Entity* e, float x, float y, float w, float h);
 
 void entity_tiled_move(Entity* e);

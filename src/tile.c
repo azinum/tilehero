@@ -38,40 +38,6 @@ void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count) {
   }
 }
 
-// TODO(lucas): Rework storing and loading of tilemaps to allow for variable sized tilemaps!
-i32 tilemap_store(struct Tile_map* tile_map, const char* path) {
-  FILE* fp = fopen(path, "wb");
-  if (!fp) {
-    fprintf(stderr, "Failed to open file '%s'\n", path);
-    return -1;
-  }
-  u32 size = sizeof(struct Tile_map);
-  u32 bytes_written = fwrite(tile_map, 1, size, fp);
-  if (size != bytes_written) {
-    fprintf(stderr, "Failed to write file '%s'\n", path);
-  }
-  fclose(fp);
-  return 0;
-}
-
-i32 tilemap_load(struct Tile_map* tile_map, const char* path) {
-  FILE* fp = fopen(path, "rb");
-  if (!fp) {
-    fprintf(stderr, "Failed to open file '%s'\n", path);
-    return -1;
-  }
-  fseek(fp, 0, SEEK_END);
-  u32 size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-  if (size < sizeof(struct Tile_map)) {
-    fprintf(stderr, "Invalid tilemap file '%s'\n", path);
-    return -1;
-  }
-  u32 bytes_read = fread(tile_map, 1, size, fp);
-  assert(bytes_read == size);
-  return 0;
-}
-
 void tilemap_render(struct Tile_map* tile_map) {
   renderer_set_tint(1, 1, 1, 1);
   for (i32 x = 0; x < tile_map->x_count; x++) {

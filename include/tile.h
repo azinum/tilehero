@@ -42,10 +42,6 @@ Tile* tilemap_get_tile(struct Tile_map* tile_map, i32 x, i32 y);
 
 void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count);
 
-i32 tilemap_store(struct Tile_map* tile_map, const char* path);
-
-i32 tilemap_load(struct Tile_map* tile_map, const char* path);
-
 void tilemap_render(struct Tile_map* tile_map);
 
 void tilemap_render_tile_highlight(struct Tile_map* tile_map, i32 x_tile, i32 y_tile);

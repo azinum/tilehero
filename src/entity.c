@@ -26,56 +26,6 @@ i32 move_count;
 static i16 id_count = 0;
 static char temp_text[TEXT_BUFF_SIZE];
 
-i32 entity_store(Entity* entities, u32 count, const char* path) {
-  FILE* fp = fopen(path, "wb");
-  if (!fp) {
-    fprintf(stderr, "Failed to open file '%s'\n", path);
-    return -1;
-  }
-  u32 bytes_written = 0;
-  bytes_written += fwrite(&count, 1, sizeof(count), fp);
-  bytes_written += fwrite(entities, 1, count * sizeof(Entity), fp);
-  if ((sizeof(count) + count * sizeof(Entity)) != bytes_written) {
-    fprintf(stderr, "Failed to write file '%s'\n", path);
-    fclose(fp);
-    return -1;
-  }
-  printf("Entities stored to file '%s'\n", path);
-  fclose(fp);
-  return 0;
-}
-
-i32 entity_load(Entity* entities, u32* count, const char* path) {
-  FILE* fp = fopen(path, "rb");
-  if (!fp) {
-    fprintf(stderr, "Failed to open file '%s'\n", path);
-    return -1;
-  }
-  fseek(fp, 0, SEEK_END);
-  u32 size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-
-  if (size < sizeof(u32)) {
-    fprintf(stderr, "Invalid entity file '%s'\n", path);
-    fclose(fp);
-    return -1;
-  }
-
-  u32 bytes_read = 0;
-  bytes_read += fread(count, 1, sizeof(u32), fp);
-  if ((*count) < (u32)(size / sizeof(Entity))) {
-    fprintf(stderr, "Invalid entity file '%s'\n", path);
-    fclose(fp);
-    return -1;
-  }
-  bytes_read += fread(entities, 1, *count * sizeof(Entity), fp);
-  if (bytes_read != (sizeof(u32) + (*count * sizeof(Entity)))) {
-    fprintf(stderr, "Failed to read entity file '%s'\n", path);
-  }
-  fclose(fp);
-  return 0;
-}
-
 void entity_init(Entity* e, float x, float y, float w, float h) {
     memset(e, 0, sizeof(Entity));
     e->x = x;
