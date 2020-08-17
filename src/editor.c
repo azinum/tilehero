@@ -26,8 +26,10 @@ void editor_update() {
       i16 health = 5 + rand() % 10;
       i16 attack = 1 + rand() % 3;
       Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
-      e->sprite_id = SPRITE_RED_MONSTER;
-      audio_play_once(SOUND_0F, 0.5f);
+      if (e) {
+        e->sprite_id = SPRITE_RED_MONSTER;
+        audio_play_once(SOUND_0F, 0.5f);
+      }
     }
   }
   if (key_pressed[GLFW_KEY_Y]) {
@@ -37,10 +39,12 @@ void editor_update() {
       i16 health = 5 + rand() % 10;
       i16 attack = 1 + rand() % 3;
       Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 1, 0, health, health, attack);
-      e->sprite_id = SPRITE_WIZARD;
-      e->e_flags |= ENTITY_FLAG_FRIENDLY;
-      e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
-      audio_play_once(SOUND_0F, 0.5f);
+      if (e) {
+        e->sprite_id = SPRITE_WIZARD;
+        e->e_flags |= ENTITY_FLAG_FRIENDLY;
+        e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
+        audio_play_once(SOUND_0F, 0.5f);
+      }
     }
   }
   if (key_pressed[GLFW_KEY_U]) {
@@ -48,10 +52,12 @@ void editor_update() {
     i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
     if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
       Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 0, 1, 1, 1);
-      e->sprite_id = TILE_SPRITE_BRICK;
-      e->e_flags |= ENTITY_FLAG_FRIENDLY;
-      e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
-      audio_play_once(SOUND_0F, 0.5f);
+      if (e) {
+        e->sprite_id = SPRITE_BOY_WITH_HELM;
+        e->e_flags |= ENTITY_FLAG_FRIENDLY;
+        e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
+        audio_play_once(SOUND_0F, 0.5f);
+      }
     }
   }
   if (key_pressed[GLFW_KEY_E]) {
@@ -76,14 +82,16 @@ void editor_update() {
     tilemap_init(&game_state.world_chunk.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
 
-  if (left_mouse_pressed) {
+  if (left_mouse_down || key_down[GLFW_KEY_R]) {
     i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
     i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
     if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
       Tile* tile = tilemap_get_tile(&game_state.world_chunk.tile_map, x_tile, y_tile);
       if (tile) {
         tile->tile_type = editor.tile_type;
-        audio_play_once(SOUND_0F, 0.5f);
+        if (left_mouse_pressed) {
+          audio_play_once(SOUND_0F, 0.5f);
+        }
       }
     }
   }
@@ -91,9 +99,8 @@ void editor_update() {
     game_store_world_chunk(&game_state.world_chunk, WORLD_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_M]) {
-    game_load_world_chunk(&game_state.world_chunk, WORLD_STORAGE_FILE);
+    game_load_world_chunk(&game_state.world_chunk, 0, WORLD_STORAGE_FILE);
   }
-
 #endif
 }
 

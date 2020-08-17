@@ -65,7 +65,7 @@ void game_init(Game_state* game) {
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&world_chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  game_load_world_chunk(world_chunk, WORLD_STORAGE_FILE);
+  game_load_world_chunk(world_chunk, 0, WORLD_STORAGE_FILE);
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
 }
 
@@ -150,15 +150,15 @@ i32 game_store_world_chunk(struct World_chunk* chunk, const char* world_storage_
     fprintf(stderr, "Failed to open file '%s'\n", world_storage_file);
     return -1;
   }
-
+  u32 chunk_address = sizeof(struct World_chunk) * chunk->chunk_index;
+  fseek(fp, chunk_address, SEEK_SET);
   fwrite(chunk, 1, sizeof(struct World_chunk), fp);
   fclose(fp);
   return 0;
 }
 
-i32 game_load_world_chunk(struct World_chunk* chunk, const char* world_storage_file) {
+i32 game_load_world_chunk(struct World_chunk* chunk, u32 chunk_index, const char* world_storage_file) {
   FILE* fp = fopen(world_storage_file, "rb");
-  const u32 chunk_index = 0;
 
   if (!fp) {
     fprintf(stderr, "Failed to open file '%s'\n", world_storage_file);

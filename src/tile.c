@@ -28,18 +28,13 @@ void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count) {
     for (i32 x = 0; x < x_count; x++) {
       Tile* tile = tilemap_get_tile(tile_map, x, y);
       assert(tile != NULL);
-      if (x == 0 || y == 0 || x == (x_count - 1) || y == (y_count - 1)) {
-        tile->tile_type = TILE_BRICK_1;
-      }
-      else {
-        tile->tile_type = TILE_DEFAULT;
-      }
+      tile->tile_type = TILE_NONE;
     }
   }
 }
 
 void tilemap_render(struct Tile_map* tile_map) {
-  renderer_set_tint(1, 1, 1, 1);
+  render_rect(0 - camera.x, 0 - camera.y, -0.9f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 1, 1, 1, 0.1f, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
   for (i32 x = 0; x < tile_map->x_count; x++) {
     for (i32 y = 0; y < tile_map->y_count; y++) {
       Tile* tile = &tile_map->map[x + (y * tile_map->x_count)];

@@ -1,8 +1,5 @@
 // game.h
 
-#ifndef _GAME_H
-#define _GAME_H
-
 #include "common.h"
 #include "game_common.h"
 #include "config.h"
@@ -24,6 +21,7 @@ typedef struct World_chunk {
   struct Tile_map tile_map;
   u32 entity_count;
   struct Entity entities[MAX_ENTITY];
+  u32 chunk_index;
 } World_chunk;
 
 struct World {
@@ -45,7 +43,7 @@ extern struct Game_state game_state;
 
 i32 game_store_world_chunk(struct World_chunk* chunk, const char* world_storage_file);
 
-i32 game_load_world_chunk(struct World_chunk* chunk, const char* world_storage_file);
+i32 game_load_world_chunk(struct World_chunk* chunk, u32 chunk_index, const char* world_storage_file);
 
 void game_entity_remove(struct Entity* e);
 
@@ -58,5 +56,3 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen);
 
 void game_restart();
-
-#endif
