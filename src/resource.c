@@ -97,11 +97,10 @@ void resources_load() {
       textures[i] = texture;
     }
   }
-#if 1
+
   for (u16 i = 0; i < MAX_SOUND; i++) {
     resource_load_sound(i);
   }
-#endif
 }
 
 void resource_load_sound(i32 sound_id) {
