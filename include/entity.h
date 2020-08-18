@@ -16,6 +16,12 @@ enum Entity_flag {
   ENTITY_FLAG_DRAW_HEALTH   = 1 << 0,
   ENTITY_FLAG_FRIENDLY      = 1 << 1,
   ENTITY_FLAG_MOVABLE       = 1 << 2,
+  ENTITY_FLAG_PLAYER        = 1 << 3,
+};
+
+enum Entity_type {
+  ENTITY_TYPE_NPC = 0,
+  ENTITY_TYPE_PLAYER,
 };
 
 struct Tile_move {

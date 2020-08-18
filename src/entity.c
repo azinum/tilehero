@@ -75,8 +75,10 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
     }
 
     if (collision) {
-      e->x_dir = -e->x_dir;
-      e->y_dir = -e->y_dir;
+      if (e->type == ENTITY_TYPE_NPC) {
+        e->x_dir = -e->x_dir;
+        e->y_dir = -e->y_dir;
+      }
       if (target) {
         if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
 #if 1

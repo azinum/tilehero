@@ -114,7 +114,7 @@ void render_text(struct Texture font_texture, float x, float y, float z, float w
 #if 1
   render_filled_rectangle(x, y, z - 0.005f, w, h,
     0, 0, 0, 1.0f,
-    0.38f, 0.21f, 0.85f, 1.0f,
+    0.50f, 0.40f, 0.85f, 1.0f,
     0, 2.0f / w);
 #endif
   float font_size = font_texture.w;

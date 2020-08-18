@@ -10,8 +10,11 @@
 struct {
   u32 tile_type;
   u32 chunk_index;
+  u32 entity_type;
 } editor = {
   .tile_type = TILE_NONE,
+  .chunk_index = 0,
+  .entity_type = 0,
 };
 
 static Tile placable_tiles[MAX_TILE] = {
@@ -23,6 +26,29 @@ static Tile placable_tiles[MAX_TILE] = {
   {TILE_DUNGEON, 1},
   {TILE_SWAPPER, 1},
   {TILE_GRASS, 1},
+};
+
+struct Entity_type_def {
+  i8 x_dir;
+  i8 y_dir;
+  i32 e_flags;
+  i16 type;
+  i16 sprite_id;
+  i16 health;
+  i16 max_health;
+  i16 attack;
+};
+
+enum Placable_entity_type {
+  ENTITY_PLAYER,
+  ENTITY_RED_MONSTER,
+
+  MAX_PLACABLE_ENTITY,
+};
+
+static struct Entity_type_def placable_entities[MAX_PLACABLE_ENTITY] = {
+  {0, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY_WITH_HELM, 10, 10, 3},
+  {0, 1, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE, 0, SPRITE_RED_MONSTER, 5, 5, 1},
 };
 
 void editor_update() {
@@ -136,6 +162,28 @@ void editor_update() {
       tilemap_init(&game_state.world_chunk.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
     }
   }
+
+  if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
+    editor.entity_type--;
+  }
+  if (key_pressed[GLFW_KEY_5] && editor.entity_type < (MAX_PLACABLE_ENTITY - 1)) {
+    editor.entity_type++;
+  }
+
+  if (key_pressed[GLFW_KEY_Z]) {
+    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+    if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
+      struct Entity_type_def entity = placable_entities[editor.entity_type];
+      Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, entity.x_dir, entity.y_dir, entity.health, entity.max_health, entity.attack);
+      if (e) {
+        e->sprite_id = entity.sprite_id;
+        e->type = entity.type;
+        e->e_flags = entity.e_flags;
+        audio_play_once(SOUND_0F, 0.5f);
+      }
+    }
+  }
 #endif
 }
 
@@ -145,9 +193,22 @@ char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 void editor_render() {
 #if USE_EDITOR
 {
+  i32 x = 10 + 10 + TILE_SIZE;
+  i32 y = 10;
+  i32 w = TILE_SIZE;
+  i32 h = w;
+  struct Spritesheet sheet = spritesheets[SHEET_ENTITIES];
+  struct Entity_type_def entity = placable_entities[editor.entity_type];
+  i32 x_offset = SHEET_GET_X_OFFSET(sheet, entity.sprite_id);
+  i32 y_offset = SHEET_GET_Y_OFFSET(sheet, entity.sprite_id);
+  render_rect(x, y, 0.9f, w, h, 0.25f, 0.80f, 0.18f, 1, 0, 1.0f / TILE_SIZE);
+  render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
+}
+
+{
   i32 x = 10;
   i32 y = 10;
-  i32 w = TILE_SIZE * 2;
+  i32 w = TILE_SIZE;
   i32 h = w;
   struct Spritesheet sheet = spritesheets[SHEET_TILES];
   i32 x_offset = SHEET_GET_X_OFFSET(sheet, editor.tile_type);
