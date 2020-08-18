@@ -5,8 +5,10 @@
 
 #include "audio.h"
 
+#define SHEET_GET_X_OFFSET(SHEET, INDEX) ((SHEET.w * INDEX) % (SHEET.texture.w))
+#define SHEET_GET_Y_OFFSET(SHEET, INDEX) (((SHEET.h * INDEX) / SHEET.texture.w) * SHEET.h)
+
 enum Texture_type {
-  TEXTURE_SPRITES,
   TEXTURE_FONT,
   MAX_TEXTURE,
 };
@@ -32,7 +34,7 @@ enum Sprite_type {
 };
 
 enum Tile_sprite_type {
-  TILE_SPRITE_VOID = MAX_SPRITE,
+  TILE_SPRITE_VOID = 0,
   TILE_SPRITE_GROUND,
   TILE_SPRITE_PURPLE_BRICK,
   TILE_SPRITE_BRICK,
@@ -40,6 +42,13 @@ enum Tile_sprite_type {
   TILE_SPRITE_SWAPPER,
 
   MAX_TILE_SPRITE,
+};
+
+enum Spritesheet_types {
+  SHEET_ENTITIES,
+  SHEET_TILES,
+
+  MAX_SHEET,
 };
 
 struct Texture {
@@ -55,9 +64,16 @@ struct Sprite_info {
   i16 y_range;
 };
 
+struct Spritesheet {
+  struct Texture texture;
+  u32 size;
+  u32 w, h;
+};
+
 extern struct Texture textures[];
 extern struct Audio_source sounds[];
 extern struct Sprite_info sprite_info[];
+extern struct Spritesheet spritesheets[];
 
 struct Texture load_texture_from_file(const char* path);
 

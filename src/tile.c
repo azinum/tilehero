@@ -40,15 +40,18 @@ void tilemap_render(struct Tile_map* tile_map) {
       Tile* tile = &tile_map->map[x + (y * tile_map->x_count)];
       if (tile->tile_type != TILE_NONE) {
         render_rect((x * TILE_SIZE) - camera.x, (y * TILE_SIZE) - camera.y, -0.1f, TILE_SIZE, TILE_SIZE, 0, 0, 0, 1, 0, 1.0f / TILE_SIZE);
-        struct Sprite_info sprite = sprite_info[TILE_SPRITE_VOID + tile->tile_type];
+        struct Spritesheet sheet = spritesheets[SHEET_TILES];
+        i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile->tile_type);
+        i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->tile_type);
         render_texture_region(
-          textures[TEXTURE_SPRITES],
+          sheet.texture,
           (x * TILE_SIZE) - camera.x,
           (y * TILE_SIZE) - camera.y,
           -0.1f,
           TILE_SIZE, TILE_SIZE,
-        0,
-        sprite.x_offset, sprite.y_offset, sprite.x_range, sprite.y_range);
+          0,
+          x_offset, y_offset, sheet.w, sheet.h
+        );
       }
     }
   }

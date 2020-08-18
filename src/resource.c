@@ -15,7 +15,6 @@
 #define SOUND_EXT "wav"
 
 static const char* texture_filenames[] = {
-  "spritesheet",
   "font",
 };
 
@@ -28,25 +27,16 @@ static const char* sound_filenames[] = {
   "metaking",
 };
 
+static const char* spritesheet_filenames[] = {
+  "entity_spritesheet",
+  "tile_spritesheet",
+};
+
 struct Texture textures[MAX_TEXTURE];
 struct Audio_source sounds[MAX_SOUND];
-
-// TODO(lucas): Think about how spritesheets should be stored,
-// in terms how how the spritesheets look (dimentions and what not) and also
-// where we store the spritesheet meta-data.
-struct Sprite_info sprite_info[] = {
-  {0, 0, 8, 8},
-  {8, 0, 8, 8},
-  {16, 0, 8, 8},
-  {24, 0, 8, 8},
-  {32, 0, 8, 8},
-
-  {40, 0, 8, 8},
-  {48, 0, 8, 8},
-  {56, 0, 8, 8},
-  {64, 0, 8, 8},
-  {72, 0, 8, 8},
-  {80, 0, 8, 8},
+struct Spritesheet spritesheets[MAX_SHEET] = {
+  {{0}, 0, 8, 8},
+  {{0}, 0, 8, 8},
 };
 
 static u32 load_texture_from_image(struct Image* image);
@@ -100,6 +90,20 @@ void resources_load() {
 
   for (u16 i = 0; i < MAX_SOUND; i++) {
     resource_load_sound(i);
+  }
+
+  for (u16 i = 0; i < MAX_SHEET; i++) {
+    char filename[MAX_PATH_LENGTH] = {0};
+    snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", TEXTURE_PATH, spritesheet_filenames[i], TEXTURE_EXT);
+    printf("loading sheet: '%s'\n", filename);
+    struct Spritesheet* sheet = &spritesheets[i];
+    sheet->texture = load_texture_from_file(filename);
+    if (sheet->texture.id > 0) {
+      sheet->size = (sheet->texture.w / sheet->w) * (sheet->texture.h / sheet->h);
+    }
+    else {
+      fprintf(stderr, "Failed to load spritesheet '%s'\n", filename);
+    }
   }
 }
 

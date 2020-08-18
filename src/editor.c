@@ -114,10 +114,11 @@ void editor_hud_render() {
   i32 y = 10;
   i32 w = TILE_SIZE * 2;
   i32 h = w;
-  struct Sprite_info sprite = sprite_info[editor.tile_type + MAX_SPRITE];
-  render_rect(x, y, 0.9f, w, h, 0.75f, 0.25f, 0.25f, 1, 0, 1.0f / TILE_SIZE);
-  render_texture_region(textures[TEXTURE_SPRITES],
-    x, y, 0.9f, w, h, 0, sprite.x_offset, sprite.y_offset, sprite.x_range, sprite.y_range);
+  struct Spritesheet sheet = spritesheets[SHEET_TILES];
+  i32 x_offset = SHEET_GET_X_OFFSET(sheet, editor.tile_type);
+  i32 y_offset = SHEET_GET_Y_OFFSET(sheet, editor.tile_type);
+  render_rect(x, y, 0.9f, w, h, 0.8f, 0.20f, 0.25f, 1, 0, 1.0f / TILE_SIZE);
+  render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
 }
   i32 w = 230;
   i32 h = 140;

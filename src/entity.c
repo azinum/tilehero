@@ -179,8 +179,10 @@ void entity_render(Entity* e) {
     render_filled_rectangle((i32)(x_pos - camera.x), (i32)(y_pos - camera.y), 0.15f, (i32)(w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0.2f, 0.2f, 0.5f, 1.0f, 0, 1.0f / w);
     render_filled_rectangle((i32)(x_pos - camera.x), (i32)(y_pos - camera.y), 0.15f, w, h, 0.85f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
   }
-  struct Sprite_info sprite = sprite_info[e->sprite_id];
-  render_texture_region(textures[TEXTURE_SPRITES], e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, sprite.x_offset, sprite.y_offset, sprite.x_range, sprite.y_range);
+  struct Spritesheet sheet = spritesheets[SHEET_ENTITIES];
+  i32 x_offset = SHEET_GET_X_OFFSET(sheet, e->sprite_id);
+  i32 y_offset = SHEET_GET_Y_OFFSET(sheet, e->sprite_id);
+  render_texture_region(sheet.texture, e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, x_offset, y_offset, sheet.w, sheet.h);
 }
 
 void entity_render_highlight(Entity* e) {
