@@ -107,6 +107,7 @@ void editor_update() {
     world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_V]) {
+    move_count = 0;
     game_state.world_chunk.chunk_index = editor.chunk_index;
     world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
     if (editor.chunk_index != 0) {
@@ -115,6 +116,7 @@ void editor_update() {
     world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_B]) {
+    move_count = 0;
     game_state.world_chunk.chunk_index = editor.chunk_index;
     world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
     editor.chunk_index++;

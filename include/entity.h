@@ -18,6 +18,15 @@ enum Entity_flag {
   ENTITY_FLAG_MOVABLE       = 1 << 2,
 };
 
+struct Tile_move {
+  i32 x_tile;
+  i32 y_tile;
+  struct Entity* entity;
+};
+
+extern struct Tile_move tile_moves[];
+extern i32 move_count;
+
 typedef struct Entity {
   i32 x_tile, y_tile;
   float x, y, w, h;
