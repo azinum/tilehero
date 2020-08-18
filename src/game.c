@@ -154,6 +154,7 @@ i32 game_store_world_chunk(struct World_chunk* chunk, const char* world_storage_
   fseek(fp, chunk_address, SEEK_SET);
   fwrite(chunk, 1, sizeof(struct World_chunk), fp);
   fclose(fp);
+  fprintf(log_file, "Stored world chunk %i to world storage file '%s'\n", chunk->chunk_index, world_storage_file);
   return 0;
 }
 
@@ -186,6 +187,7 @@ i32 game_load_world_chunk(struct World_chunk* chunk, u32 chunk_index, const char
   }
   fclose(fp);
 
+  fprintf(log_file, "Loaded world chunk %i from world storage file '%s'\n", chunk->chunk_index, world_storage_file);
   return 0;
 }
 

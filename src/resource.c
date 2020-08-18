@@ -84,6 +84,7 @@ void resources_load() {
     snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", TEXTURE_PATH, texture_filenames[i], TEXTURE_EXT);
     struct Texture texture = load_texture_from_file(filename);
     if (texture.id > 0) {
+      fprintf(log_file, "Loaded texture '%s'\n", filename);
       textures[i] = texture;
     }
   }
@@ -107,8 +108,8 @@ void resources_load() {
   }
 }
 
-void resource_load_sound(i32 sound_id) {
-  if (sound_id < 0 || sound_id >= MAX_SOUND) {
+void resource_load_sound(u32 sound_id) {
+  if (sound_id >= MAX_SOUND) {
     fprintf(stderr, "Failed to load sound (no such sound id: %i)\n", sound_id);
     return;
   }
@@ -117,10 +118,25 @@ void resource_load_sound(i32 sound_id) {
   struct Audio_source source = {0};
   load_wav_from_file(filename, &source);
   sounds[sound_id] = source;
+  fprintf(log_file, "Loaded sound file '%s'\n", filename);
 }
 
 void resources_unload() {
-  for (i32 i = 0; i < MAX_SOUND; i++) {
+  for (u16 i = 0; i < MAX_TEXTURE; i++) {
+    struct Texture texture = textures[i];
+    if (texture.id > 0) {
+      glDeleteTextures(1, &texture.id);
+    }
+  }
+
+  for (u16 i = 0; i < MAX_SHEET; i++) {
+    struct Spritesheet sheet = spritesheets[i];
+    if (sheet.texture.id > 0) {
+      glDeleteTextures(1, &sheet.texture.id);
+    }
+  }
+
+  for (u16 i = 0; i < MAX_SOUND; i++) {
     struct Audio_source* source = &sounds[i];
     if (source->sample_buffer != NULL) {
       free(source->sample_buffer);
