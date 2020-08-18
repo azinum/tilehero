@@ -14,4 +14,6 @@
 #define WORLD_STORAGE_FILE "resource/map/world.data"
 #define WORLD_STORAGE_FILE_BACKUP "resource/map/world.data.backup"
 
+#define LOG_FILE "profile/debug.log"
+
 #endif

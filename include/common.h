@@ -46,4 +46,6 @@ inline float random_number(float from, float to) {
   return (float)rand() / (float)(RAND_MAX / to) + (float)rand() / (float)(RAND_MAX / from);
 }
 
+FILE* log_file;
+
 #endif

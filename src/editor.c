@@ -107,7 +107,7 @@ void editor_update() {
 #define UI_TEXT_BUFF_SIZE (256)
 char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 
-void editor_hud_render() {
+void editor_render() {
 #if USE_EDITOR
 {
   i32 x = 10;

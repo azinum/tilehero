@@ -7,6 +7,6 @@
 
 void editor_update();
 
-void editor_hud_render();
+void editor_render();
 
 #endif

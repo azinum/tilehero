@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "game_common.h"
+#include "matrix_math.h"
 #include "config.h"
 #include "camera.h"
 #include "entity.h"

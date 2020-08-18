@@ -95,11 +95,11 @@ void resources_load() {
   for (u16 i = 0; i < MAX_SHEET; i++) {
     char filename[MAX_PATH_LENGTH] = {0};
     snprintf(filename, MAX_PATH_LENGTH, "%s/%s.%s", TEXTURE_PATH, spritesheet_filenames[i], TEXTURE_EXT);
-    printf("loading sheet: '%s'\n", filename);
     struct Spritesheet* sheet = &spritesheets[i];
     sheet->texture = load_texture_from_file(filename);
     if (sheet->texture.id > 0) {
       sheet->size = (sheet->texture.w / sheet->w) * (sheet->texture.h / sheet->h);
+      fprintf(log_file, "Loaded spritesheet '%s'\n", filename);
     }
     else {
       fprintf(stderr, "Failed to load spritesheet '%s'\n", filename);

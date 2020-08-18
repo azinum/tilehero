@@ -119,7 +119,7 @@ void game_run() {
     }
 
     editor_update();
-    editor_hud_render();
+    editor_render();
 
     if (game_state.time >= game_state.move_timer) {
       entity_do_tiled_move(world_chunk->entities, world_chunk->entity_count);
@@ -209,6 +209,7 @@ void game_entity_remove(Entity* e) {
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
+  log_file = fopen(LOG_FILE, "w");
   if (window_open(window_width, window_height, fullscreen, "Tile Hero") != 0) {
     fprintf(stderr, "Failed to open window\n");
     return -1;
@@ -222,6 +223,9 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
   game_store_world_chunk(&game_state.world_chunk, WORLD_STORAGE_FILE_BACKUP);
   window_close();
   resources_unload();
+  if (log_file != stdout) {
+    fclose(log_file);
+  }
   return 0;
 }
 
