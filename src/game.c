@@ -9,6 +9,7 @@
 #include "renderer_common.h"
 #include "resource.h"
 #include "editor.h"
+#include "player.h"
 #include "game.h"
 
 #define MAX_DELTA_TIME (0.2f)
@@ -101,6 +102,13 @@ void game_run() {
     for (u32 i = 0; i < world_chunk->entity_count; i++) {
       Entity* e = &world_chunk->entities[i];
       if (game_state.mode == MODE_GAME) {
+        if (e->e_flags & ENTITY_FLAG_PLAYER) {
+          player_update(e);
+          if (!camera.has_target) {
+            camera.target = e;
+            camera.has_target = 1;
+          }
+        }
         entity_update(e);
       }
       entity_render(e);
