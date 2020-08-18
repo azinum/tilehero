@@ -42,7 +42,7 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
   e->x_dir = x_dir;
   e->y_dir = y_dir;
   e->state = STATE_ALIVE;
-  e->e_flags |= ENTITY_FLAG_DRAW_HEALTH;
+  e->e_flags |= ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE;
   e->health = health;
   e->max_health = max_health;
   e->attack = attack;

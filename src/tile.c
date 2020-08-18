@@ -41,7 +41,6 @@ void tilemap_render(struct Tile_map* tile_map) {
     for (i32 y = 0; y < tile_map->y_count; y++) {
       Tile* tile = &tile_map->map[x + (y * tile_map->x_count)];
       if (tile->tile_type != TILE_NONE) {
-        render_rect((x * TILE_SIZE) - camera.x, (y * TILE_SIZE) - camera.y, -0.1f, TILE_SIZE, TILE_SIZE, 0, 0, 0, 1, 0, 1.0f / TILE_SIZE);
         struct Spritesheet sheet = spritesheets[SHEET_TILES];
         i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile->tile_type);
         i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->tile_type);
@@ -54,6 +53,7 @@ void tilemap_render(struct Tile_map* tile_map) {
           0,
           x_offset, y_offset, sheet.w, sheet.h
         );
+        // render_rect((x * TILE_SIZE) - camera.x, (y * TILE_SIZE) - camera.y, -0.05f, TILE_SIZE, TILE_SIZE, 0, 0, 0, 0.3f, 0, 1.0f / TILE_SIZE);
       }
     }
   }

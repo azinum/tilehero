@@ -58,6 +58,7 @@ void editor_update() {
         e->sprite_id = SPRITE_BOY_WITH_HELM;
         e->e_flags |= ENTITY_FLAG_FRIENDLY;
         e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
+        e->e_flags ^= ENTITY_FLAG_MOVABLE;
         audio_play_once(SOUND_0F, 0.5f);
       }
     }
@@ -67,7 +68,7 @@ void editor_update() {
   }
 
   if (key_pressed[GLFW_KEY_1]) {
-    game_state.time_scale *= 0.9f;;
+    game_state.time_scale *= 0.9f;
     if (game_state.time_scale <= TIME_SCALING_MIN)
       game_state.time_scale = TIME_SCALING_MIN;
   }
@@ -97,6 +98,7 @@ void editor_update() {
       }
     }
   }
+
   if (key_pressed[GLFW_KEY_N]) {
     game_state.world_chunk.chunk_index = editor.chunk_index;
     world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
@@ -107,7 +109,9 @@ void editor_update() {
   if (key_pressed[GLFW_KEY_V]) {
     game_state.world_chunk.chunk_index = editor.chunk_index;
     world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
-    editor.chunk_index--;
+    if (editor.chunk_index != 0) {
+      editor.chunk_index--;
+    }
     world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_B]) {

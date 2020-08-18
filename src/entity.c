@@ -78,7 +78,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
     if (!tile) {  // Outside the map
       collision = 1;
     }
-    else if (tile->tile_type != TILE_DEFAULT && tile->tile_type != TILE_SWAPPER && tile->tile_type != TILE_DUNGEON) { // Make sure we don't hit a walkable tile
+    else if (tile->tile_type != TILE_DEFAULT && tile->tile_type != TILE_SWAPPER && tile->tile_type != TILE_DUNGEON && tile->tile_type != TILE_GRASS) { // Make sure we don't hit a walkable tile
       collision = 1;
     }
 
@@ -138,7 +138,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
             *t = *b;
             *b = t_tmp;
           }
-          audio_play_once(SOUND_RANDOM_1, 0.5f);
+          audio_play_once(SOUND_RANDOM_1, 0.3f);
           break;
         }
       }
@@ -158,16 +158,18 @@ void entity_update(Entity* e) {
     game_entity_remove(e);
     return;
   }
-  if (game_state.time >= game_state.move_timer) {
-    entity_tiled_move(e);
-  }
+  if (e->e_flags & ENTITY_FLAG_MOVABLE) {
+    if (game_state.time >= game_state.move_timer) {
+      entity_tiled_move(e);
+    }
 #if INTERP_MOVEMENT
-  e->x = lerp(e->x, TILE_SIZE * e->x_tile, INTERP_SPEED * game_state.delta_time * game_state.time_scale);
-  e->y = lerp(e->y, TILE_SIZE * e->y_tile, INTERP_SPEED * game_state.delta_time * game_state.time_scale);
+    e->x = lerp(e->x, TILE_SIZE * e->x_tile, INTERP_SPEED * game_state.delta_time * game_state.time_scale);
+    e->y = lerp(e->y, TILE_SIZE * e->y_tile, INTERP_SPEED * game_state.delta_time * game_state.time_scale);
 #else
-  e->x = TILE_SIZE * e->x_tile;
-  e->y = TILE_SIZE * e->y_tile;
+    e->x = TILE_SIZE * e->x_tile;
+    e->y = TILE_SIZE * e->y_tile;
 #endif
+  }
 }
 
 void entity_render(Entity* e) {

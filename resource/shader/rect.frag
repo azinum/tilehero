@@ -13,6 +13,9 @@ void main() {
 	if ((TexCoords.x <= thickness || TexCoords.x >= 1.0 - thickness) ||
 		(TexCoords.y <= thickness * (rect_size.x / rect_size.y) || TexCoords.y >= 1.0 - thickness * (rect_size.x / rect_size.y))) {
 		color = in_color;
+    if (color.a < 0.1) {
+      discard;
+    }
 	}
 	else {
 		discard;
