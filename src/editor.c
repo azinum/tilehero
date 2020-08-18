@@ -4,10 +4,12 @@
 #include "renderer.h"
 #include "renderer_common.h"
 #include "window.h"
+#include "world.h"
 #include "editor.h"
 
 struct {
-  i32 tile_type;
+  u32 tile_type;
+  u32 chunk_index;
 } editor = {
   .tile_type = TILE_NONE,
 };
@@ -96,10 +98,25 @@ void editor_update() {
     }
   }
   if (key_pressed[GLFW_KEY_N]) {
-    game_store_world_chunk(&game_state.world_chunk, WORLD_STORAGE_FILE);
+    game_state.world_chunk.chunk_index = editor.chunk_index;
+    world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_M]) {
-    game_load_world_chunk(&game_state.world_chunk, 0, WORLD_STORAGE_FILE);
+    world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE);
+  }
+  if (key_pressed[GLFW_KEY_V]) {
+    game_state.world_chunk.chunk_index = editor.chunk_index;
+    world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
+    editor.chunk_index--;
+    world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE);
+  }
+  if (key_pressed[GLFW_KEY_B]) {
+    game_state.world_chunk.chunk_index = editor.chunk_index;
+    world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
+    editor.chunk_index++;
+    if (world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE) < 0) {
+      tilemap_init(&game_state.world_chunk.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
+    }
   }
 #endif
 }
@@ -121,7 +138,7 @@ void editor_render() {
   render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
 }
   i32 w = 230;
-  i32 h = 140;
+  i32 h = 200;
   snprintf(
     ui_text,
     UI_TEXT_BUFF_SIZE,
@@ -133,6 +150,7 @@ void editor_render() {
     "entity count: %i/%i\n"
     "master volume: %.2f\n"
     "active sounds: %i/%i\n"
+    "chunk index: %i\n"
     ,
     (i32)camera.x, (i32)camera.y,
     window.width, window.height,
@@ -141,7 +159,8 @@ void editor_render() {
     (i32)(1.0f / game_state.delta_time),
     game_state.world_chunk.entity_count, MAX_ENTITY,
     audio_engine.master_volume,
-    audio_engine.sound_count, MAX_ACTIVE_SOUNDS);
+    audio_engine.sound_count, MAX_ACTIVE_SOUNDS,
+    editor.chunk_index);
   render_text(textures[TEXTURE_FONT],
     10, window.height - 10 - h, // x, y
     0.9f, // z

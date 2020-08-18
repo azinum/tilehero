@@ -21,7 +21,7 @@ enum Tile_type {
 };
 
 struct Tile_info {
-  i32 tile_type;
+  u8 tile_type;
 };
 
 #define USE_ENTITY_AS_TILE 0

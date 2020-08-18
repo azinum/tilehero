@@ -51,7 +51,6 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
 
 void game_init(Game_state* game) {
   srand((u32)time(NULL));
-
   World_chunk* world_chunk = &game->world_chunk;
   world_chunk->entity_count = 0;
   game->time = 0;
@@ -65,7 +64,7 @@ void game_init(Game_state* game) {
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
   tilemap_init(&world_chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  game_load_world_chunk(world_chunk, 0, WORLD_STORAGE_FILE);
+  world_chunk_load(world_chunk, 0, WORLD_STORAGE_FILE);
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
 }
 
@@ -144,53 +143,6 @@ void fade_out() {
   }
 }
 
-i32 game_store_world_chunk(struct World_chunk* chunk, const char* world_storage_file) {
-  FILE* fp = fopen(world_storage_file, "wb");
-  if (!fp) {
-    fprintf(stderr, "Failed to open file '%s'\n", world_storage_file);
-    return -1;
-  }
-  u32 chunk_address = sizeof(struct World_chunk) * chunk->chunk_index;
-  fseek(fp, chunk_address, SEEK_SET);
-  fwrite(chunk, 1, sizeof(struct World_chunk), fp);
-  fclose(fp);
-  fprintf(log_file, "Stored world chunk %i to world storage file '%s'\n", chunk->chunk_index, world_storage_file);
-  return 0;
-}
-
-i32 game_load_world_chunk(struct World_chunk* chunk, u32 chunk_index, const char* world_storage_file) {
-  FILE* fp = fopen(world_storage_file, "rb");
-
-  if (!fp) {
-    fprintf(stderr, "Failed to open file '%s'\n", world_storage_file);
-    return -1;
-  }
-
-  fseek(fp, 0, SEEK_END);
-  u32 size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-  if (size < sizeof(struct World_chunk)) {
-    fprintf(stderr, "Invalid world storage file '%s'\n", world_storage_file);
-    fclose(fp);
-    return -1;
-  }
-  if ((chunk_index * sizeof(struct World_chunk)) > size) {
-    fprintf(stderr, "Failed to load chunk (id: %u)\n", chunk_index);
-    fclose(fp);
-    return -1;
-  }
-  u32 bytes_read = fread(chunk, 1, sizeof(struct World_chunk), fp);
-  if (bytes_read != sizeof(struct World_chunk)) {
-    fprintf(stderr, "Failed to read world chunk (id: %u)\n", chunk_index);
-    fclose(fp);
-    return -1;
-  }
-  fclose(fp);
-
-  fprintf(log_file, "Loaded world chunk %i from world storage file '%s'\n", chunk->chunk_index, world_storage_file);
-  return 0;
-}
-
 void game_entity_remove(Entity* e) {
   if (game_state.world_chunk.entity_count > 0) {
     Entity* top = &game_state.world_chunk.entities[--game_state.world_chunk.entity_count];
@@ -211,7 +163,7 @@ void game_entity_remove(Entity* e) {
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
-  log_file = fopen(LOG_FILE, "w");
+  log_file = stdout; // fopen(LOG_FILE, "w");
   if (window_open(window_width, window_height, fullscreen, "Tile Hero") != 0) {
     fprintf(stderr, "Failed to open window\n");
     return -1;
@@ -222,7 +174,7 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
     // NOTE(lucas): Run the game without audio?
     game_run();
   }
-  game_store_world_chunk(&game_state.world_chunk, WORLD_STORAGE_FILE_BACKUP);
+  world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE_BACKUP);
   window_close();
   resources_unload();
   if (log_file != stdout) {

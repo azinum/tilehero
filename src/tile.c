@@ -33,8 +33,10 @@ void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count) {
   }
 }
 
+
+// TODO(lucas): Instanced rendering!
 void tilemap_render(struct Tile_map* tile_map) {
-  render_rect(0 - camera.x, 0 - camera.y, -0.9f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 1, 1, 1, 0.1f, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
+  render_rect(0 - camera.x, 0 - camera.y, -0.9f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 1, 1, 1, 0.3f, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
   for (i32 x = 0; x < tile_map->x_count; x++) {
     for (i32 y = 0; y < tile_map->y_count; y++) {
       Tile* tile = &tile_map->map[x + (y * tile_map->x_count)];
