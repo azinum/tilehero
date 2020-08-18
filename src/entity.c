@@ -70,7 +70,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
     if (!tile) {  // Outside the map
       collision = 1;
     }
-    else if (tile->tile_type != TILE_DEFAULT && tile->tile_type != TILE_SWAPPER && tile->tile_type != TILE_DUNGEON && tile->tile_type != TILE_GRASS) { // Make sure we don't hit a walkable tile
+    else if (!tile->walkable) {
       collision = 1;
     }
 

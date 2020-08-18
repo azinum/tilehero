@@ -18,20 +18,16 @@ enum Tile_type {
   TILE_DUNGEON,
   TILE_SWAPPER,
   TILE_GRASS,
+
   MAX_TILE,
 };
 
 struct Tile_info {
   u8 tile_type;
+  u8 walkable;
 };
 
-#define USE_ENTITY_AS_TILE 0
-
-#if USE_ENTITY_AS_TILE
-typedef struct Entity Tile;
-#else
 typedef struct Tile_info Tile;
-#endif
 
 typedef struct Tile_map {
   i32 x_count;

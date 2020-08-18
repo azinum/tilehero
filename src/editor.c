@@ -14,6 +14,17 @@ struct {
   .tile_type = TILE_NONE,
 };
 
+static Tile placable_tiles[MAX_TILE] = {
+  // type, walkable
+  {TILE_NONE, 0},
+  {TILE_DEFAULT, 1},
+  {TILE_BRICK_1, 0},
+  {TILE_BRICK_2, 0},
+  {TILE_DUNGEON, 1},
+  {TILE_SWAPPER, 1},
+  {TILE_GRASS, 1},
+};
+
 void editor_update() {
 #if USE_EDITOR
   i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
@@ -91,7 +102,8 @@ void editor_update() {
     if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
       Tile* tile = tilemap_get_tile(&game_state.world_chunk.tile_map, x_tile, y_tile);
       if (tile) {
-        tile->tile_type = editor.tile_type;
+        Tile new_tile = placable_tiles[editor.tile_type];
+        *tile = new_tile;
         if (left_mouse_pressed) {
           audio_play_once(SOUND_0F, 0.5f);
         }
