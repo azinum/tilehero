@@ -24,6 +24,7 @@ typedef struct Game_state {
   float time_scale;
   float delta_time;
   float move_timer;
+  u8 should_move;
   u8 is_running;
   u8 mode;
 } Game_state;

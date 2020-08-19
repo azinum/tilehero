@@ -58,6 +58,7 @@ void game_init(Game_state* game) {
   game->time_scale = 1;
   game->delta_time = 0;
   game->move_timer = 0;
+  game->should_move = 0;
   game->is_running = 1;
   game->mode = MODE_GAME;
 
@@ -104,7 +105,7 @@ void game_run() {
       if (game_state.mode == MODE_GAME) {
         if (e->e_flags & ENTITY_FLAG_PLAYER) {
           player_update(e);
-          if (!camera.has_target) {
+          if (!camera.target) {
             camera.target = e;
             camera.has_target = 1;
           }
@@ -128,9 +129,9 @@ void game_run() {
     editor_update();
     editor_render();
 
-    if (game_state.time >= game_state.move_timer) {
+    if (game_state.should_move) {
       entity_do_tiled_move(world_chunk->entities, world_chunk->entity_count);
-      game_state.move_timer = game_state.time + MOVE_INTERVAL;
+      game_state.should_move = 0;
     }
 
     tilemap_render(&world_chunk->tile_map);

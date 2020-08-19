@@ -12,14 +12,14 @@ struct {
   u32 chunk_index;
   u32 entity_type;
 } editor = {
-  .tile_type = TILE_NONE,
+  .tile_type = 0,
   .chunk_index = 0,
   .entity_type = 0,
 };
 
 static Tile placable_tiles[MAX_TILE] = {
   // type, walkable
-  {TILE_NONE, 0},
+  {TILE_VOID, 0},
   {TILE_DEFAULT, 1},
   {TILE_BRICK_1, 0},
   {TILE_BRICK_2, 0},
@@ -27,6 +27,14 @@ static Tile placable_tiles[MAX_TILE] = {
   {TILE_SWAPPER, 1},
   {TILE_GRASS, 1},
 };
+
+typedef union Arg {
+  i32 i;
+  float f;
+  double d;
+} Arg;
+
+typedef void (*init_func)(Entity* e, const Arg*);
 
 struct Entity_type_def {
   i8 x_dir;
@@ -37,19 +45,38 @@ struct Entity_type_def {
   i16 health;
   i16 max_health;
   i16 attack;
+  init_func func;
+  const Arg arg;
 };
 
 enum Placable_entity_type {
   ENTITY_PLAYER,
   ENTITY_RED_MONSTER,
+  ENTITY_MAD_SCIENTIST,
+  ENTITY_WIZARD,
+  ENTITY_VOID_WALKER,
 
   MAX_PLACABLE_ENTITY,
 };
 
+static void add_random_health(Entity* e, const Arg* arg);
+static void add_random_attack(Entity* e, const Arg* arg);
+
 static struct Entity_type_def placable_entities[MAX_PLACABLE_ENTITY] = {
-  {0, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY_WITH_HELM, 10, 10, 3},
-  {0, 1, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE, 0, SPRITE_RED_MONSTER, 5, 5, 1},
+  {0, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY_WITH_HELM, 10, 10, 3, NULL, {}},
+  {0, 1, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_RED_MONSTER, 5, 5, 1, add_random_health, {.i = 4}},
+  {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_MAD_SCIENTIST, 12, 12, 1, add_random_attack, {.i = 3}},
+  {1, 0, ENTITY_FLAG_FRIENDLY     | ENTITY_FLAG_MOVABLE, 0, SPRITE_WIZARD, 5, 5, 1, NULL, {}},
+  {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, 0, SPRITE_VOID_WALKER, 35, 35, 5, add_random_attack, {.i = 5}},
 };
+
+void add_random_health(Entity* e, const Arg* arg) {
+  e->max_health = e->health = e->health + rand() % (arg->i);
+}
+
+void add_random_attack(Entity* e, const Arg* arg) {
+  e->attack += rand() % arg->i;
+}
 
 void editor_update() {
 #if USE_EDITOR
@@ -58,52 +85,9 @@ void editor_update() {
   if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
     tilemap_render_tile_highlight(&game_state.world_chunk.tile_map, x_tile, y_tile);
   }
-  if (key_pressed[GLFW_KEY_T]) {
-    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
-    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-    if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-      i16 health = 5 + rand() % 10;
-      i16 attack = 1 + rand() % 3;
-      Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 1, health, health, attack);
-      if (e) {
-        e->sprite_id = SPRITE_RED_MONSTER;
-        audio_play_once(SOUND_0F, 0.5f);
-      }
-    }
-  }
-  if (key_pressed[GLFW_KEY_Y]) {
-    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
-    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-    if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-      i16 health = 5 + rand() % 10;
-      i16 attack = 1 + rand() % 3;
-      Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 1, 0, health, health, attack);
-      if (e) {
-        e->sprite_id = SPRITE_WIZARD;
-        e->e_flags |= ENTITY_FLAG_FRIENDLY;
-        e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
-        audio_play_once(SOUND_0F, 0.5f);
-      }
-    }
-  }
-  if (key_pressed[GLFW_KEY_U]) {
-    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
-    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-    if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-      Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, 0, 0, 1, 1, 1);
-      if (e) {
-        e->sprite_id = SPRITE_BOY_WITH_HELM;
-        e->e_flags |= ENTITY_FLAG_FRIENDLY;
-        e->e_flags ^= ENTITY_FLAG_DRAW_HEALTH;
-        e->e_flags ^= ENTITY_FLAG_MOVABLE;
-        audio_play_once(SOUND_0F, 0.5f);
-      }
-    }
-  }
   if (key_pressed[GLFW_KEY_E]) {
     editor.tile_type = (editor.tile_type + 1) % MAX_TILE;
   }
-
   if (key_pressed[GLFW_KEY_1]) {
     game_state.time_scale *= 0.9f;
     if (game_state.time_scale <= TIME_SCALING_MIN)
@@ -180,6 +164,9 @@ void editor_update() {
         e->sprite_id = entity.sprite_id;
         e->type = entity.type;
         e->e_flags = entity.e_flags;
+        if (entity.func) {
+          entity.func(e, &entity.arg);
+        }
         audio_play_once(SOUND_0F, 0.5f);
       }
     }

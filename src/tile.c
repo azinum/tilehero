@@ -28,7 +28,7 @@ void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count) {
     for (i32 x = 0; x < x_count; x++) {
       Tile* tile = tilemap_get_tile(tile_map, x, y);
       assert(tile != NULL);
-      tile->tile_type = TILE_NONE;
+      tile->tile_type = TILE_VOID;
     }
   }
 }
@@ -40,7 +40,7 @@ void tilemap_render(struct Tile_map* tile_map) {
   for (i32 x = 0; x < tile_map->x_count; x++) {
     for (i32 y = 0; y < tile_map->y_count; y++) {
       Tile* tile = &tile_map->map[x + (y * tile_map->x_count)];
-      if (tile->tile_type != TILE_NONE) {
+      if (tile->tile_type != TILE_VOID) {
         struct Spritesheet sheet = spritesheets[SHEET_TILES];
         i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile->tile_type);
         i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->tile_type);

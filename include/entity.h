@@ -17,6 +17,7 @@ enum Entity_flag {
   ENTITY_FLAG_FRIENDLY      = 1 << 1,
   ENTITY_FLAG_MOVABLE       = 1 << 2,
   ENTITY_FLAG_PLAYER        = 1 << 3,
+  ENTITY_FLAG_FLY           = 1 << 4,
 };
 
 enum Entity_type {

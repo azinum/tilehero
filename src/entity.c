@@ -6,6 +6,7 @@
 #include "game.h"
 #include "resource.h"
 #include "audio.h"
+#include "player.h"
 #include "entity.h"
 
 #define TEXT_BUFF_SIZE (96)
@@ -70,7 +71,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
     if (!tile) {  // Outside the map
       collision = 1;
     }
-    else if (!tile->walkable) {
+    else if (tile->walkable == 0 && !(e->e_flags & ENTITY_FLAG_FLY && tile->tile_type == TILE_VOID)) {
       collision = 1;
     }
 
@@ -80,7 +81,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
         e->y_dir = -e->y_dir;
       }
       if (target) {
-        if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY)) {
+        if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY) && !(e->type == ENTITY_TYPE_PLAYER && target->type == ENTITY_TYPE_PLAYER)) {
 #if 1
           target->health -= e->attack;
           if (target->health <= 0) {
@@ -113,6 +114,9 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
           else if (abs(e->y_dir) == 1) {
             e->x_dir = e->y_dir;
             e->y_dir = 0;
+          }
+          if (e->type == ENTITY_TYPE_PLAYER) {
+            player.stunned = 1; // Player is stunned for 1 move
           }
           break;
         }
@@ -153,7 +157,7 @@ void entity_update(Entity* e) {
     return;
   }
   if (e->e_flags & ENTITY_FLAG_MOVABLE) {
-    if (game_state.time >= game_state.move_timer) {
+    if (game_state.should_move) {
       entity_tiled_move(e);
     }
 #if INTERP_MOVEMENT

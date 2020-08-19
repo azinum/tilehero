@@ -11,7 +11,7 @@
 #define PIXEL_TO_TILE_POS(PX) (PX >= 0 ? (i32)((PX) / TILE_SIZE) : -1)
 
 enum Tile_type {
-  TILE_NONE,
+  TILE_VOID,
   TILE_DEFAULT,
   TILE_BRICK_1,
   TILE_BRICK_2,
