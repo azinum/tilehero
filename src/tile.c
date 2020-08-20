@@ -39,9 +39,9 @@ void tilemap_render(struct Tile_map* tile_map) {
   render_rect(0 - camera.x, 0 - camera.y, -0.9f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 1, 1, 1, 0.3f, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
   for (i32 x = 0; x < tile_map->x_count; x++) {
     for (i32 y = 0; y < tile_map->y_count; y++) {
+      struct Spritesheet sheet = spritesheets[SHEET_TILES];
       Tile* tile = &tile_map->map[x + (y * tile_map->x_count)];
       if (tile->tile_type != TILE_VOID) {
-        struct Spritesheet sheet = spritesheets[SHEET_TILES];
         i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile->tile_type);
         i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->tile_type);
         render_texture_region(
@@ -53,7 +53,19 @@ void tilemap_render(struct Tile_map* tile_map) {
           0,
           x_offset, y_offset, sheet.w, sheet.h
         );
-        // render_rect((x * TILE_SIZE) - camera.x, (y * TILE_SIZE) - camera.y, -0.05f, TILE_SIZE, TILE_SIZE, 0, 0, 0, 0.3f, 0, 1.0f / TILE_SIZE);
+      }
+      if (tile->background_tile != 0) {
+        i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile->background_tile);
+        i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->background_tile);
+        render_texture_region(
+          sheet.texture,
+          (x * TILE_SIZE) - camera.x,
+          (y * TILE_SIZE) - camera.y,
+          -0.1f,
+          TILE_SIZE, TILE_SIZE,
+          0,
+          x_offset, y_offset, sheet.w, sheet.h
+        );
       }
     }
   }

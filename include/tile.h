@@ -18,6 +18,7 @@ enum Tile_type {
   TILE_DUNGEON,
   TILE_SWAPPER,
   TILE_GRASS,
+  TILE_TREE,
 
   MAX_TILE,
 };
@@ -25,6 +26,7 @@ enum Tile_type {
 struct Tile_info {
   u8 tile_type;
   u8 walkable;
+  u8 background_tile;
 };
 
 typedef struct Tile_info Tile;

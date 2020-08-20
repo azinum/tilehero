@@ -19,13 +19,14 @@ struct {
 
 static Tile placable_tiles[MAX_TILE] = {
   // type, walkable
-  {TILE_VOID, 0},
-  {TILE_DEFAULT, 1},
-  {TILE_BRICK_1, 0},
-  {TILE_BRICK_2, 0},
-  {TILE_DUNGEON, 1},
-  {TILE_SWAPPER, 1},
-  {TILE_GRASS, 1},
+  {TILE_VOID, 0, 0},
+  {TILE_DEFAULT, 1, 0},
+  {TILE_BRICK_1, 0, 0},
+  {TILE_BRICK_2, 0, 0},
+  {TILE_DUNGEON, 1, 0},
+  {TILE_SWAPPER, 1, 0},
+  {TILE_GRASS, 1, 0},
+  {TILE_TREE, 0, TILE_GRASS},
 };
 
 typedef union Arg {
