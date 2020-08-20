@@ -18,9 +18,10 @@ struct {
 };
 
 static Tile placable_tiles[MAX_TILE] = {
-  // type, walkable
+  // type, walkable, background
   {TILE_VOID, 0, 0},
   {TILE_DEFAULT, 1, 0},
+  {TILE_FLOOR, 1, 0},
   {TILE_BRICK_1, 0, 0},
   {TILE_BRICK_2, 0, 0},
   {TILE_DUNGEON, 1, 0},
@@ -104,6 +105,7 @@ void editor_update() {
   }
 
   if (key_pressed[GLFW_KEY_9]) {
+    game_state.world_chunk.entity_count = 0;
     tilemap_init(&game_state.world_chunk.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
 

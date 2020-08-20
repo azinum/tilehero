@@ -13,6 +13,7 @@
 enum Tile_type {
   TILE_VOID,
   TILE_DEFAULT,
+  TILE_FLOOR,
   TILE_BRICK_1,
   TILE_BRICK_2,
   TILE_DUNGEON,

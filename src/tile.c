@@ -29,6 +29,8 @@ void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count) {
       Tile* tile = tilemap_get_tile(tile_map, x, y);
       assert(tile != NULL);
       tile->tile_type = TILE_VOID;
+      tile->walkable = 0;
+      tile->background_tile = 0;
     }
   }
 }
