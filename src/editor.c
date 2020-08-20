@@ -9,12 +9,12 @@
 
 struct {
   u32 tile_type;
-  u32 chunk_index;
   u32 entity_type;
+  u32 chunk_index;
 } editor = {
   .tile_type = 0,
-  .chunk_index = 0,
   .entity_type = 0,
+  .chunk_index = 0,
 };
 
 static Tile placable_tiles[MAX_TILE] = {
@@ -63,7 +63,7 @@ static void add_random_health(Entity* e, const Arg* arg);
 static void add_random_attack(Entity* e, const Arg* arg);
 
 static struct Entity_type_def placable_entities[MAX_PLACABLE_ENTITY] = {
-  {0, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY_WITH_HELM, 10, 10, 3, NULL, {}},
+  {0, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY, 10, 10, 3, NULL, {}},
   {0, 1, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_RED_MONSTER, 5, 5, 1, add_random_health, {.i = 4}},
   {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_MAD_SCIENTIST, 12, 12, 1, add_random_attack, {.i = 3}},
   {1, 0, ENTITY_FLAG_FRIENDLY     | ENTITY_FLAG_MOVABLE, 0, SPRITE_WIZARD, 5, 5, 1, NULL, {}},
@@ -135,6 +135,7 @@ void editor_update() {
     if (editor.chunk_index != 0) {
       editor.chunk_index--;
     }
+    game_state.world_chunk.entity_count = 0;
     world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_B]) {
@@ -142,6 +143,7 @@ void editor_update() {
     game_state.world_chunk.chunk_index = editor.chunk_index;
     world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
     editor.chunk_index++;
+    game_state.world_chunk.entity_count = 0;
     if (world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE) < 0) {
       tilemap_init(&game_state.world_chunk.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
     }

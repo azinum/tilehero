@@ -15,7 +15,8 @@
 #define INTERP_SPEED (20.0f)
 
 struct Tile_move tile_moves[MAX_MOVES];
-i32 move_count;
+u32 move_count = 0;
+float move_time = 0;
 static i16 id_count = 0;
 static char temp_text[TEXT_BUFF_SIZE];
 
@@ -27,7 +28,7 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->h = h;
   e->x_dir = 0;
   e->y_dir = 0;
-  e->state = STATE_ALIVE;
+  e->state = STATE_ACTIVE;
   e->e_flags = 0;
   e->type = 0;
   e->tile_type = 0;
@@ -52,7 +53,7 @@ void entity_tiled_move(struct Entity* e) {
 }
 
 void entity_do_tiled_move(Entity* entities, i32 entity_count) {
-  for (i32 i = 0; i < move_count; i++) {
+  for (u32 i = 0; i < move_count; i++) {
     struct Tile_move* move = &tile_moves[i];
     Entity* e = move->entity;
     Entity* target = NULL;
@@ -81,6 +82,18 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
         e->y_dir = -e->y_dir;
       }
       if (target) {
+        if (e->type == ENTITY_TYPE_CONSUMABLE) {
+          target->health += e->health;
+          if (target->health > target->max_health)
+            target->health = target->max_health;
+          e->state = STATE_DEAD;
+        }
+        if (target->type == ENTITY_TYPE_CONSUMABLE && e->id != target->id) {
+          e->health += target->health;
+          if (e->health > e->max_health)
+            e->health = e->max_health;
+          target->state = STATE_DEAD;
+        }
         if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY) && !(e->type == ENTITY_TYPE_PLAYER && target->type == ENTITY_TYPE_PLAYER)) {
 #if 1
           target->health -= e->attack;
@@ -99,6 +112,13 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
             audio_play_once(SOUND_GOOD_MORNING, 0.5f);
           }
 #endif
+        }
+      }
+      else { // We hit a non-walkable tile!
+        if (e->type == ENTITY_TYPE_CONSUMABLE) {
+          e->health--;
+          if (e->health <= 0)
+            e->state = STATE_DEAD;
         }
       }
     }
@@ -120,7 +140,6 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
           }
           break;
         }
-        // TODO(lucas): Find a way to do this more elegantly!
         case TILE_SWAPPER: {
           Tile* l = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile - 1, move->y_tile); // Left
           Tile* r = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile + 1, move->y_tile); // Right

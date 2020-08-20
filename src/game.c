@@ -32,7 +32,9 @@ Entity* game_add_entity(float x, float y, float w, float h) {
 Entity* game_add_empty_entity() {
   if (game_state.world_chunk.entity_count >= MAX_ENTITY)
     return NULL;
-  return &game_state.world_chunk.entities[game_state.world_chunk.entity_count++];
+  Entity* e = &game_state.world_chunk.entities[game_state.world_chunk.entity_count++];
+  entity_init(e, 0, 0, 0, 0);
+  return e;
 }
 
 Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_dir, i8 y_dir, i16 health, i16 max_health, i16 attack) {
@@ -42,7 +44,7 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
   entity_init_tilepos(e, x_tile, y_tile, w, h);
   e->x_dir = x_dir;
   e->y_dir = y_dir;
-  e->state = STATE_ALIVE;
+  e->state = STATE_ACTIVE;
   e->e_flags |= ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE;
   e->health = health;
   e->max_health = max_health;
@@ -65,8 +67,11 @@ void game_init(Game_state* game) {
   is_fading_out = 1;
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
+  u32 chunk_index = world_chunk->chunk_index;
   tilemap_init(&world_chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  world_chunk_load(world_chunk, 0, WORLD_STORAGE_FILE);
+  world_chunk_load(world_chunk, chunk_index, WORLD_STORAGE_FILE);
+  move_count = 0;
+  move_time = 0;
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
 }
 

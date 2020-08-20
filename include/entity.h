@@ -7,7 +7,7 @@
 
 enum Entity_state {
   STATE_NONE = 0,
-  STATE_ALIVE,
+  STATE_ACTIVE,
   STATE_DEAD,
 };
 
@@ -20,9 +20,11 @@ enum Entity_flag {
   ENTITY_FLAG_FLY           = 1 << 4,
 };
 
+// All of these are temporary, will think about how the interactibility should work.
 enum Entity_type {
   ENTITY_TYPE_NPC = 0,
   ENTITY_TYPE_PLAYER,
+  ENTITY_TYPE_CONSUMABLE,
 };
 
 struct Tile_move {
@@ -32,7 +34,8 @@ struct Tile_move {
 };
 
 extern struct Tile_move tile_moves[];
-extern i32 move_count;
+extern u32 move_count;
+extern float move_time; // At which time we are ready to do a move
 
 typedef struct Entity {
   i32 x_tile, y_tile;

@@ -8,9 +8,9 @@
 #include "camera.h"
 
 #define CAMERA_MOVE_SPEED (500.0f)
-#define CAMERA_TARGET_SPEED (5.0f)
+#define CAMERA_TARGET_SPEED (7.0f)
 
-void camera_init(float x, float y) {
+void camera_init(i32 x, i32 y) {
   camera.x = x;
   camera.y = y;
   camera.x_target = x;
