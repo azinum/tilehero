@@ -7,7 +7,7 @@
 
 #define TILE_COUNT_X (28)
 #define TILE_COUNT_Y (28)
-#define TILE_SIZE (42)
+#define TILE_SIZE (56)
 #define PIXEL_TO_TILE_POS(PX) (PX >= 0 ? (i32)((PX) / TILE_SIZE) : -1)
 
 enum Tile_type {
@@ -41,6 +41,8 @@ typedef struct Tile_map {
 Tile* tilemap_get_tile(struct Tile_map* tile_map, i32 x, i32 y);
 
 void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count);
+
+void tilemap_init_tile(struct Tile_map* tile_map, i32 x_count, i32 y_count, Tile tile);
 
 void tilemap_render(struct Tile_map* tile_map);
 

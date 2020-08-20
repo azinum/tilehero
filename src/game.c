@@ -177,7 +177,7 @@ void game_entity_remove(Entity* e) {
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
-  log_file = stdout; // fopen(LOG_FILE, "w");
+  log_file = fopen(LOG_FILE, "w");
   if (window_open(window_width, window_height, fullscreen, "Tile Hero") != 0) {
     fprintf(stderr, "Failed to open window\n");
     return -1;
@@ -190,6 +190,7 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
   }
   world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE_BACKUP);
   window_close();
+  renderer_free();
   resources_unload();
   if (log_file != stdout) {
     fclose(log_file);
