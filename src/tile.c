@@ -74,6 +74,10 @@ void tilemap_render(struct Tile_map* tile_map) {
   glUniformMatrix4fv(glGetUniformLocation(tile_shader, "model"), 1, GL_FALSE, (float*)&model);
   render_instanced_list(&l);
 #else
+  World_position world_position = game_state.world_chunk.position;
+  i32 x_position = (world_position.x * (TILE_SIZE * TILE_COUNT_X));
+  i32 y_position = (world_position.y * (TILE_SIZE * TILE_COUNT_Y));
+
   for (i32 y = 0; y < tile_map->y_count; y++) {
     for (i32 x = 0; x < tile_map->y_count; x++) {
       struct Spritesheet sheet = spritesheets[SHEET_TILES];
@@ -83,8 +87,8 @@ void tilemap_render(struct Tile_map* tile_map) {
         i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->tile_type);
         render_texture_region(
           sheet.texture,
-          (x * TILE_SIZE) - camera.x,
-          (y * TILE_SIZE) - camera.y,
+          x_position + (x * TILE_SIZE) - camera.x,
+          y_position + (y * TILE_SIZE) - camera.y,
           -0.1f,
           TILE_SIZE, TILE_SIZE,
           0,
@@ -96,8 +100,8 @@ void tilemap_render(struct Tile_map* tile_map) {
         i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->background_tile);
         render_texture_region(
           sheet.texture,
-          (x * TILE_SIZE) - camera.x,
-          (y * TILE_SIZE) - camera.y,
+          x_position + (x * TILE_SIZE) - camera.x,
+          y_position + (y * TILE_SIZE) - camera.y,
           -0.1f,
           TILE_SIZE, TILE_SIZE,
           0,
