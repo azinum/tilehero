@@ -5,21 +5,26 @@
 
 #define MAX_ENTITY (256)
 
+typedef struct World_position {
+  i32 x, y, z;
+} World_position;
+
+#define WORLD_VEC3(X, Y, Z) ((World_position) {X, Y, Z})
+
 typedef struct World_chunk {
-  struct Tile_map tile_map;
-  u32 entity_count;
-  struct Entity entities[MAX_ENTITY];
+  World_position position;
   u32 chunk_index;
+  u32 entity_count;
+  struct Tile_map tile_map;
+  struct Entity entities[MAX_ENTITY];
 } World_chunk;
 
 #define NUM_WORLD_CHUNKS 4096
 
-struct World {
-  struct World_chunk chunks[NUM_WORLD_CHUNKS];
-};
+void world_chunk_init(struct World_chunk* chunk, World_position position);
 
-i32 world_chunk_store(struct World_chunk* chunk, const char* world_storage_file);
+i32 world_chunk_store_hashed(struct World_chunk* chunk, const char* world_storage_file);
 
-i32 world_chunk_load(struct World_chunk* chunk, u32 chunk_index, const char* world_storage_file);
+i32 world_chunk_load_hashed(struct World_chunk* chunk, World_position position, const char* world_storage_file);
 
 #endif

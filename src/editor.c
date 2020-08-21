@@ -11,10 +11,12 @@ struct {
   u32 tile_type;
   u32 entity_type;
   u32 chunk_index;
+  World_position world_pos;
 } editor = {
   .tile_type = 0,
   .entity_type = 0,
   .chunk_index = 0,
+  .world_pos = WORLD_VEC3(0, 0, 0),
 };
 
 static Tile placable_tiles[MAX_TILE] = {
@@ -129,31 +131,27 @@ void editor_update() {
   }
 
   if (key_pressed[GLFW_KEY_N]) {
-    game_state.world_chunk.chunk_index = editor.chunk_index;
-    world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
+    game_state.world_chunk.position = editor.world_pos;
+    world_chunk_store_hashed(&game_state.world_chunk, WORLD_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_M]) {
-    world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE);
+    move_count = 0;
+    world_chunk_load_hashed(&game_state.world_chunk, editor.world_pos, WORLD_STORAGE_FILE);
   }
+
   if (key_pressed[GLFW_KEY_V]) {
     move_count = 0;
-    game_state.world_chunk.chunk_index = editor.chunk_index;
-    world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
-    if (editor.chunk_index != 0) {
-      editor.chunk_index--;
+    if (editor.world_pos.x != 0) {
+      editor.world_pos.x--;
     }
-    game_state.world_chunk.entity_count = 0;
-    world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE);
+    world_chunk_store_hashed(&game_state.world_chunk, WORLD_STORAGE_FILE);
+    world_chunk_load_hashed(&game_state.world_chunk, editor.world_pos, WORLD_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_B]) {
     move_count = 0;
-    game_state.world_chunk.chunk_index = editor.chunk_index;
-    world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE);
-    editor.chunk_index++;
-    game_state.world_chunk.entity_count = 0;
-    if (world_chunk_load(&game_state.world_chunk, editor.chunk_index, WORLD_STORAGE_FILE) < 0) {
-      tilemap_init(&game_state.world_chunk.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-    }
+    editor.world_pos.x++;
+    world_chunk_store_hashed(&game_state.world_chunk, WORLD_STORAGE_FILE);
+    world_chunk_load_hashed(&game_state.world_chunk, editor.world_pos, WORLD_STORAGE_FILE);
   }
 
   if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
@@ -225,7 +223,7 @@ void editor_render() {
     "entity count: %i/%i\n"
     "master volume: %.2f\n"
     "active sounds: %i/%i\n"
-    "chunk index: %i\n"
+    "world pos: (%i, %i, %i)\n"
     ,
     (i32)camera.x, (i32)camera.y,
     window.width, window.height,
@@ -235,7 +233,7 @@ void editor_render() {
     game_state.world_chunk.entity_count, MAX_ENTITY,
     audio_engine.master_volume,
     audio_engine.sound_count, MAX_ACTIVE_SOUNDS,
-    editor.chunk_index);
+    editor.world_pos.x, editor.world_pos.y, editor.world_pos.z);
   render_text(textures[TEXTURE_FONT],
     10, window.height - 10 - h, // x, y
     0.9f, // z

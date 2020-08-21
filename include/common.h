@@ -42,6 +42,17 @@ typedef uint16_t u16;
 typedef int8_t i8;
 typedef uint8_t u8;
 
+typedef struct vec4 {
+  float x, y, z, w;
+} vec4;
+
+typedef struct vec3 {
+  float x, y, z;
+} vec3;
+
+typedef struct vec2 {
+  float x, y;
+} vec2;
 inline float random_number(float from, float to) {
   return (float)rand() / (float)(RAND_MAX / to) + (float)rand() / (float)(RAND_MAX / from);
 }

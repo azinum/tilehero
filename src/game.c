@@ -67,9 +67,10 @@ void game_init(Game_state* game) {
   is_fading_out = 1;
   fade_value = 1.0f;
   camera_init(-(window.width / 2), -(window.height / 2));
-  u32 chunk_index = world_chunk->chunk_index;
   tilemap_init(&world_chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  world_chunk_load(world_chunk, chunk_index, WORLD_STORAGE_FILE);
+  world_chunk_init(world_chunk, WORLD_VEC3(0, 0, 0));
+  world_chunk_load_hashed(world_chunk, WORLD_VEC3(0, 0, 0), WORLD_STORAGE_FILE);
+
   move_count = 0;
   move_time = 0;
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
@@ -188,7 +189,7 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
     // NOTE(lucas): Run the game without audio?
     game_run();
   }
-  world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE_BACKUP);
+  // world_chunk_store(&game_state.world_chunk, WORLD_STORAGE_FILE_BACKUP);
   window_close();
   renderer_free();
   resources_unload();

@@ -4,18 +4,6 @@
 #ifndef _MMATH_H
 #define _MMATH_H
 
-typedef struct vec4 {
-  float x, y, z, w;
-} vec4;
-
-typedef struct vec3 {
-  float x, y, z;
-} vec3;
-
-typedef struct vec2 {
-  float x, y;
-} vec2;
-
 typedef union mat4 {
   float elements[4][4];
 #if USE_SSE

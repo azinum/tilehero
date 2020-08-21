@@ -6,18 +6,38 @@
 #include "game.h"
 #include "world.h"
 
-i32 world_chunk_store(struct World_chunk* chunk, const char* world_storage_file) {
-  i32 fd = open(world_storage_file, O_WRONLY | O_CREAT, 0644);
+inline i32 hash_position(World_position pos);
+
+i32 hash_position(World_position pos) {
+  i32 result = 0;
+
+  result = ((pos.x * 137) + (pos.y * 149) + (pos.z * 163)) % NUM_WORLD_CHUNKS;
+
+  return result;
+}
+
+void world_chunk_init(struct World_chunk* chunk, World_position pos) {
+  chunk->position = pos;
+  chunk->chunk_index = 0;
+  chunk->entity_count = 0;
+}
+
+i32 world_chunk_store_hashed(struct World_chunk* chunk, const char* world_storage_file) {
+  i32 fd = open(world_storage_file, O_RDWR | O_CREAT, 0644);
   if (fd < 0) {
     fprintf(stderr, "Failed to open file '%s'\n", world_storage_file);
     return -1;
   }
-  u32 chunk_address = sizeof(struct World_chunk) * chunk->chunk_index;
-  lseek(fd, chunk_address, SEEK_SET);
+
+  i32 hash_value = hash_position(chunk->position);
+  i32 address = hash_value * sizeof(struct World_chunk);
+  lseek(fd, address, SEEK_SET);
+
+  // TODO(lucas): Read at this address to check for collisions before writing here!
   u32 bytes_written = write(fd, chunk, sizeof(struct World_chunk));
   if (bytes_written != sizeof(struct World_chunk)) {
+    fprintf(stderr, "Failed to write changes to world storage file '%s'\n", world_storage_file);
     close(fd);
-    fprintf(stderr, "Failed to write world chunk\n");
     return -1;
   }
 
@@ -25,37 +45,25 @@ i32 world_chunk_store(struct World_chunk* chunk, const char* world_storage_file)
   return 0;
 }
 
-i32 world_chunk_load(struct World_chunk* chunk, u32 chunk_index, const char* world_storage_file) {
-  FILE* fp = fopen(world_storage_file, "rb");
-
-  if (!fp) {
+i32 world_chunk_load_hashed(struct World_chunk* chunk, World_position pos, const char* world_storage_file) {
+  i32 fd = open(world_storage_file, O_RDONLY);
+  if (fd < 0) {
     fprintf(stderr, "Failed to open file '%s'\n", world_storage_file);
     return -1;
   }
 
-  fseek(fp, 0, SEEK_END);
-  u32 size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-  if (size < sizeof(struct World_chunk)) {
-    fprintf(stderr, "Invalid world storage file '%s'\n", world_storage_file);
-    fclose(fp);
-    return -1;
-  }
-  u32 chunk_address = chunk_index * sizeof(struct World_chunk);
-  if (chunk_address > size) {
-    fprintf(stderr, "Failed to load chunk (id: %u)\n", chunk_index);
-    fclose(fp);
-    return -1;
-  }
-  fseek(fp, chunk_address, SEEK_SET);
-  u32 num_read = fread(chunk, sizeof(struct World_chunk), 1, fp);
-  if (num_read != 1) {
-    fprintf(stderr, "Failed to read world chunk (id: %u)\n", chunk_index);
-    fclose(fp);
-    return -1;
-  }
+  i32 hash_value = hash_position(pos);
+  i32 address = hash_value * sizeof(struct World_chunk);
+  lseek(fd, address, SEEK_SET);
 
-  fclose(fp);
+  struct World_chunk temp_chunk;
+  u32 bytes_read = read(fd, &temp_chunk, sizeof(struct World_chunk));
+  if (bytes_read != sizeof(struct World_chunk)) {
+    fprintf(stderr, "Failed to read chunk in world storage file '%s'\n", world_storage_file);
+    close(fd);
+    return -1;
+  }
+  *chunk = temp_chunk;
+  close(fd);
   return 0;
 }
-
