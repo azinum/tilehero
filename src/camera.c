@@ -7,7 +7,7 @@
 #include "player.h"
 #include "camera.h"
 
-#define CAMERA_MOVE_SPEED (500.0f)
+#define CAMERA_MOVE_SPEED (600.0f)
 #define CAMERA_TARGET_SPEED (7.0f)
 
 void camera_init(i32 x, i32 y) {

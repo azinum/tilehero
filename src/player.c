@@ -60,15 +60,16 @@ void player_update(Entity* e) {
     move = 0;
   }
 
-  if (!move)
+  if (!move) {
     return;
+  }
 
   // TODO(lucas): We would probably want to be able to stun any entity, not just the player.
   if (game_state.time >= move_time) {
     game_state.should_move = 1;
     if (player.stunned) {
       player.stunned--;
-      move_time = game_state.time + STUNNED_INTERVAL;
+    move_time = game_state.time + STUNNED_INTERVAL;
     }
     else {
       move_time = game_state.time + INTERVAL;

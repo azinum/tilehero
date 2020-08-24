@@ -52,7 +52,15 @@ void entity_tiled_move(struct Entity* e) {
   tile_moves[move_count++] = move;
 }
 
+
+// TODO(lucas): Think about how we should traverse the world via world chunks.
+// How do we transfer entities from one world chunk to another? How do we store
+// world chunks persistently? Do we have multiple world chunks
+// in memory? And when we move the camera we write the chunks we don't need to disk, and
+// load the chunks we need? How should all of this work?
 void entity_do_tiled_move(Entity* entities, i32 entity_count) {
+  World_position world_position = game_state.world_chunk.position;
+
   for (u32 i = 0; i < move_count; i++) {
     struct Tile_move* move = &tile_moves[i];
     Entity* e = move->entity;
@@ -68,7 +76,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
         break;
       }
     }
-    Tile* tile = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile, move->y_tile);
+    Tile* tile = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile - (world_position.x * TILE_COUNT_X), move->y_tile - (world_position.y * TILE_COUNT_Y));
     if (!tile) {  // Outside the map
       collision = 1;
     }
@@ -206,7 +214,7 @@ void entity_render(Entity* e) {
 
 void entity_render_highlight(Entity* e) {
   render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 1.0f, 0, 1.0f / (e->w));
-  snprintf(temp_text, TEXT_BUFF_SIZE, "id=%i\nx=%i\ny=%i\nhp: %i/%i\nattack: %i\nxp: %i", e->id, (i32)e->x, (i32)e->y, e->health, e->max_health, e->attack, e->xp);
+  snprintf(temp_text, TEXT_BUFF_SIZE, "id: %i\nx: %i\ny: %i\nhp: %i/%i\nattack: %i\nxp: %i", e->id, (i32)e->x, (i32)e->y, e->health, e->max_health, e->attack, e->xp);
   render_text(textures[TEXTURE_FONT],
         e->x - camera.x + e->w + 2,
         e->y - camera.y + e->h + 2, 0.2f, 130, 105, 14, 0.7f, 0.5f, 6, temp_text, TEXT_BUFF_SIZE);
