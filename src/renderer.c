@@ -113,14 +113,15 @@ void render_texture_region(struct Texture texture, float x, float y, float z, fl
   glBindVertexArray(0);
 }
 
-void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, float line_spacing, float margin, const char* text, u32 text_length) {
+void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, float line_spacing, float margin, const char* text, u32 text_length, u8 background, float rect_r, float rect_g, float rect_b, float rect_a, float border_r, float border_g, float border_b, float border_a, float border_thickness) {
 
-#if 1
-  render_filled_rectangle(x, y, z - 0.005f, w, h,
-    0, 0, 0, 1.0f,
-    0.50f, 0.40f, 0.85f, 1.0f,
-    0, 2.0f / w);
-#endif
+  if (background) {
+    render_filled_rectangle(x, y, z - 0.005f, w, h,
+      rect_r, rect_g, rect_b, rect_a,
+      border_r, border_g, border_b, border_a,
+      0, border_thickness / w);
+  }
+
   float font_size = font_texture.w;
 
   const u32 program = text_shader;

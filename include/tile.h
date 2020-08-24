@@ -5,8 +5,8 @@
 
 #include "entity.h"
 
-#define TILE_COUNT_X (28)
-#define TILE_COUNT_Y (28)
+#define TILE_COUNT_X (16)
+#define TILE_COUNT_Y (16)
 #define TILE_SIZE (48)
 #define PIXEL_TO_TILE_POS(PX) (PX >= 0 ? (i32)((PX) / TILE_SIZE) : -1)
 

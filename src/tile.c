@@ -24,9 +24,10 @@ Tile* tilemap_get_tile(struct Tile_map* tile_map, i32 x, i32 y) {
   return tile;
 }
 
+// #define MAX_INSTANCES 1024
+
 void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count) {
   tilemap_init_tile(tile_map, x_count, y_count, (Tile) {.tile_type = TILE_VOID, .walkable = 0, .background_tile = 0});
-// #define MAX_INSTANCES 1024
 // instanced_list_init(&l, 4, MAX_INSTANCES, &spritesheets[SHEET_TILES].texture);
 }
 

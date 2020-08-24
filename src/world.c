@@ -6,18 +6,18 @@
 #include "game.h"
 #include "world.h"
 
-inline i32 hash_position(World_position pos);
+inline i32 hash_world_position(World_position pos);
 
-i32 hash_position(World_position pos) {
+i32 hash_world_position(World_position pos) {
   i32 result = 0;
 
-  result = ((pos.x * 137) + (pos.y * 149) + (pos.z * 163)) % NUM_WORLD_CHUNKS;
+  result = (abs(((pos.x * 137) + (pos.y * 149) + (pos.z * 163)))) % NUM_WORLD_CHUNKS;
 
   return result;
 }
 
-void world_chunk_init(struct World_chunk* chunk, World_position pos) {
-  chunk->position = pos;
+void world_chunk_init(struct World_chunk* chunk, World_position position) {
+  chunk->position = position;
   chunk->chunk_index = 0;
   chunk->entity_count = 0;
 }
@@ -29,7 +29,7 @@ i32 world_chunk_store_hashed(struct World_chunk* chunk, const char* world_storag
     return -1;
   }
 
-  i32 hash_value = hash_position(chunk->position);
+  i32 hash_value = hash_world_position(chunk->position);
   i32 address = hash_value * sizeof(struct World_chunk);
   lseek(fd, address, SEEK_SET);
 
@@ -52,7 +52,7 @@ i32 world_chunk_load_hashed(struct World_chunk* chunk, World_position pos, const
     return -1;
   }
 
-  i32 hash_value = hash_position(pos);
+  i32 hash_value = hash_world_position(pos);
   i32 address = hash_value * sizeof(struct World_chunk);
   lseek(fd, address, SEEK_SET);
 

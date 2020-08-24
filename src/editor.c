@@ -140,14 +140,15 @@ void editor_update() {
       editor.world_pos.x--;
     }
     world_chunk_store_hashed(&game_state.world_chunk, WORLD_STORAGE_FILE);
+    world_chunk_init(&game_state.world_chunk, editor.world_pos);
     world_chunk_load_hashed(&game_state.world_chunk, editor.world_pos, WORLD_STORAGE_FILE);
   }
   if (key_pressed[GLFW_KEY_B]) {
     move_count = 0;
     editor.world_pos.x++;
+
     world_chunk_store_hashed(&game_state.world_chunk, WORLD_STORAGE_FILE);
     world_chunk_init(&game_state.world_chunk, editor.world_pos);
-    world_chunk_store_hashed(&game_state.world_chunk, WORLD_STORAGE_FILE);
     world_chunk_load_hashed(&game_state.world_chunk, editor.world_pos, WORLD_STORAGE_FILE);
   }
 
@@ -233,7 +234,7 @@ void editor_render() {
     game_state.world_chunk.position.x,
     game_state.world_chunk.position.y,
     game_state.world_chunk.position.z);
-  render_text(textures[TEXTURE_FONT],
+  render_simple_text(textures[TEXTURE_FONT],
     10, window.height - 10 - h, // x, y
     0.9f, // z
     w,   // Width
@@ -256,7 +257,7 @@ void editor_render() {
   i32 y = 10;
   if (game_state.mode == MODE_PAUSE) {
     snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[game paused]");
-    render_text(textures[TEXTURE_FONT],
+    render_simple_text(textures[TEXTURE_FONT],
       x, y, // x, y
       0.9f, // z
       w,   // Width
@@ -272,7 +273,7 @@ void editor_render() {
 }
   if (camera.has_target && camera.target != NULL) {
     snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[camera locked]");
-    render_text(textures[TEXTURE_FONT],
+    render_simple_text(textures[TEXTURE_FONT],
       window.width - 10 - 160, window.height - 10 - 35, // x, y
       0.9f, // z
       160,   // Width

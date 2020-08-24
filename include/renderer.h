@@ -16,7 +16,11 @@ struct Instanced_list {
   u8 data_length;
 };
 
-#define render_filled_rect(x, y, z, w, h, r, g, b, a, angle) render_filled_rectangle(x, y, z, w, h, r, g, b, a, 0, 0, 0, 0, angle, 0)
+#define render_filled_rect(x, y, z, w, h, r, g, b, a, angle) \
+  render_filled_rectangle(x, y, z, w, h, r, g, b, a, 0, 0, 0, 0, angle, 0)
+
+#define render_simple_text(tex, x, y, z, w, h, size, kerning, line_spacing, margin, text, text_length) \
+  render_text(tex, x, y, z, w, h, size, kerning, line_spacing, margin, text, text_length, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 struct Texture;
 
@@ -28,7 +32,7 @@ void renderer_init();
 
 void render_texture_region(struct Texture texture, float x, float y, float z, float w, float h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range);
 
-void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, float line_spacing, float margin, const char* text, u32 text_length);
+void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, float line_spacing, float margin, const char* text, u32 text_length, u8 background, float rect_r, float rect_g, float rect_b, float rect_a, float border_r, float border_g, float border_b, float border_a, float border_thickness);
 
 void render_rect(float x, float y, float z, float w, float h, float r, float g, float b, float a, float angle, float thickness);
 
