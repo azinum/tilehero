@@ -179,12 +179,9 @@ void entity_update(Entity* e) {
     if (game_state.should_move) {
       entity_tiled_move(e);
     }
-  World_position world_position = game_state.world_chunk.position;
-  i32 x_position = (world_position.x * (TILE_SIZE * TILE_COUNT_X));
-  i32 y_position = (world_position.y * (TILE_SIZE * TILE_COUNT_Y));
 #if INTERP_MOVEMENT
-    e->x = lerp(e->x, x_position + (TILE_SIZE * e->x_tile), INTERP_SPEED * game_state.delta_time * game_state.time_scale);
-    e->y = lerp(e->y, y_position + (TILE_SIZE * e->y_tile), INTERP_SPEED * game_state.delta_time * game_state.time_scale);
+    e->x = lerp(e->x, (TILE_SIZE * e->x_tile), INTERP_SPEED * game_state.delta_time * game_state.time_scale);
+    e->y = lerp(e->y, (TILE_SIZE * e->y_tile), INTERP_SPEED * game_state.delta_time * game_state.time_scale);
 #else
     e->x = TILE_SIZE * e->x_tile;
     e->y = TILE_SIZE * e->y_tile;

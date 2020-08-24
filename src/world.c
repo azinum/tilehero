@@ -59,7 +59,7 @@ i32 world_chunk_load_hashed(struct World_chunk* chunk, World_position pos, const
   struct World_chunk temp_chunk;
   u32 bytes_read = read(fd, &temp_chunk, sizeof(struct World_chunk));
   if (bytes_read != sizeof(struct World_chunk)) {
-    fprintf(stderr, "Failed to read chunk in world storage file '%s'\n", world_storage_file);
+    fprintf(stderr, "Failed to read chunk (%i, %i, %i) in world storage file '%s'\n", pos.x, pos.y, pos.z, world_storage_file);
     close(fd);
     return -1;
   }
