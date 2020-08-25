@@ -19,7 +19,7 @@ struct {
   .world_position = WORLD_VEC3(0, 0, 0),
 };
 
-static Tile placable_tiles[MAX_TILE] = {
+static Tile placable_tiles[] = {
   // type, walkable, background
   {TILE_VOID, 0, 0},
   {TILE_DEFAULT, 1, 0},
@@ -93,7 +93,7 @@ void editor_update() {
   tilemap_render_tile_highlight(&chunk->tile_map, x_tile, y_tile);
 
   if (key_pressed[GLFW_KEY_E]) {
-    editor.tile_type = (editor.tile_type + 1) % MAX_TILE;
+    editor.tile_type = (editor.tile_type + 1) % ARR_SIZE(placable_tiles);
   }
   if (key_pressed[GLFW_KEY_1]) {
     game_state.time_scale -= 0.05f;
@@ -205,6 +205,18 @@ char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 void editor_render() {
 #if USE_EDITOR
 {
+  i32 x = 10;
+  i32 y = 10;
+  i32 w = TILE_SIZE;
+  i32 h = w;
+  Tile tile = placable_tiles[editor.tile_type];
+  struct Spritesheet sheet = spritesheets[SHEET_TILES];
+  i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile.tile_type);
+  i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile.tile_type);
+  render_rect(x, y, 0.9f, w, h, 0.8f, 0.20f, 0.25f, 1, 0, 1.0f / TILE_SIZE);
+  render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
+}
+{
   i32 x = 10 + 10 + TILE_SIZE;
   i32 y = 10;
   i32 w = TILE_SIZE;
@@ -217,17 +229,6 @@ void editor_render() {
   render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
 }
 
-{
-  i32 x = 10;
-  i32 y = 10;
-  i32 w = TILE_SIZE;
-  i32 h = w;
-  struct Spritesheet sheet = spritesheets[SHEET_TILES];
-  i32 x_offset = SHEET_GET_X_OFFSET(sheet, editor.tile_type);
-  i32 y_offset = SHEET_GET_Y_OFFSET(sheet, editor.tile_type);
-  render_rect(x, y, 0.9f, w, h, 0.8f, 0.20f, 0.25f, 1, 0, 1.0f / TILE_SIZE);
-  render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
-}
   i32 w = 230;
   i32 h = 200;
   snprintf(
