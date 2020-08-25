@@ -52,15 +52,8 @@ void entity_tiled_move(struct Entity* e) {
   tile_moves[move_count++] = move;
 }
 
-
-// TODO(lucas): Many questions: Think about how we should traverse the world via world chunks.
-// How do we transfer entities from one world chunk to another? How do we store
-// world chunks persistently? Do we have multiple world chunks
-// in memory? And when we move the camera we write the chunks we don't need to disk, and
-// load the chunks we need? How should all of this work?
 void entity_do_tiled_move(Entity* entities, i32 entity_count) {
-  World_position world_position = game_state.world_chunk.position;
-
+#if 1
   for (u32 i = 0; i < move_count; i++) {
     struct Tile_move* move = &tile_moves[i];
     Entity* e = move->entity;
@@ -76,7 +69,22 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
         break;
       }
     }
-    Tile* tile = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile - (world_position.x * TILE_COUNT_X), move->y_tile - (world_position.y * TILE_COUNT_Y));
+
+    Tile* tile = NULL;
+    World_chunk* chunk = NULL;
+    World_position world_position = {0};
+    i32 x_tile_relative = 0;
+    i32 y_tile_relative = 0;
+
+    for (u32 chunk_index = 0; chunk_index < NUM_LOADED_WORLD_CHUNKS; chunk_index++) {
+      chunk = &game_state.world.chunks[chunk_index];
+      world_position = chunk->position;
+      x_tile_relative = move->x_tile - (world_position.x * TILE_COUNT_X);
+      y_tile_relative = move->y_tile - (world_position.y * TILE_COUNT_Y);
+      tile = tilemap_get_tile(&chunk->tile_map, x_tile_relative, y_tile_relative);
+      if (tile)
+        break;
+    }
     if (!tile) {  // Outside the map
       collision = 1;
     }
@@ -130,7 +138,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
         }
       }
     }
-    else {  // No collision, let's move to this tile!
+    else if (tile) {  // No collision, let's move to this tile!
       e->x_tile = move->x_tile;
       e->y_tile = move->y_tile;
       switch (tile->tile_type) {
@@ -149,10 +157,10 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
           break;
         }
         case TILE_SWAPPER: {
-          Tile* l = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile - 1, move->y_tile); // Left
-          Tile* r = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile + 1, move->y_tile); // Right
-          Tile* t = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile, move->y_tile - 1); // Top
-          Tile* b = tilemap_get_tile(&game_state.world_chunk.tile_map, move->x_tile, move->y_tile + 1); // Bottom
+          Tile* l = tilemap_get_tile(&chunk->tile_map, x_tile_relative - 1, y_tile_relative); // Left
+          Tile* r = tilemap_get_tile(&chunk->tile_map, x_tile_relative + 1, y_tile_relative); // Right
+          Tile* t = tilemap_get_tile(&chunk->tile_map, x_tile_relative, y_tile_relative - 1); // Top
+          Tile* b = tilemap_get_tile(&chunk->tile_map, x_tile_relative, y_tile_relative + 1); // Bottom
           if (l && r) {
             Tile l_tmp = *l;
             *l = *r;
@@ -168,7 +176,12 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
         }
       }
     }
+    else {
+      e->x_tile = move->x_tile;
+      e->y_tile = move->y_tile;
+    }
   }
+#endif
   move_count = 0;
 }
 

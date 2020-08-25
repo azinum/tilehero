@@ -11,12 +11,12 @@ struct {
   u32 tile_type;
   u32 entity_type;
   u32 chunk_index;
-  World_position world_pos;
+  World_position world_position;
 } editor = {
   .tile_type = 0,
   .entity_type = 0,
   .chunk_index = 0,
-  .world_pos = WORLD_VEC3(0, 0, 0),
+  .world_position = WORLD_VEC3(0, 0, 0),
 };
 
 static Tile placable_tiles[MAX_TILE] = {
@@ -84,21 +84,24 @@ void add_random_attack(Entity* e, const Arg* arg) {
 
 void editor_update() {
 #if USE_EDITOR
-  World_position p = game_state.world_chunk.position;
+
+  World_position p = game_state.world.current_origin;
+  World_chunk* chunk = &game_state.world.chunks[4];
+
   i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x) - (p.x * TILE_COUNT_X);
   i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y) - (p.y * TILE_COUNT_Y);
-  tilemap_render_tile_highlight(&game_state.world_chunk.tile_map, x_tile, y_tile);
+  tilemap_render_tile_highlight(&chunk->tile_map, x_tile, y_tile);
 
   if (key_pressed[GLFW_KEY_E]) {
     editor.tile_type = (editor.tile_type + 1) % MAX_TILE;
   }
   if (key_pressed[GLFW_KEY_1]) {
-    game_state.time_scale *= 0.9f;
+    game_state.time_scale -= 0.05f;
     if (game_state.time_scale <= TIME_SCALING_MIN)
       game_state.time_scale = TIME_SCALING_MIN;
   }
   if (key_pressed[GLFW_KEY_2]) {
-    game_state.time_scale *= 1.1f;
+    game_state.time_scale += 0.05f;
     if (game_state.time_scale >= TIME_SCALING_MAX)
       game_state.time_scale = TIME_SCALING_MAX;
   }
@@ -107,15 +110,15 @@ void editor_update() {
   }
 
   if (key_pressed[GLFW_KEY_9]) {
-    game_state.world_chunk.entity_count = 0;
-    tilemap_init(&game_state.world_chunk.tile_map, TILE_COUNT_X, TILE_COUNT_Y);
+    game_state.world.entity_count = 0;
+    tilemap_init(&chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
   if (key_pressed[GLFW_KEY_8]) {
-    tilemap_init_tile(&game_state.world_chunk.tile_map, TILE_COUNT_X, TILE_COUNT_Y, placable_tiles[editor.tile_type]);
+    tilemap_init_tile(&chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y, placable_tiles[editor.tile_type]);
   }
 
   if (left_mouse_down || key_down[GLFW_KEY_R]) {
-    Tile* tile = tilemap_get_tile(&game_state.world_chunk.tile_map, x_tile, y_tile);
+    Tile* tile = tilemap_get_tile(&chunk->tile_map, x_tile, y_tile);
     if (tile) {
       Tile new_tile = placable_tiles[editor.tile_type];
       *tile = new_tile;
@@ -125,6 +128,7 @@ void editor_update() {
     }
   }
 
+#if 0
   if (key_pressed[GLFW_KEY_N]) {
     game_state.world_chunk.position = editor.world_pos;
     world_chunk_store_hashed(&game_state.world_chunk, WORLD_STORAGE_FILE);
@@ -151,6 +155,24 @@ void editor_update() {
     world_chunk_init(&game_state.world_chunk, editor.world_pos);
     world_chunk_load_hashed(&game_state.world_chunk, editor.world_pos, WORLD_STORAGE_FILE);
   }
+#endif
+  if (key_pressed[GLFW_KEY_N]) {
+    world_transfer_entities_to_chunks(&game_state.world);
+    world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
+    world_load_chunks_from_origin(&game_state.world, game_state.world.current_origin);
+  }
+  if (key_pressed[GLFW_KEY_V]) {
+    world_transfer_entities_to_chunks(&game_state.world);
+    world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
+    game_state.world.current_origin.x--;
+    world_load_chunks_from_origin(&game_state.world, game_state.world.current_origin);
+  }
+  if (key_pressed[GLFW_KEY_B]) {
+    world_transfer_entities_to_chunks(&game_state.world);
+    world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
+    game_state.world.current_origin.x++;
+    world_load_chunks_from_origin(&game_state.world, game_state.world.current_origin);
+  }
 
   if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
     editor.entity_type--;
@@ -162,19 +184,17 @@ void editor_update() {
   if (key_pressed[GLFW_KEY_Z]) {
     i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
     i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-    // if (x_tile >= 0 && x_tile < TILE_COUNT_X && y_tile >= 0 && y_tile < TILE_COUNT_Y) {
-      struct Entity_type_def entity = placable_entities[editor.entity_type];
-      Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, entity.x_dir, entity.y_dir, entity.health, entity.max_health, entity.attack);
-      if (e) {
-        e->sprite_id = entity.sprite_id;
-        e->type = entity.type;
-        e->e_flags = entity.e_flags;
-        if (entity.func) {
-          entity.func(e, &entity.arg);
-        }
-        audio_play_once(SOUND_0F, 0.5f);
+    struct Entity_type_def entity = placable_entities[editor.entity_type];
+    Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, entity.x_dir, entity.y_dir, entity.health, entity.max_health, entity.attack);
+    if (e) {
+      e->sprite_id = entity.sprite_id;
+      e->type = entity.type;
+      e->e_flags = entity.e_flags;
+      if (entity.func) {
+        entity.func(e, &entity.arg);
       }
-    // }
+      audio_play_once(SOUND_0F, 0.5f);
+    }
   }
 #endif
 }
@@ -221,19 +241,19 @@ void editor_render() {
     "entity count: %i/%i\n"
     "master volume: %.2f\n"
     "active sounds: %i/%i\n"
-    "world pos: (%i, %i, %i)\n"
+    "world origin: (%i, %i, %i)\n"
     ,
     (i32)camera.x, (i32)camera.y,
     window.width, window.height,
     game_state.time,
     (i32)(100 * game_state.time_scale),
     (i32)(1.0f / game_state.delta_time),
-    game_state.world_chunk.entity_count, MAX_ENTITY,
+    game_state.world.entity_count, MAX_ENTITY,
     audio_engine.master_volume,
     audio_engine.sound_count, MAX_ACTIVE_SOUNDS,
-    game_state.world_chunk.position.x,
-    game_state.world_chunk.position.y,
-    game_state.world_chunk.position.z);
+    game_state.world.current_origin.x,
+    game_state.world.current_origin.y,
+    game_state.world.current_origin.z);
   render_simple_text(textures[TEXTURE_FONT],
     10, window.height - 10 - h, // x, y
     0.9f, // z

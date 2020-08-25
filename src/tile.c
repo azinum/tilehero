@@ -43,7 +43,7 @@ void tilemap_init_tile(struct Tile_map* tile_map, i32 x_count, i32 y_count, Tile
   }
 }
 
-void tilemap_render(struct Tile_map* tile_map) {
+void tilemap_render(struct Tile_map* tile_map, World_position world_position) {
 #if 0
   u32 index = 0;
   struct Spritesheet sheet = spritesheets[SHEET_TILES];
@@ -74,14 +74,12 @@ void tilemap_render(struct Tile_map* tile_map) {
   glUniformMatrix4fv(glGetUniformLocation(tile_shader, "model"), 1, GL_FALSE, (float*)&model);
   render_instanced_list(&l);
 #else
-  World_position world_position = game_state.world_chunk.position;
   i32 x_position = (world_position.x * (TILE_SIZE * TILE_COUNT_X));
   i32 y_position = (world_position.y * (TILE_SIZE * TILE_COUNT_Y));
-
-  render_rect(x_position - camera.x, y_position - camera.y, -0.9f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 1, 1, 1, 0.3f, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
+  render_rect(x_position - camera.x, y_position - camera.y, 0, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 0.35f, 0.1f, 0.35f, 1, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
 
   for (i32 y = 0; y < tile_map->y_count; y++) {
-    for (i32 x = 0; x < tile_map->y_count; x++) {
+    for (i32 x = 0; x < tile_map->x_count; x++) {
       struct Spritesheet sheet = spritesheets[SHEET_TILES];
       Tile* tile = &tile_map->map[x + (y * tile_map->x_count)];
       if (tile->tile_type != TILE_VOID) {
@@ -116,13 +114,12 @@ void tilemap_render(struct Tile_map* tile_map) {
 }
 
 void tilemap_render_tile_highlight(struct Tile_map* tile_map, i32 x_tile, i32 y_tile) {
-  World_position world_position = game_state.world_chunk.position;
+  World_position world_position = game_state.world.current_origin;
   i32 x_position = (world_position.x * TILE_COUNT_X * TILE_SIZE) + (x_tile * TILE_SIZE);
   i32 y_position = (world_position.y * TILE_COUNT_Y * TILE_SIZE) + (y_tile * TILE_SIZE);
 
   Tile* tile = tilemap_get_tile(tile_map, x_tile, y_tile);
   if (tile) {
-    // render_rect((x_tile * TILE_SIZE) - camera.x, (y_tile * TILE_SIZE) - camera.y, -0.1f, TILE_SIZE, TILE_SIZE, 1, 1, 1, 1, 0, 1.0f / TILE_SIZE);
     render_rect(x_position - camera.x, y_position - camera.y, -0.1f, TILE_SIZE, TILE_SIZE, 1, 1, 1, 1, 0, 1.0f / TILE_SIZE);
   }
 }
