@@ -82,8 +82,9 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
       x_tile_relative = move->x_tile - (world_position.x * TILE_COUNT_X);
       y_tile_relative = move->y_tile - (world_position.y * TILE_COUNT_Y);
       tile = tilemap_get_tile(&chunk->tile_map, x_tile_relative, y_tile_relative);
-      if (tile)
+      if (tile) {
         break;
+      }
     }
     if (!tile) {  // Outside the map
       collision = 1;

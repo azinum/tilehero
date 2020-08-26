@@ -10,7 +10,7 @@ typedef struct World_position {
 } World_position;
 
 #define WORLD_VEC3(X, Y, Z) ((World_position) {X, Y, Z})
-#define WORLD_VEC3_EQUAL(A, B) (A.x == B.x && A.y == B.y && A.z == B.z)
+#define WORLD_OFFSET(A, B) WORLD_VEC3(A.x - B.x, A.y - B.y, A.z - B.z)
 
 typedef struct World_chunk {
   World_position position;
@@ -29,9 +29,8 @@ typedef struct World {
   World_position current_origin;
   World_chunk chunks[NUM_LOADED_WORLD_CHUNKS];
 
-  // NOTE(lucas): These are the entities in which we are currently processing
-  Entity* entities;
-  u32 entity_count;
+  // NOTE(lucas): This is the chunk that we are currently processing
+  World_chunk* chunk;
 
   Entity swap_entities[MAX_ENTITY];
   u32 swap_entity_count;
@@ -44,6 +43,8 @@ void world_load_chunks_from_origin(World* world, World_position origin);
 i32 world_add_entity_to_chunk(World_chunk* chunk, Entity* e);
 
 i32 world_transfer_entities_to_chunks(World* world);
+
+i32 world_add_entity_to_swap(World* world, Entity* e);
 
 i32 world_chunk_store(World_chunk* chunk, i32 fd);
 

@@ -110,7 +110,7 @@ void editor_update() {
   }
 
   if (key_pressed[GLFW_KEY_9]) {
-    game_state.world.entity_count = 0;
+    game_state.world.chunk->entity_count = 0;
     tilemap_init(&chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
   if (key_pressed[GLFW_KEY_8]) {
@@ -128,34 +128,6 @@ void editor_update() {
     }
   }
 
-#if 0
-  if (key_pressed[GLFW_KEY_N]) {
-    game_state.world_chunk.position = editor.world_pos;
-    world_chunk_store_hashed(&game_state.world_chunk, WORLD_STORAGE_FILE);
-  }
-  if (key_pressed[GLFW_KEY_M]) {
-    move_count = 0;
-    world_chunk_load_hashed(&game_state.world_chunk, editor.world_pos, WORLD_STORAGE_FILE);
-  }
-
-  if (key_pressed[GLFW_KEY_V]) {
-    move_count = 0;
-    if (editor.world_pos.x != 0) {
-      editor.world_pos.x--;
-    }
-    world_chunk_store_hashed(&game_state.world_chunk, WORLD_STORAGE_FILE);
-    world_chunk_init(&game_state.world_chunk, editor.world_pos);
-    world_chunk_load_hashed(&game_state.world_chunk, editor.world_pos, WORLD_STORAGE_FILE);
-  }
-  if (key_pressed[GLFW_KEY_B]) {
-    move_count = 0;
-    editor.world_pos.x++;
-
-    world_chunk_store_hashed(&game_state.world_chunk, WORLD_STORAGE_FILE);
-    world_chunk_init(&game_state.world_chunk, editor.world_pos);
-    world_chunk_load_hashed(&game_state.world_chunk, editor.world_pos, WORLD_STORAGE_FILE);
-  }
-#endif
   if (key_pressed[GLFW_KEY_N]) {
     world_transfer_entities_to_chunks(&game_state.world);
     world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
@@ -249,7 +221,7 @@ void editor_render() {
     game_state.time,
     (i32)(100 * game_state.time_scale),
     (i32)(1.0f / game_state.delta_time),
-    game_state.world.entity_count, MAX_ENTITY,
+    game_state.world.chunk->entity_count, MAX_ENTITY,
     audio_engine.master_volume,
     audio_engine.sound_count, MAX_ACTIVE_SOUNDS,
     game_state.world.current_origin.x,

@@ -35,6 +35,7 @@ void camera_update() {
   if (key_pressed[GLFW_KEY_Q] && camera.target != NULL) {
     camera.has_target = !camera.has_target;
   }
+
   if (camera.target != NULL && camera.has_target) {
     camera.x_target = camera.target->x - (window.width / 2);
     camera.y_target = camera.target->y - (window.height / 2);

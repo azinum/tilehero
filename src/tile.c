@@ -76,7 +76,7 @@ void tilemap_render(struct Tile_map* tile_map, World_position world_position) {
 #else
   i32 x_position = (world_position.x * (TILE_SIZE * TILE_COUNT_X));
   i32 y_position = (world_position.y * (TILE_SIZE * TILE_COUNT_Y));
-  render_rect(x_position - camera.x, y_position - camera.y, 0, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 0.35f, 0.1f, 0.35f, 1, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
+  render_rect(x_position - camera.x, y_position - camera.y, -0.9f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 0.35f, 0.1f, 0.35f, 1, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
 
   for (i32 y = 0; y < tile_map->y_count; y++) {
     for (i32 x = 0; x < tile_map->x_count; x++) {

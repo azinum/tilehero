@@ -32,6 +32,8 @@
 #define VEC3(X, Y, Z) ((vec3) {X, Y, Z})
 #define VEC4(X, Y, Z, W) ((vec4) {X, Y, Z, W})
 #define MAT4(A) mm_mat4d(A)
+#define VEC3I(X, Y, Z) ((vec3i) {X, Y, Z})
+#define VEC3I_EQUAL(A, B) (A.x == B.x && A.y == B.y && A.z == B.z)
 
 typedef int64_t i64;
 typedef uint64_t u64;
@@ -53,6 +55,11 @@ typedef struct vec3 {
 typedef struct vec2 {
   float x, y;
 } vec2;
+
+typedef struct vec3i {
+  i32 x, y, z;
+} vec3i;
+
 inline float random_number(float from, float to) {
   return (float)rand() / (float)(RAND_MAX / to) + (float)rand() / (float)(RAND_MAX / from);
 }
