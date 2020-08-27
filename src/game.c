@@ -113,7 +113,6 @@ void game_run() {
           player_update(e);
           if (!camera.target) {
             camera.target = e;
-            camera.has_target = 1;
           }
         }
         entity_update(e);

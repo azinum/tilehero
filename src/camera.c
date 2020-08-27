@@ -10,6 +10,9 @@
 #define CAMERA_MOVE_SPEED (600.0f)
 #define CAMERA_TARGET_SPEED (7.0f)
 
+World_position world_position = {0, 0, 0};
+World_position old = {0, 0, 0};
+
 void camera_init(i32 x, i32 y) {
   camera.x = x;
   camera.y = y;
@@ -20,6 +23,16 @@ void camera_init(i32 x, i32 y) {
 }
 
 void camera_update() {
+  world_position = WORLD_VEC3(
+    (camera.x + (window.width / 2)) / (TILE_COUNT_X * TILE_SIZE),
+    (camera.y + (window.height / 2)) / (TILE_COUNT_Y * TILE_SIZE),
+    0
+  );
+  if (!VEC3I_EQUAL(old, world_position)) {
+    old = world_position;
+    world_load_chunks_from_origin(&game_state.world, world_position);
+  }
+
   if (key_down[GLFW_KEY_A]) {
     camera.x_target -= CAMERA_MOVE_SPEED * game_state.delta_time;
   }

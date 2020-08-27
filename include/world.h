@@ -32,6 +32,9 @@ typedef struct World {
   // NOTE(lucas): This is the chunk that we are currently processing
   World_chunk* chunk;
 
+  Entity* entities;
+  u32 entity_count;
+
   Entity swap_entities[MAX_ENTITY];
   u32 swap_entity_count;
 } World;
