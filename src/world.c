@@ -6,33 +6,33 @@
 #include "game.h"
 #include "world.h"
 
-inline i32 hash_world_position(World_position pos);
+inline i32 hash_world_position(vec3i pos);
 
-i32 hash_world_position(World_position pos) {
+i32 hash_world_position(vec3i pos) {
   i32 result = abs(((pos.x * 137) + (pos.y * 149) + (pos.z * 163))) % NUM_WORLD_CHUNKS;
 
   return result;
 }
 
-void world_chunk_init(World_chunk* chunk, World_position position) {
+void world_chunk_init(World_chunk* chunk, vec3i position) {
   chunk->position = position;
   chunk->chunk_index = 0;
   chunk->entity_count = 0;
   tilemap_init(&chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
 }
 
-void world_load_chunks_from_origin(World* world, World_position origin) {
-  world->current_origin = origin;
+void world_load_chunks_from_world_position(World* world, vec3i position) {
+  world->current_origin = position;
   u32 index = 0;
   for (i32 y = -1; y <= 1; y++) {
     for (i32 x = -1; x <= 1; x++) {
-      World_position p = WORLD_VEC3(origin.x + x, origin.y + y, origin.z);
+      vec3i p = VEC3I(position.x + x, position.y + y, position.z);
       World_chunk* chunk = &world->chunks[index++];
       world_chunk_load_hashed(chunk, p, WORLD_STORAGE_FILE);
       assert(chunk);
 
-      if (p.x == origin.x && p.y == origin.y && p.z == origin.z) {
-        world->chunk = chunk;
+      for (u32 i = 0; i < chunk->entity_count; i++) {
+        game_copy_add_entity(chunk->entities[i]);
       }
     }
   }
@@ -48,18 +48,18 @@ i32 world_add_entity_to_chunk(World_chunk* chunk, Entity* e) {
 }
 
 i32 world_transfer_entities_to_chunks(World* world) {
-  for (u32 entity_index = 0; entity_index < world->swap_entity_count; entity_index++) {
-    Entity* e = &world->swap_entities[entity_index];
+  for (u32 chunk_index = 0; chunk_index < NUM_LOADED_WORLD_CHUNKS; chunk_index++) {
+    World_chunk* chunk = &world->chunks[chunk_index];
+    chunk->entity_count = 0;
+  }
+
+  for (u32 entity_index = 0; entity_index < world->entity_count; entity_index++) {
+    Entity* e = &world->entities[entity_index];
     assert(e);
 
-    World_position world_position = WORLD_VEC3((i32)(e->x_tile / TILE_COUNT_X), (i32)(e->y_tile / TILE_COUNT_Y), 0);
-    World_position center = world->current_origin;
-    if (VEC3I_EQUAL(world_position, center)) {
-      continue;
-    }
-
-    World_position origin = world->chunks[0].position;
-    World_position offset = WORLD_OFFSET(world_position, origin);
+    vec3i world_position = VEC3I((i32)(e->x_tile / TILE_COUNT_X), (i32)(e->y_tile / TILE_COUNT_Y), 0);
+    vec3i origin = world->chunks[0].position;
+    vec3i offset = VEC3I_OFFSET(world_position, origin);
     i32 chunk_index = offset.x + (CHUNK_AREA_X * offset.y);
     if (chunk_index >= 0) {
       World_chunk* chunk = &world->chunks[chunk_index];
@@ -69,16 +69,7 @@ i32 world_transfer_entities_to_chunks(World* world) {
       fprintf(stderr, "Failed to transfer entity to chunk index %i\n", chunk_index);
     }
   }
-  world->swap_entity_count = 0;
-  return 0;
-}
-
-i32 world_add_entity_to_swap(World* world, Entity* e) {
-  if (world->swap_entity_count >= MAX_ENTITY) {
-    fprintf(stderr, "Failed to move entity to entity swap space\n");
-    return -1;
-  }
-  world->swap_entities[world->swap_entity_count++] = *e;
+  world->entity_count = 0;
   return 0;
 }
 
@@ -114,7 +105,7 @@ i32 world_chunks_store_hashed(World* world, const char* world_storage_file) {
   return 0;
 }
 
-i32 world_chunk_load_hashed(World_chunk* chunk, World_position pos, const char* world_storage_file) {
+i32 world_chunk_load_hashed(World_chunk* chunk, vec3i pos, const char* world_storage_file) {
   i32 fd = open(world_storage_file, O_RDWR | O_CREAT, 0644);
   if (fd < 0) {
     fprintf(stderr, "Failed to open file '%s'\n", world_storage_file);

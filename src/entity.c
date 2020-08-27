@@ -31,7 +31,6 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->state = STATE_ACTIVE;
   e->e_flags = 0;
   e->type = 0;
-  e->tile_type = 0;
   e->sprite_id = 0;
   e->id = id_count++;
   e->health = e->max_health = 0;
@@ -72,7 +71,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
 
     Tile* tile = NULL;
     World_chunk* chunk = NULL;
-    World_position world_position = {0};
+    vec3i world_position = {0};
     i32 x_tile_relative = 0;
     i32 y_tile_relative = 0;
 

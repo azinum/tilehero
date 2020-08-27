@@ -11,12 +11,10 @@ struct {
   u32 tile_type;
   u32 entity_type;
   u32 chunk_index;
-  World_position world_position;
 } editor = {
   .tile_type = 0,
   .entity_type = 0,
   .chunk_index = 0,
-  .world_position = WORLD_VEC3(0, 0, 0),
 };
 
 static Tile placable_tiles[] = {
@@ -85,7 +83,7 @@ void add_random_attack(Entity* e, const Arg* arg) {
 void editor_update() {
 #if USE_EDITOR
 
-  World_position p = game_state.world.current_origin;
+  vec3i p = game_state.world.current_origin;
   World_chunk* chunk = &game_state.world.chunks[4];
 
   i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x) - (p.x * TILE_COUNT_X);
@@ -110,7 +108,7 @@ void editor_update() {
   }
 
   if (key_pressed[GLFW_KEY_9]) {
-    game_state.world.chunk->entity_count = 0;
+    chunk->entity_count = 0;
     tilemap_init(&chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
   if (key_pressed[GLFW_KEY_8]) {
@@ -131,21 +129,8 @@ void editor_update() {
   if (key_pressed[GLFW_KEY_N]) {
     world_transfer_entities_to_chunks(&game_state.world);
     world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
-    world_load_chunks_from_origin(&game_state.world, game_state.world.current_origin);
+    world_load_chunks_from_world_position(&game_state.world, game_state.world.current_origin);
   }
-  if (key_pressed[GLFW_KEY_V]) {
-    world_transfer_entities_to_chunks(&game_state.world);
-    world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
-    game_state.world.current_origin.x--;
-    world_load_chunks_from_origin(&game_state.world, game_state.world.current_origin);
-  }
-  if (key_pressed[GLFW_KEY_B]) {
-    world_transfer_entities_to_chunks(&game_state.world);
-    world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
-    game_state.world.current_origin.x++;
-    world_load_chunks_from_origin(&game_state.world, game_state.world.current_origin);
-  }
-
   if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
     editor.entity_type--;
   }
@@ -221,7 +206,7 @@ void editor_render() {
     game_state.time,
     (i32)(100 * game_state.time_scale),
     (i32)(1.0f / game_state.delta_time),
-    game_state.world.chunk->entity_count, MAX_ENTITY,
+    game_state.world.entity_count, MAX_ENTITY,
     audio_engine.master_volume,
     audio_engine.sound_count, MAX_ACTIVE_SOUNDS,
     game_state.world.current_origin.x,

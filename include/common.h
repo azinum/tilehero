@@ -32,8 +32,10 @@
 #define VEC3(X, Y, Z) ((vec3) {X, Y, Z})
 #define VEC4(X, Y, Z, W) ((vec4) {X, Y, Z, W})
 #define MAT4(A) mm_mat4d(A)
+
 #define VEC3I(X, Y, Z) ((vec3i) {X, Y, Z})
 #define VEC3I_EQUAL(A, B) (A.x == B.x && A.y == B.y && A.z == B.z)
+#define VEC3I_OFFSET(A, B) VEC3I(A.x - B.x, A.y - B.y, A.z - B.z)
 
 typedef int64_t i64;
 typedef uint64_t u64;

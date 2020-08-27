@@ -10,8 +10,6 @@
 #define TILE_SIZE (48)
 #define PIXEL_TO_TILE_POS(PX) (PX >= 0 ? (i32)((PX) / TILE_SIZE) : -1)
 
-struct World_position;
-
 enum Tile_type {
   TILE_VOID,
   TILE_DEFAULT,
@@ -44,7 +42,7 @@ void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count);
 
 void tilemap_init_tile(struct Tile_map* tile_map, i32 x_count, i32 y_count, Tile tile);
 
-void tilemap_render(struct Tile_map* tile_map, struct World_position world_position);
+void tilemap_render(struct Tile_map* tile_map, vec3i world_position);
 
 void tilemap_render_tile_highlight(struct Tile_map* tile_map, i32 x_tile, i32 y_tile);
 

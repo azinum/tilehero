@@ -35,17 +35,16 @@ struct Tile_move {
 
 extern struct Tile_move tile_moves[];
 extern u32 move_count;
-extern float move_time; // At which time we are ready to do a move
+extern float move_time; // NOTE(lucas): At which time we are ready to do a move
 
 typedef struct Entity {
   i32 x_tile, y_tile;
   float x, y, w, h;
-  float x_speed, y_speed;
+  vec3i world_position;
   i8 x_dir, y_dir;
   i32 state;
   i32 e_flags;
   i16 type;
-  i16 tile_type;
   i16 sprite_id;
   i16 id;
   i16 health;

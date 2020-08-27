@@ -9,9 +9,11 @@
 
 #define CAMERA_MOVE_SPEED (600.0f)
 #define CAMERA_TARGET_SPEED (7.0f)
+#define CAMERA_CENTER_X (camera.x + (window.width >> 1))
+#define CAMERA_CENTER_Y (camera.y + (window.height >> 1))
 
-World_position world_position = {0, 0, 0};
-World_position old = {0, 0, 0};
+vec3i world_position = {0, 0, 0};
+vec3i old = {0, 0, 0};
 
 void camera_init(i32 x, i32 y) {
   camera.x = x;
@@ -23,14 +25,16 @@ void camera_init(i32 x, i32 y) {
 }
 
 void camera_update() {
-  world_position = WORLD_VEC3(
-    (camera.x + (window.width / 2)) / (TILE_COUNT_X * TILE_SIZE),
-    (camera.y + (window.height / 2)) / (TILE_COUNT_Y * TILE_SIZE),
+  world_position = VEC3I(
+    CAMERA_CENTER_X / CHUNK_SIZE_IN_PIXELS_X,
+    CAMERA_CENTER_Y / CHUNK_SIZE_IN_PIXELS_Y,
     0
   );
   if (!VEC3I_EQUAL(old, world_position)) {
     old = world_position;
-    world_load_chunks_from_origin(&game_state.world, world_position);
+    world_transfer_entities_to_chunks(&game_state.world);
+    world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
+    world_load_chunks_from_world_position(&game_state.world, world_position);
   }
 
   if (key_down[GLFW_KEY_A]) {

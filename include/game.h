@@ -33,6 +33,8 @@ extern struct Game_state game_state;
 
 void game_entity_remove(struct Entity* e);
 
+Entity* game_copy_add_entity(Entity copy);
+
 Entity* game_add_entity(float x, float y, float w, float h);
 
 Entity* game_add_empty_entity();
