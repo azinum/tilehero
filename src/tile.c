@@ -27,7 +27,7 @@ Tile* tilemap_get_tile(struct Tile_map* tile_map, i32 x, i32 y) {
 // #define MAX_INSTANCES 1024
 
 void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count) {
-  tilemap_init_tile(tile_map, x_count, y_count, (Tile) {.tile_type = TILE_VOID, .walkable = 0, .background_tile = 0});
+  tilemap_init_tile(tile_map, x_count, y_count, (Tile) {.type = TILE_VOID, .walkable = 0, .background_tile = 0});
 // instanced_list_init(&l, 4, MAX_INSTANCES, &spritesheets[SHEET_TILES].texture);
 }
 
@@ -50,12 +50,12 @@ void tilemap_render(struct Tile_map* tile_map) {
   for (i32 y = 0; y < tile_map->y_count; y++) {
     for (i32 x = 0; x < tile_map->y_count; x++) {
       Tile* tile = tilemap_get_tile(tile_map, x, y);
-      if (tile->tile_type == TILE_VOID) {
+      if (tile->type == TILE_VOID) {
         index += 4;
         continue;
       }
-      i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile->tile_type);
-      i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->tile_type);
+      i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile->type);
+      i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->type);
       l.instance_data[index++] = (x * TILE_SIZE) - camera.x;
       l.instance_data[index++] = (y * TILE_SIZE) - camera.y;
       l.instance_data[index++] = x_offset;
@@ -78,9 +78,9 @@ void tilemap_render(struct Tile_map* tile_map) {
     for (i32 x = 0; x < tile_map->x_count; x++) {
       struct Spritesheet sheet = spritesheets[SHEET_TILES];
       Tile* tile = &tile_map->map[x + (y * tile_map->x_count)];
-      if (tile->tile_type != TILE_VOID) {
-        i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile->tile_type);
-        i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->tile_type);
+      if (tile->type != TILE_VOID) {
+        i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile->type);
+        i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->type);
         render_texture_region(
           sheet.texture,
           (x * TILE_SIZE) - camera.x,

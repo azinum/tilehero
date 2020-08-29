@@ -57,6 +57,7 @@ enum Placable_entity_type {
   ENTITY_MAD_SCIENTIST,
   ENTITY_WIZARD,
   ENTITY_VOID_WALKER,
+  ENTITY_FLAG,
 
   MAX_PLACABLE_ENTITY,
 };
@@ -70,6 +71,7 @@ static struct Entity_type_def placable_entities[MAX_PLACABLE_ENTITY] = {
   {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_MAD_SCIENTIST, 12, 12, 1, add_random_attack, {.i = 3}},
   {1, 0, ENTITY_FLAG_FRIENDLY     | ENTITY_FLAG_MOVABLE, 0, SPRITE_WIZARD, 5, 5, 1, NULL, {}},
   {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, 0, SPRITE_VOID_WALKER, 35, 35, 5, add_random_attack, {.i = 5}},
+  {0, 0, ENTITY_FLAG_MOVABLE, ENTITY_TYPE_FLAG, SPRITE_FLAG, 1, 1, 0, NULL, {}},
 };
 
 void add_random_health(Entity* e, const Arg* arg) {
@@ -175,8 +177,8 @@ void editor_render() {
   i32 h = w;
   Tile tile = placable_tiles[editor.tile_type];
   struct Spritesheet sheet = spritesheets[SHEET_TILES];
-  i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile.tile_type);
-  i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile.tile_type);
+  i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile.type);
+  i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile.type);
   render_rect(x, y, 0.9f, w, h, 0.8f, 0.20f, 0.25f, 1, 0, 1.0f / TILE_SIZE);
   render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
 }

@@ -52,7 +52,6 @@ void entity_tiled_move(struct Entity* e) {
 }
 
 void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
-#if 1
   for (u32 i = 0; i < move_count; i++) {
     struct Tile_move* move = &tile_moves[i];
     Entity* e = move->entity;
@@ -74,7 +73,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
     if (!tile) {  // Outside the map
       collision = 1;
     }
-    else if (tile->walkable == 0 && !(e->e_flags & ENTITY_FLAG_FLY && tile->tile_type == TILE_VOID)) {
+    else if (tile->walkable == 0 && !(e->e_flags & ENTITY_FLAG_FLY && tile->type == TILE_VOID)) {
       collision = 1;
     }
 
@@ -84,6 +83,11 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
         e->y_dir = -e->y_dir;
       }
       if (target) {
+        if (target->type == ENTITY_TYPE_FLAG && e->type == ENTITY_TYPE_PLAYER) {
+          Level* level = &game_state.level;
+          level_load(level, level->index + 1);
+          return;
+        }
         if (e->type == ENTITY_TYPE_CONSUMABLE) {
           target->health += e->health;
           if (target->health > target->max_health)
@@ -127,7 +131,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
     else if (tile) {  // No collision, let's move to this tile!
       e->x_tile = move->x_tile;
       e->y_tile = move->y_tile;
-      switch (tile->tile_type) {
+      switch (tile->type) {
         case TILE_DUNGEON: {
           if (abs(e->x_dir) == 1) {
             e->y_dir = e->x_dir;
@@ -167,7 +171,6 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
       e->y_tile = move->y_tile;
     }
   }
-#endif
   move_count = 0;
 }
 

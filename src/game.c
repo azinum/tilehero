@@ -16,7 +16,8 @@
 Game_state game_state;
 
 static float fade_value;
-static i32 is_fading_out;
+static u8 fade_from_black;
+static u8 is_fading;
 
 static void game_init(Game_state* game);
 static void game_run();
@@ -81,6 +82,18 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
   return e;
 }
 
+void game_fade_to_black() {
+  is_fading = 1;
+  fade_value = 0;
+  fade_from_black = 0;
+}
+
+void game_fade_from_black() {
+  is_fading = 1;
+  fade_value = 1;
+  fade_from_black = 1;
+}
+
 void game_init(Game_state* game) {
   srand((u32)time(NULL));
   game->time = 0;
@@ -95,8 +108,7 @@ void game_init(Game_state* game) {
 
   level_load(&game->level, 0);
 
-  is_fading_out = 1;
-  fade_value = 1.0f;
+  game_fade_from_black();
   camera_init(0, 0);
 
   move_count = 0;
@@ -169,7 +181,7 @@ void game_run() {
       game_state.should_move = 0;
     }
 
-    if (is_fading_out) {
+    if (is_fading) {
       fade_out();
     }
     window_swapbuffers();
@@ -178,12 +190,21 @@ void game_run() {
 }
 
 void fade_out() {
-  fade_value = lerp(fade_value, 0.0f, 0.05f);
-  render_filled_rect(0, 0, 1, window.width, window.height, 0, 0, 0, fade_value, 0);
-  if (fade_value < 0.01f) {
-    fade_value = 0;
-    is_fading_out = 0;
+  if (fade_from_black) {  // Fade from black
+    fade_value = lerp(fade_value, 0.0f, 0.05f);
+    if (fade_value < 0.01f) {
+      fade_value = 0;
+      is_fading = 0;
+    }
   }
+  else {  // Fade to black
+    fade_value = lerp(fade_value, 1.0f, 0.05f);
+    if (fade_value > (1 - 0.01f)) {
+      fade_value = 1;
+      is_fading = 0;
+    }
+  }
+  render_filled_rect(0, 0, 1, window.width, window.height, 0, 0, 0, fade_value, 0);
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {

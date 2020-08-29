@@ -27,6 +27,7 @@ enum Entity_type {
   ENTITY_TYPE_NPC = 0,
   ENTITY_TYPE_PLAYER,
   ENTITY_TYPE_CONSUMABLE,
+  ENTITY_TYPE_FLAG,
 };
 
 struct Tile_move {

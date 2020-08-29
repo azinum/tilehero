@@ -25,7 +25,7 @@ enum Tile_type {
 };
 
 typedef struct Tile {
-  u8 tile_type;
+  u8 type;
   u8 walkable;
   u8 background_tile;
 } Tile;

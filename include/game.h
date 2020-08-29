@@ -41,6 +41,10 @@ Entity* game_add_empty_entity();
 
 Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_dir, i8 y_dir, i16 health, i16 max_health, i16 attack);
 
+void game_fade_to_black();
+
+void game_fade_from_black();
+
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen);
 
 void game_restart();
