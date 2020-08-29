@@ -42,7 +42,7 @@ void tilemap_init(struct Tile_map* tile_map, i32 x_count, i32 y_count);
 
 void tilemap_init_tile(struct Tile_map* tile_map, i32 x_count, i32 y_count, Tile tile);
 
-void tilemap_render(struct Tile_map* tile_map, vec3i world_position);
+void tilemap_render(struct Tile_map* tile_map);
 
 void tilemap_render_tile_highlight(struct Tile_map* tile_map, i32 x_tile, i32 y_tile);
 

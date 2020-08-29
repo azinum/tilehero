@@ -5,6 +5,8 @@
 
 #define MOVE_INTERVAL (1.0f / 5.0f)
 
+struct Level;
+
 enum Entity_state {
   STATE_NONE = 0,
   STATE_ACTIVE,
@@ -57,7 +59,7 @@ void entity_init(Entity* e, float x, float y, float w, float h);
 
 void entity_tiled_move(Entity* e);
 
-void entity_do_tiled_move(Entity* entities, i32 entity_count);
+void entity_do_tiled_move(Entity* entities, i32 entity_count, struct Level* level);
 
 void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h);
 

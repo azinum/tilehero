@@ -51,7 +51,7 @@ void entity_tiled_move(struct Entity* e) {
   tile_moves[move_count++] = move;
 }
 
-void entity_do_tiled_move(Entity* entities, i32 entity_count) {
+void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
 #if 1
   for (u32 i = 0; i < move_count; i++) {
     struct Tile_move* move = &tile_moves[i];
@@ -69,22 +69,8 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
       }
     }
 
-    Tile* tile = NULL;
-    World_chunk* chunk = NULL;
-    vec3i world_position = {0};
-    i32 x_tile_relative = 0;
-    i32 y_tile_relative = 0;
+    Tile* tile = tilemap_get_tile(&level->tile_map, move->x_tile, move->y_tile);
 
-    for (u32 chunk_index = 0; chunk_index < NUM_LOADED_WORLD_CHUNKS; chunk_index++) {
-      chunk = &game_state.world.chunks[chunk_index];
-      world_position = chunk->position;
-      x_tile_relative = move->x_tile - (world_position.x * TILE_COUNT_X);
-      y_tile_relative = move->y_tile - (world_position.y * TILE_COUNT_Y);
-      tile = tilemap_get_tile(&chunk->tile_map, x_tile_relative, y_tile_relative);
-      if (tile) {
-        break;
-      }
-    }
     if (!tile) {  // Outside the map
       collision = 1;
     }
@@ -157,10 +143,10 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count) {
           break;
         }
         case TILE_SWAPPER: {
-          Tile* l = tilemap_get_tile(&chunk->tile_map, x_tile_relative - 1, y_tile_relative); // Left
-          Tile* r = tilemap_get_tile(&chunk->tile_map, x_tile_relative + 1, y_tile_relative); // Right
-          Tile* t = tilemap_get_tile(&chunk->tile_map, x_tile_relative, y_tile_relative - 1); // Top
-          Tile* b = tilemap_get_tile(&chunk->tile_map, x_tile_relative, y_tile_relative + 1); // Bottom
+          Tile* l = tilemap_get_tile(&level->tile_map, move->x_tile - 1, move->y_tile); // Left
+          Tile* r = tilemap_get_tile(&level->tile_map, move->x_tile + 1, move->y_tile); // Right
+          Tile* t = tilemap_get_tile(&level->tile_map, move->x_tile, move->y_tile - 1); // Top
+          Tile* b = tilemap_get_tile(&level->tile_map, move->x_tile, move->y_tile + 1); // Bottom
           if (l && r) {
             Tile l_tmp = *l;
             *l = *r;

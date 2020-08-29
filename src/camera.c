@@ -12,31 +12,16 @@
 #define CAMERA_CENTER_X (camera.x + (window.width >> 1))
 #define CAMERA_CENTER_Y (camera.y + (window.height >> 1))
 
-vec3i world_position = {0, 0, 0};
-vec3i old = {0, 0, 0};
-
 void camera_init(i32 x, i32 y) {
   camera.x = x;
   camera.y = y;
   camera.x_target = x;
   camera.y_target = y;
   camera.target = NULL;
-  camera.has_target = 0;
+  camera.has_target = 1;
 }
 
 void camera_update() {
-  world_position = VEC3I(
-    CAMERA_CENTER_X / CHUNK_SIZE_IN_PIXELS_X,
-    CAMERA_CENTER_Y / CHUNK_SIZE_IN_PIXELS_Y,
-    0
-  );
-  if (!VEC3I_EQUAL(old, world_position)) {
-    old = world_position;
-    world_transfer_entities_to_chunks(&game_state.world);
-    world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
-    world_load_chunks_from_world_position(&game_state.world, world_position);
-  }
-
   if (key_down[GLFW_KEY_A]) {
     camera.x_target -= CAMERA_MOVE_SPEED * game_state.delta_time;
   }
@@ -54,8 +39,8 @@ void camera_update() {
   }
 
   if (camera.target != NULL && camera.has_target) {
-    camera.x_target = camera.target->x - (window.width / 2);
-    camera.y_target = camera.target->y - (window.height / 2);
+    camera.x_target = camera.target->x - (window.width >> 1);
+    camera.y_target = camera.target->y - (window.height >> 1);
     camera.x = lerp(camera.x, camera.x_target, CAMERA_TARGET_SPEED * game_state.delta_time);
     camera.y = lerp(camera.y, camera.y_target, CAMERA_TARGET_SPEED * game_state.delta_time);
   }

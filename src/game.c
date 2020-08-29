@@ -23,16 +23,15 @@ static void game_run();
 static void fade_out();
 
 void game_entity_remove(Entity* e) {
-  if (game_state.world.entity_count > 0) {
-    Entity* top = &game_state.world.entities[--game_state.world.entity_count];
+  if (game_state.level.entity_count > 0) {
+    Entity* top = &game_state.level.entities[--game_state.level.entity_count];
     if (e == camera.target) {
       camera.target = NULL;
-      camera.has_target = 0;
     }
     if (top == camera.target) {
       camera.target = e;
     }
-    if (game_state.world.entity_count == 0) {
+    if (game_state.level.entity_count == 0) {
       return;
     }
     *e = *top;
@@ -42,11 +41,11 @@ void game_entity_remove(Entity* e) {
 }
 
 Entity* game_copy_add_entity(Entity copy) {
-  World* world = &game_state.world;
-  if (world->entity_count >= MAX_ENTITY) {
+  Level* level = &game_state.level;
+  if (level->entity_count >= MAX_ENTITY) {
     return NULL;
   }
-  Entity* e = &world->entities[world->entity_count++];
+  Entity* e = &level->entities[level->entity_count++];
   *e = copy;
   return e;
 }
@@ -58,11 +57,11 @@ Entity* game_add_entity(float x, float y, float w, float h) {
 }
 
 Entity* game_add_empty_entity() {
-  World* world = &game_state.world;
-  if (world->entity_count >= MAX_ENTITY) {
+  Level* level = &game_state.level;
+  if (level->entity_count >= MAX_ENTITY) {
     return NULL;
   }
-  Entity* e = &world->entities[world->entity_count++];
+  Entity* e = &level->entities[level->entity_count++];
   entity_init(e, 0, 0, 0, 0);
   return e;
 }
@@ -92,12 +91,13 @@ void game_init(Game_state* game) {
   game->is_running = 1;
   game->mode = MODE_GAME;
 
-  memset(&game->world, 0, sizeof(struct World));
+  memset(&game->level, 0, sizeof(Level));
+  world_level_init(&game->level);
+  world_level_load(&game->level, 0);
 
   is_fading_out = 1;
   fade_value = 1.0f;
-  camera_init((window.width / 2) + 100, (window.height / 2) + 100);
-  world_load_chunks_from_world_position(&game->world, VEC3I(1, 1, 0));
+  camera_init(0, 0);
 
   move_count = 0;
   move_time = 0;
@@ -134,8 +134,8 @@ void game_run() {
       game_restart();
     }
 
-    for (u32 i = 0; i < game_state.world.entity_count; i++) {
-      Entity* e = &game_state.world.entities[i];
+    for (u32 i = 0; i < game_state.level.entity_count; i++) {
+      Entity* e = &game_state.level.entities[i];
       if (game_state.mode == MODE_GAME) {
         if (e->e_flags & ENTITY_FLAG_PLAYER) {
           player_update(e);
@@ -162,15 +162,10 @@ void game_run() {
     editor_update();
     editor_render();
 
-    for (u32 i = 0; i < NUM_LOADED_WORLD_CHUNKS; i++) {
-      World_chunk* chunk = &game_state.world.chunks[i];
-      assert(chunk);
-      vec3i position = chunk->position;
-      tilemap_render(&chunk->tile_map, position);
-    }
+    tilemap_render(&game_state.level.tile_map);
 
     if (game_state.should_move) {
-      entity_do_tiled_move(game_state.world.entities, game_state.world.entity_count);
+      entity_do_tiled_move(game_state.level.entities, game_state.level.entity_count, &game_state.level);
       game_state.should_move = 0;
     }
 
@@ -203,7 +198,6 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
     // NOTE(lucas): Run the game without audio?
     game_run();
   }
-  world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
   window_close();
   renderer_free();
   resources_unload();

@@ -65,7 +65,7 @@ static void add_random_health(Entity* e, const Arg* arg);
 static void add_random_attack(Entity* e, const Arg* arg);
 
 static struct Entity_type_def placable_entities[MAX_PLACABLE_ENTITY] = {
-  {0, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY_WITH_HELM, 10, 10, 3, NULL, {}},
+  {0, 0, ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY_WITH_HELM, 10, 10, 3, NULL, {}},
   {0, 1, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_RED_MONSTER, 5, 5, 1, add_random_health, {.i = 4}},
   {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_MAD_SCIENTIST, 12, 12, 1, add_random_attack, {.i = 3}},
   {1, 0, ENTITY_FLAG_FRIENDLY     | ENTITY_FLAG_MOVABLE, 0, SPRITE_WIZARD, 5, 5, 1, NULL, {}},
@@ -82,13 +82,10 @@ void add_random_attack(Entity* e, const Arg* arg) {
 
 void editor_update() {
 #if USE_EDITOR
-
-  vec3i p = game_state.world.current_origin;
-  World_chunk* chunk = &game_state.world.chunks[4];
-
-  i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x) - (p.x * TILE_COUNT_X);
-  i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y) - (p.y * TILE_COUNT_Y);
-  tilemap_render_tile_highlight(&chunk->tile_map, x_tile, y_tile);
+  Level* level = &game_state.level;
+  i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+  i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+  tilemap_render_tile_highlight(&level->tile_map, x_tile, y_tile);
 
   if (key_pressed[GLFW_KEY_E]) {
     editor.tile_type = (editor.tile_type + 1) % ARR_SIZE(placable_tiles);
@@ -108,15 +105,14 @@ void editor_update() {
   }
 
   if (key_pressed[GLFW_KEY_9]) {
-    chunk->entity_count = 0;
-    tilemap_init(&chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
+    tilemap_init(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
   if (key_pressed[GLFW_KEY_8]) {
-    tilemap_init_tile(&chunk->tile_map, TILE_COUNT_X, TILE_COUNT_Y, placable_tiles[editor.tile_type]);
+    tilemap_init_tile(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y, placable_tiles[editor.tile_type]);
   }
 
   if (left_mouse_down || key_down[GLFW_KEY_R]) {
-    Tile* tile = tilemap_get_tile(&chunk->tile_map, x_tile, y_tile);
+    Tile* tile = tilemap_get_tile(&level->tile_map, x_tile, y_tile);
     if (tile) {
       Tile new_tile = placable_tiles[editor.tile_type];
       *tile = new_tile;
@@ -127,10 +123,20 @@ void editor_update() {
   }
 
   if (key_pressed[GLFW_KEY_N]) {
-    world_transfer_entities_to_chunks(&game_state.world);
-    world_chunks_store_hashed(&game_state.world, WORLD_STORAGE_FILE);
-    world_load_chunks_from_world_position(&game_state.world, game_state.world.current_origin);
+    world_level_store(level, level->index);
   }
+  if (key_pressed[GLFW_KEY_M]) {
+    world_level_load(level, level->index);
+  }
+  if (key_pressed[GLFW_KEY_V]) {
+    if (level->index > 0) {
+      world_level_load(level, level->index - 1);
+    }
+  }
+  if (key_pressed[GLFW_KEY_B]) {
+    world_level_load(level, level->index + 1);
+  }
+
   if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
     editor.entity_type--;
   }
@@ -161,6 +167,7 @@ char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 
 void editor_render() {
 #if USE_EDITOR
+  Level* level = &game_state.level;
 {
   i32 x = 10;
   i32 y = 10;
@@ -199,19 +206,18 @@ void editor_render() {
     "entity count: %i/%i\n"
     "master volume: %.2f\n"
     "active sounds: %i/%i\n"
-    "world origin: (%i, %i, %i)\n"
+    "current level: %i\n"
     ,
     (i32)camera.x, (i32)camera.y,
     window.width, window.height,
     game_state.time,
     (i32)(100 * game_state.time_scale),
     (i32)(1.0f / game_state.delta_time),
-    game_state.world.entity_count, MAX_ENTITY,
+    game_state.level.entity_count, MAX_ENTITY,
     audio_engine.master_volume,
     audio_engine.sound_count, MAX_ACTIVE_SOUNDS,
-    game_state.world.current_origin.x,
-    game_state.world.current_origin.y,
-    game_state.world.current_origin.z);
+    level->index
+  );
   render_simple_text(textures[TEXTURE_FONT],
     10, window.height - 10 - h, // x, y
     0.9f, // z
