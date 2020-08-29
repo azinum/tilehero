@@ -4,7 +4,7 @@
 #include "renderer.h"
 #include "renderer_common.h"
 #include "window.h"
-#include "world.h"
+#include "level.h"
 #include "editor.h"
 
 struct {
@@ -123,18 +123,18 @@ void editor_update() {
   }
 
   if (key_pressed[GLFW_KEY_N]) {
-    world_level_store(level, level->index);
+    level_store(level, level->index);
   }
   if (key_pressed[GLFW_KEY_M]) {
-    world_level_load(level, level->index);
+    level_load(level, level->index);
   }
   if (key_pressed[GLFW_KEY_V]) {
     if (level->index > 0) {
-      world_level_load(level, level->index - 1);
+      level_load(level, level->index - 1);
     }
   }
   if (key_pressed[GLFW_KEY_B]) {
-    world_level_load(level, level->index + 1);
+    level_load(level, level->index + 1);
   }
 
   if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
@@ -206,7 +206,7 @@ void editor_render() {
     "entity count: %i/%i\n"
     "master volume: %.2f\n"
     "active sounds: %i/%i\n"
-    "current level: %i\n"
+    "level: %i\n"
     ,
     (i32)camera.x, (i32)camera.y,
     window.width, window.height,

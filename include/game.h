@@ -8,7 +8,7 @@
 #include "entity.h"
 #include "resource.h"
 #include "tile.h"
-#include "world.h"
+#include "level.h"
 
 #define TIME_SCALING_MIN (0)
 #define TIME_SCALING_MAX (4.0f)

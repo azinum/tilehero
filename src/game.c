@@ -92,8 +92,8 @@ void game_init(Game_state* game) {
   game->mode = MODE_GAME;
 
   memset(&game->level, 0, sizeof(Level));
-  world_level_init(&game->level);
-  world_level_load(&game->level, 0);
+
+  level_load(&game->level, 0);
 
   is_fading_out = 1;
   fade_value = 1.0f;
