@@ -5,7 +5,7 @@
 #include "common.h"
 #include "config.h"
 #include "renderer_common.h"
-#include "matrix_math.h"
+#include "math_util.h"
 #include "renderer.h"
 #include "shader.h"
 #include "window.h"

@@ -1,8 +1,8 @@
-// matrix_math.h
+// math_util.h
 // Thanks to HandMadeMath
 
-#ifndef _MMATH_H
-#define _MMATH_H
+#ifndef _MATH_UTIL_H
+#define _MATH_UTIL_H
 
 typedef union mat4 {
   float elements[4][4];

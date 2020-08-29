@@ -2,10 +2,10 @@
 
 #include "common.h"
 #include "renderer_common.h"
-#include "matrix_math.h"
 #include "shader.h"
 #include "resource.h"
 #include "window.h"
+#include "math_util.h"
 #include "renderer.h"
 
 mat4 model, view, projection;

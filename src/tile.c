@@ -109,7 +109,7 @@ void tilemap_render(struct Tile_map* tile_map, vec3i world_position) {
       }
     }
   }
-  // render_rect(x_position - camera.x, y_position - camera.y, 0.9f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 0.66f, 0.25f, 0.66f, 0.7f, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
+  render_rect(x_position - camera.x, y_position - camera.y, 0.9f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 0.66f, 0.25f, 0.66f, 0.7f, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
 #endif
 }
 

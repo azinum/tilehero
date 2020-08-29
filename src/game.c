@@ -2,7 +2,6 @@
 
 #include "common.h"
 #include "window.h"
-#include "matrix_math.h"
 #include "audio.h"
 #include "entity.h"
 #include "renderer.h"
