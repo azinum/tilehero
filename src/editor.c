@@ -208,7 +208,6 @@ void editor_render() {
   render_rect(x, y, 0.9f, w, h, 0.8f, 0.1f, 0.1f, 1, 0, 1.0f / TILE_SIZE);
   render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
   snprintf(ui_text, UI_TEXT_BUFF_SIZE,
-    "\n\n"
     "%s\n"
     ,
     placable_tile_names[editor.tile_type]
@@ -219,7 +218,7 @@ void editor_render() {
   i32 w = TILE_SIZE >> 1;
   i32 h = w;
   i32 x = 10 + 10 + TILE_SIZE;
-  i32 y = 10;
+  i32 y = 10 + TILE_SIZE - h;
   Tile tile = placable_tiles[editor.tile_type];
   struct Spritesheet sheet = spritesheets[SHEET_TILES];
   i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile.background_tile);
