@@ -31,6 +31,19 @@ static Tile placable_tiles[] = {
   {TILE_SILVER_DOOR, 0, TILE_FLOOR},
 };
 
+static const char* placable_tile_names[] = {
+  "Void",
+  "Default",
+  "Floor",
+  "Gray Brick",
+  "Purple Brick",
+  "Dungeon",
+  "Swapper",
+  "Grass",
+  "Pine Tree",
+  "Silver Door",
+};
+
 typedef union Arg {
   i32 i;
   float f;
@@ -194,6 +207,13 @@ void editor_render() {
   i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile.type);
   render_rect(x, y, 0.9f, w, h, 0.8f, 0.1f, 0.1f, 1, 0, 1.0f / TILE_SIZE);
   render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
+  snprintf(ui_text, UI_TEXT_BUFF_SIZE,
+    "\n\n"
+    "%s\n"
+    ,
+    placable_tile_names[editor.tile_type]
+  );
+  render_simple_text(textures[TEXTURE_FONT], x + w + 5, y, 0.9f, 500, 600, 12, 0.7f, 0.7f, 5.0f, ui_text, UI_TEXT_BUFF_SIZE);
 }
 {
   i32 w = TILE_SIZE >> 1;
