@@ -28,6 +28,7 @@ static Tile placable_tiles[] = {
   {TILE_SWAPPER, 1, 0},
   {TILE_GRASS, 1, 0},
   {TILE_TREE, 0, TILE_GRASS},
+  {TILE_SILVER_DOOR, 0, TILE_FLOOR},
 };
 
 typedef union Arg {
@@ -67,13 +68,23 @@ static void add_random_health(Entity* e, const Arg* arg);
 static void add_random_attack(Entity* e, const Arg* arg);
 
 static struct Entity_type_def placable_entities[MAX_PLACABLE_ENTITY] = {
-  {0, 0, ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY_WITH_HELM, 5, 5, 1, NULL, {}},
-  {0, 1, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_RED_MONSTER, 3, 3, 1, add_random_health, {.i = 1}},
-  {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_MAD_SCIENTIST, 5, 5, 1, add_random_attack, {.i = 1}},
-  {1, 0, ENTITY_FLAG_FRIENDLY     | ENTITY_FLAG_MOVABLE, 0, SPRITE_WIZARD, 2, 2, 1, NULL, {}},
-  {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, 0, SPRITE_VOID_WALKER, 36, 36, 3, add_random_attack, {.i = 5}},
-  {0, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_FLAG, SPRITE_FLAG, 2, 2, 0, NULL, {}},
-  {0, 0, ENTITY_FLAG_FRIENDLY     | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_SILVER_KEY, SPRITE_SILVER_KEY, 1, 1, 0, NULL, {}},
+  {0, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY_WITH_HELM, 5, 5, 1, NULL, {}},
+  {0, 1, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE, 0, SPRITE_RED_MONSTER, 3, 3, 1, add_random_health, {.i = 1}},
+  {1, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE, 0, SPRITE_MAD_SCIENTIST, 5, 5, 1, add_random_attack, {.i = 1}},
+  {1, 0, ENTITY_FLAG_FRIENDLY    | ENTITY_FLAG_MOVABLE, 0, SPRITE_WIZARD, 2, 2, 1, NULL, {}},
+  {1, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, 0, SPRITE_VOID_WALKER, 36, 36, 3, add_random_attack, {.i = 5}},
+  {0, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_FLAG, SPRITE_FLAG, 2, 2, 0, NULL, {}},
+  {0, 0, ENTITY_FLAG_FRIENDLY    | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_SILVER_KEY, SPRITE_SILVER_KEY, 1, 1, 0, NULL, {}},
+};
+
+static const char* placable_entity_names[MAX_PLACABLE_ENTITY] = {
+  "Player",
+  "Red Monster",
+  "Mad Scientist",
+  "Wise Wizard",
+  "Void Walker",
+  "Red Flag",
+  "Silver Key",
 };
 
 void add_random_health(Entity* e, const Arg* arg) {
@@ -181,12 +192,23 @@ void editor_render() {
   struct Spritesheet sheet = spritesheets[SHEET_TILES];
   i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile.type);
   i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile.type);
-  render_rect(x, y, 0.9f, w, h, 0.8f, 0.20f, 0.25f, 1, 0, 1.0f / TILE_SIZE);
+  render_rect(x, y, 0.9f, w, h, 0.8f, 0.1f, 0.1f, 1, 0, 1.0f / TILE_SIZE);
   render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
 }
 {
+  i32 w = TILE_SIZE >> 1;
+  i32 h = w;
   i32 x = 10 + 10 + TILE_SIZE;
   i32 y = 10;
+  Tile tile = placable_tiles[editor.tile_type];
+  struct Spritesheet sheet = spritesheets[SHEET_TILES];
+  i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile.background_tile);
+  i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile.background_tile);
+  render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
+}
+{
+  i32 x = 10;
+  i32 y = 10 + 10 + (1 * TILE_SIZE);
   i32 w = TILE_SIZE;
   i32 h = w;
   struct Spritesheet sheet = spritesheets[SHEET_ENTITIES];
@@ -195,6 +217,20 @@ void editor_render() {
   i32 y_offset = SHEET_GET_Y_OFFSET(sheet, entity.sprite_id);
   render_rect(x, y, 0.9f, w, h, 0.25f, 0.80f, 0.18f, 1, 0, 1.0f / TILE_SIZE);
   render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
+  snprintf(ui_text, UI_TEXT_BUFF_SIZE,
+    "%s\n"
+    "health: %i/%i\n"
+    "attack: %i\n"
+    "type: 0x%x\n"
+    "e_flags: 0x%x\n"
+    ,
+    placable_entity_names[editor.entity_type],
+    entity.health, entity.max_health,
+    entity.attack,
+    entity.type,
+    entity.e_flags
+  );
+  render_simple_text(textures[TEXTURE_FONT], x + w + 5, y, 0.9f, 500, 600, 12, 0.7f, 0.7f, 5.0f, ui_text, UI_TEXT_BUFF_SIZE);
 }
 
   i32 w = 230;

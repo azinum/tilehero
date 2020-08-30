@@ -46,7 +46,7 @@ void entity_tiled_move(struct Entity* e) {
   struct Tile_move move = {
     .x_tile = e->x_tile + e->x_dir,
     .y_tile = e->y_tile + e->y_dir,
-    .entity = e
+    .entity = e,
   };
   tile_moves[move_count++] = move;
 }
@@ -54,13 +54,15 @@ void entity_tiled_move(struct Entity* e) {
 void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
   for (u32 i = 0; i < move_count; i++) {
     struct Tile_move* move = &tile_moves[i];
+    if (!move->entity)    continue;
+
     Entity* e = move->entity;
     Entity* target = NULL;
     u8 collision = 0;
     for (i32 entity_index = 0; entity_index < entity_count; entity_index++) {
       Entity* current = &entities[entity_index];
-      if (current == e)
-        continue;
+      if (current == e)   continue;
+
       if (move->x_tile == current->x_tile && move->y_tile == current->y_tile) {
         target = current;
         collision = 1;
@@ -73,7 +75,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
     if (!tile) {  // Outside the map
       collision = 1;
     }
-    else if (tile->walkable == 0 && !(e->e_flags & ENTITY_FLAG_FLY && tile->type == TILE_VOID)) {
+    else if (!tile->walkable && !(e->e_flags & ENTITY_FLAG_FLY && tile->type == TILE_VOID)) {
       collision = 1;
     }
 
@@ -111,10 +113,6 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
             target->health = 0;
             target->state = STATE_DEAD;
             e->xp += target->max_health * 4;
-            // e->max_health += 0.1756f * target->max_health;
-            // e->health += target->max_health * 0.8f;
-            if (e->health >= e->max_health)
-              e->health = e->max_health;
             audio_play_once(SOUND_HIT, 0.5f);
           }
           else {
@@ -124,10 +122,23 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
         }
       }
       else { // We hit a non-walkable tile!
-        if (e->type == ENTITY_TYPE_CONSUMABLE) {
-          e->health--;
-          if (e->health <= 0)
-            e->state = STATE_DEAD;
+        switch (e->type) {
+          case ENTITY_TYPE_CONSUMABLE: {
+            e->health--;
+            if (e->health <= 0) {
+              e->state = STATE_DEAD;
+            }
+            break;
+          }
+
+          case ENTITY_TYPE_SILVER_KEY: {
+            if (tile->type == TILE_SILVER_DOOR) {
+              tile->type = 0;
+              tile->walkable = 1;
+              e->state = STATE_DEAD;
+            }
+            break;
+          }
         }
       }
     }
@@ -206,10 +217,10 @@ void entity_render(Entity* e) {
   if (e->e_flags & ENTITY_FLAG_DRAW_HEALTH) {
     i32 w = e->w * 0.8f;
     i32 h = 8;
-    i32 x_pos = (e->x + (e->w / 2.0f)) - (w / 2.0f),
-    y_pos = e->y - 10;
-    render_filled_rectangle((i32)(x_pos - camera.x), (i32)(y_pos - camera.y), 0.15f, (i32)(w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0.2f, 0.2f, 0.5f, 1.0f, 0, 1.0f / w);
-    render_filled_rectangle((i32)(x_pos - camera.x), (i32)(y_pos - camera.y), 0.15f, w, h, 0.85f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
+    i32 x_pos = (e->x + ((i32)e->w >> 1)) - (w >> 1),
+    y_pos = e->y - 12;
+    render_filled_rect((i32)(x_pos - camera.x), (i32)(y_pos - camera.y), 0.15f, (i32)(w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0);
+    render_filled_rectangle((i32)(x_pos - camera.x), (i32)(y_pos - camera.y), 0.15f, w, h, 0.65f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
   }
   struct Spritesheet sheet = spritesheets[SHEET_ENTITIES];
   i32 x_offset = SHEET_GET_X_OFFSET(sheet, e->sprite_id);
