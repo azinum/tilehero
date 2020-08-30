@@ -78,14 +78,18 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
     }
 
     if (collision) {
-      if (e->type == ENTITY_TYPE_NPC) {
+      if (e->type == ENTITY_TYPE_NPC || e->type == ENTITY_TYPE_FLAG) {
         e->x_dir = -e->x_dir;
         e->y_dir = -e->y_dir;
       }
       if (target) {
+        if (target->type == ENTITY_TYPE_SILVER_KEY) {
+          target->x_dir = e->x_dir;
+          target->y_dir = e->y_dir;
+          entity_tiled_move(target);
+        }
         if (target->type == ENTITY_TYPE_FLAG && e->type == ENTITY_TYPE_PLAYER) {
-          Level* level = &game_state.level;
-          level_load(level, level->index + 1);
+          game_load_level(level->index + 1);
           return;
         }
         if (e->type == ENTITY_TYPE_CONSUMABLE) {

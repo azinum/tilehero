@@ -58,6 +58,7 @@ enum Placable_entity_type {
   ENTITY_WIZARD,
   ENTITY_VOID_WALKER,
   ENTITY_FLAG,
+  ENTITY_SILVER_KEY,
 
   MAX_PLACABLE_ENTITY,
 };
@@ -66,12 +67,13 @@ static void add_random_health(Entity* e, const Arg* arg);
 static void add_random_attack(Entity* e, const Arg* arg);
 
 static struct Entity_type_def placable_entities[MAX_PLACABLE_ENTITY] = {
-  {0, 0, ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY_WITH_HELM, 10, 10, 3, NULL, {}},
-  {0, 1, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_RED_MONSTER, 5, 5, 1, add_random_health, {.i = 4}},
-  {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_MAD_SCIENTIST, 12, 12, 1, add_random_attack, {.i = 3}},
-  {1, 0, ENTITY_FLAG_FRIENDLY     | ENTITY_FLAG_MOVABLE, 0, SPRITE_WIZARD, 5, 5, 1, NULL, {}},
-  {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, 0, SPRITE_VOID_WALKER, 35, 35, 5, add_random_attack, {.i = 5}},
-  {0, 0, ENTITY_FLAG_MOVABLE, ENTITY_TYPE_FLAG, SPRITE_FLAG, 1, 1, 0, NULL, {}},
+  {0, 0, ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PLAYER, ENTITY_TYPE_PLAYER, SPRITE_BOY_WITH_HELM, 5, 5, 1, NULL, {}},
+  {0, 1, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_RED_MONSTER, 3, 3, 1, add_random_health, {.i = 1}},
+  {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE, 0, SPRITE_MAD_SCIENTIST, 5, 5, 1, add_random_attack, {.i = 1}},
+  {1, 0, ENTITY_FLAG_FRIENDLY     | ENTITY_FLAG_MOVABLE, 0, SPRITE_WIZARD, 2, 2, 1, NULL, {}},
+  {1, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, 0, SPRITE_VOID_WALKER, 36, 36, 3, add_random_attack, {.i = 5}},
+  {0, 0, ENTITY_FLAG_DRAW_HEALTH  | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_FLAG, SPRITE_FLAG, 2, 2, 0, NULL, {}},
+  {0, 0, ENTITY_FLAG_FRIENDLY     | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_SILVER_KEY, SPRITE_SILVER_KEY, 1, 1, 0, NULL, {}},
 };
 
 void add_random_health(Entity* e, const Arg* arg) {
@@ -132,11 +134,11 @@ void editor_update() {
   }
   if (key_pressed[GLFW_KEY_V]) {
     if (level->index > 0) {
-      level_load(level, level->index - 1);
+      game_load_level(level->index - 1);
     }
   }
   if (key_pressed[GLFW_KEY_B]) {
-    level_load(level, level->index + 1);
+    game_load_level(level->index + 1);
   }
 
   if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {

@@ -13,6 +13,8 @@
 
 #define MAX_DELTA_TIME (0.2f)
 
+#define FADE_SPEED 2.0f
+
 Game_state game_state;
 
 static float fade_value;
@@ -82,6 +84,13 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
   return e;
 }
 
+void game_load_level(u32 index) {
+  game_fade_from_black();
+  move_count = 0;
+  camera.target = NULL;
+  level_load(&game_state.level, index);
+}
+
 void game_fade_to_black() {
   is_fading = 1;
   fade_value = 0;
@@ -110,9 +119,10 @@ void game_init(Game_state* game) {
 
   game_fade_from_black();
   camera_init(0, 0);
-
   move_count = 0;
   move_time = 0;
+
+  game_load_level(0);
 
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
 }
@@ -191,14 +201,14 @@ void game_run() {
 
 void fade_out() {
   if (fade_from_black) {  // Fade from black
-    fade_value = lerp(fade_value, 0.0f, 0.05f);
+    fade_value = lerp(fade_value, 0.0f, FADE_SPEED * game_state.delta_time);
     if (fade_value < 0.01f) {
       fade_value = 0;
       is_fading = 0;
     }
   }
   else {  // Fade to black
-    fade_value = lerp(fade_value, 1.0f, 0.05f);
+    fade_value = lerp(fade_value, 1.0f, FADE_SPEED * game_state.delta_time);
     if (fade_value > (1 - 0.01f)) {
       fade_value = 1;
       is_fading = 0;
@@ -229,6 +239,7 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
 }
 
 void game_restart() {
-  game_init(&game_state);
+  // game_init(&game_state);
+  game_load_level(game_state.level.index);
 }
 

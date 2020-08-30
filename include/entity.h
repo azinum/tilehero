@@ -28,6 +28,7 @@ enum Entity_type {
   ENTITY_TYPE_PLAYER,
   ENTITY_TYPE_CONSUMABLE,
   ENTITY_TYPE_FLAG,
+  ENTITY_TYPE_SILVER_KEY,
 };
 
 struct Tile_move {
