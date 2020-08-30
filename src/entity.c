@@ -104,18 +104,17 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
             e->health = e->max_health;
           target->state = STATE_DEAD;
         }
-        if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY) && !(e->type == ENTITY_TYPE_PLAYER && target->type == ENTITY_TYPE_PLAYER)) {
+        if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY) && !(e->type == ENTITY_TYPE_PLAYER && target->type == ENTITY_TYPE_PLAYER) && !(e->type == target->type)) {
 #if 1
           target->health -= e->attack;
           if (target->health <= 0) {
             target->health = 0;
             target->state = STATE_DEAD;
             e->xp += target->max_health * 4;
-            e->max_health += 0.1756f * target->max_health;
-            e->health += target->max_health * 0.8f;
+            // e->max_health += 0.1756f * target->max_health;
+            // e->health += target->max_health * 0.8f;
             if (e->health >= e->max_health)
               e->health = e->max_health;
-            e->attack++;
             audio_play_once(SOUND_HIT, 0.5f);
           }
           else {
