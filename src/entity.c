@@ -9,10 +9,10 @@
 #include "player.h"
 #include "entity.h"
 
-#define TEXT_BUFF_SIZE (96)
-#define MAX_MOVES (512)
+#define TEXT_BUFF_SIZE 96
+#define MAX_MOVES 512
 #define INTERP_MOVEMENT 1
-#define INTERP_SPEED (20.0f)
+#define INTERP_SPEED 20
 
 struct Tile_move tile_moves[MAX_MOVES];
 u32 move_count = 0;
@@ -217,8 +217,8 @@ void entity_update(Entity* e) {
       entity_tiled_move(e);
     }
 #if INTERP_MOVEMENT
-    e->x = lerp(e->x, (TILE_SIZE * e->x_tile), INTERP_SPEED * game_state.delta_time * game_state.time_scale);
-    e->y = lerp(e->y, (TILE_SIZE * e->y_tile), INTERP_SPEED * game_state.delta_time * game_state.time_scale);
+    e->x = lerp2(e->x, (TILE_SIZE * e->x_tile), INTERP_SPEED * game_state.delta_time * game_state.time_scale, 0.1f);
+    e->y = lerp2(e->y, (TILE_SIZE * e->y_tile), INTERP_SPEED * game_state.delta_time * game_state.time_scale, 0.1f);
 #else
     e->x = TILE_SIZE * e->x_tile;
     e->y = TILE_SIZE * e->y_tile;
@@ -232,8 +232,8 @@ void entity_render(Entity* e) {
     i32 h = 8;
     i32 x_pos = (e->x + ((i32)e->w >> 1)) - (w >> 1),
     y_pos = e->y - 12;
-    render_filled_rect((i32)(x_pos - camera.x), (i32)(y_pos - camera.y), 0.15f, (i32)(w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0);
-    render_filled_rectangle((i32)(x_pos - camera.x), (i32)(y_pos - camera.y), 0.15f, w, h, 0.65f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
+    render_filled_rect(x_pos - (i32)camera.x, y_pos - (i32)camera.y, 0.15f, (i32)(w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0);
+    render_filled_rectangle(x_pos - (i32)camera.x, y_pos - (i32)camera.y, 0.15f, w, h, 0.65f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
   }
   struct Spritesheet sheet = spritesheets[SHEET_ENTITIES];
   i32 x_offset = SHEET_GET_X_OFFSET(sheet, e->sprite_id);

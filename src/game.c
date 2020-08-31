@@ -129,7 +129,8 @@ void game_init(Game_state* game) {
 }
 
 void game_run() {
-  game_init(&game_state);
+  Game_state* game = &game_state;
+  game_init(game);
   struct timeval time_now = {0};
   struct timeval time_last = {0};
 
@@ -150,8 +151,8 @@ void game_run() {
       case MODE_PAUSE:
         break;
       case MODE_EDITOR: {
-        editor_update();
-        editor_render();
+        editor_update(game);
+        editor_render(game);
         break;
       }
     }
@@ -189,18 +190,8 @@ void game_run() {
         entity_update(e);
       }
       entity_render(e);
-      if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
-        entity_render_highlight(e);
-        if (key_pressed[GLFW_KEY_F]) {
-          camera.target = e;
-          camera.has_target = 1;
-        }
-        if (key_pressed[GLFW_KEY_X]) {
-          game_entity_remove(e);
-          audio_play_once(SOUND_HIT, 0.5f);
-        }
-      }
     }
+
     tilemap_render(&game_state.level.tile_map);
     ui_render();
 
@@ -244,19 +235,22 @@ void ui_render() {
 }
   if (camera.has_target && camera.target != NULL) {
     snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[camera locked]");
-    render_simple_text(textures[TEXTURE_FONT],
-      window.width - 10 - 160, window.height - 10 - 35, // x, y
-      0.9f, // z
-      160,   // Width
-      35, // Height
-      12, // Font size
-      0.7f, // Font kerning
-      0.7f, // Line spacing
-      12.0f, // Margin
-      ui_text,
-      UI_TEXT_BUFF_SIZE
-    );
   }
+  else if (!camera.has_target || !camera.target) {
+    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[free camera]");
+  }
+  render_simple_text(textures[TEXTURE_FONT],
+    window.width - 10 - 190, window.height - 10 - 35, // x, y
+    0.9f, // z
+    190,   // Width
+    35, // Height
+    14, // Font size
+    0.7f, // Font kerning
+    0.7f, // Line spacing
+    12.0f, // Margin
+    ui_text,
+    UI_TEXT_BUFF_SIZE
+  );
 }
 
 void fade_out() {

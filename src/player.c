@@ -69,7 +69,7 @@ void player_update(Entity* e) {
     game_state.should_move = 1;
     if (player.stunned) {
       player.stunned--;
-    move_time = game_state.time + STUNNED_INTERVAL;
+      move_time = game_state.time + STUNNED_INTERVAL;
     }
     else {
       move_time = game_state.time + INTERVAL;

@@ -11,7 +11,7 @@ inline float lerp(float v0, float v1, float t) {
 
 inline float lerp2(float v0, float v1, float t, float delta) {
   if (fabs(v0 - v1) < delta) {
-    return v0;
+    return v1;
   }
   return (1.0f - t) * v0 + t * v1;
 }

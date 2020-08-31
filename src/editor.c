@@ -108,9 +108,9 @@ void add_random_attack(Entity* e, const Arg* arg) {
   e->attack += rand() % arg->i;
 }
 
-void editor_update() {
+void editor_update(struct Game_state* game) {
 #if USE_EDITOR
-  Level* level = &game_state.level;
+  Level* level = &game->level;
   i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
   i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
   tilemap_render_tile_highlight(&level->tile_map, x_tile, y_tile);
@@ -187,15 +187,30 @@ void editor_update() {
       audio_play_once(SOUND_0F, 0.5f);
     }
   }
+
+  for (u32 i = 0; i < level->entity_count; i++) {
+    Entity* e = &level->entities[i];
+    if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
+      entity_render_highlight(e);
+      if (key_pressed[GLFW_KEY_F]) {
+        camera.target = e;
+        camera.has_target = 1;
+      }
+      if (key_pressed[GLFW_KEY_X]) {
+        game_entity_remove(e);
+        audio_play_once(SOUND_HIT, 0.5f);
+      }
+    }
+  }
 #endif
 }
 
 #define UI_TEXT_BUFF_SIZE (256)
 char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 
-void editor_render() {
+void editor_render(struct Game_state* game) {
 #if USE_EDITOR
-  Level* level = &game_state.level;
+  Level* level = &game->level;
 {
   i32 x = 10;
   i32 y = 10;
