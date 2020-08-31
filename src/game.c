@@ -140,7 +140,6 @@ void game_run() {
       game_state.delta_time = MAX_DELTA_TIME;
 
     window_pollevents();
-    camera_update();
 
     if (game_state.mode == MODE_GAME) {
       game_state.time += game_state.delta_time * game_state.time_scale;
@@ -155,6 +154,8 @@ void game_run() {
     if (key_pressed[GLFW_KEY_0]) {
       game_restart();
     }
+
+    camera_update();
 
     for (u32 i = 0; i < game_state.level.entity_count; i++) {
       Entity* e = &game_state.level.entities[i];

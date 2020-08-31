@@ -41,8 +41,8 @@ void camera_update() {
   if (camera.target != NULL && camera.has_target) {
     camera.x_target = camera.target->x - (window.width >> 1);
     camera.y_target = camera.target->y - (window.height >> 1);
-    camera.x = lerp(camera.x, camera.x_target, CAMERA_TARGET_SPEED * game_state.delta_time);
-    camera.y = lerp(camera.y, camera.y_target, CAMERA_TARGET_SPEED * game_state.delta_time);
+    camera.x = lerp2(camera.x, camera.x_target, CAMERA_TARGET_SPEED * game_state.delta_time, 0.2f);
+    camera.y = lerp2(camera.y, camera.y_target, CAMERA_TARGET_SPEED * game_state.delta_time, 0.2f);
   }
   else {
     camera.x = camera.x_target;

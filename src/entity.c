@@ -10,7 +10,7 @@
 #include "entity.h"
 
 #define TEXT_BUFF_SIZE (96)
-#define MAX_MOVES (256)
+#define MAX_MOVES (512)
 #define INTERP_MOVEMENT 1
 #define INTERP_SPEED (20.0f)
 
@@ -40,9 +40,12 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
 
 void entity_tiled_move(struct Entity* e) {
   if (move_count >= MAX_MOVES) {
-    assert(0);
+    fprintf(stderr, "Move count limit reached!\n");
+    // assert(0);
     return;
   }
+  if (!e->x_dir && !e->y_dir)
+    return;
   struct Tile_move move = {
     .x_tile = e->x_tile + e->x_dir,
     .y_tile = e->y_tile + e->y_dir,
@@ -80,7 +83,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
     }
 
     if (collision) {
-      if (e->type == ENTITY_TYPE_NPC || e->type == ENTITY_TYPE_FLAG || e->type == ENTITY_TYPE_SILVER_KEY) {
+      if (e->type == ENTITY_TYPE_NPC || e->type == ENTITY_TYPE_FLAG) {
         e->x_dir = -e->x_dir;
         e->y_dir = -e->y_dir;
       }
@@ -95,6 +98,9 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
             entity_tiled_move(target);
             target->x_dir = 0;
             target->y_dir = 0;
+            entity_tiled_move(e);
+            e->x_dir = 0;
+            e->y_dir = 0;
           }
         }
         if (target->type == ENTITY_TYPE_FLAG && e->type == ENTITY_TYPE_PLAYER) {
