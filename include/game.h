@@ -16,6 +16,7 @@
 enum Game_mode {
   MODE_GAME,
   MODE_PAUSE,
+  MODE_EDITOR,
 };
 
 typedef struct Game_state {

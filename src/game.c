@@ -23,6 +23,7 @@ static u8 is_fading;
 
 static void game_init(Game_state* game);
 static void game_run();
+static void ui_render();
 static void fade_out();
 
 void game_entity_remove(Entity* e) {
@@ -141,14 +142,33 @@ void game_run() {
 
     window_pollevents();
 
-    if (game_state.mode == MODE_GAME) {
-      game_state.time += game_state.delta_time * game_state.time_scale;
+    switch (game_state.mode) {
+      case MODE_GAME: {
+        game_state.time += game_state.delta_time * game_state.time_scale;
+        break;
+      }
+      case MODE_PAUSE:
+        break;
+      case MODE_EDITOR: {
+        editor_update();
+        editor_render();
+        break;
+      }
     }
+
     if (key_pressed[GLFW_KEY_P]) {
       if (game_state.mode == MODE_GAME)
         game_state.mode = MODE_PAUSE;
       else
         game_state.mode = MODE_GAME;
+    }
+    if (key_pressed[GLFW_KEY_F1]) {
+      if (game_state.mode == MODE_EDITOR) {
+        game_state.mode = MODE_GAME;
+      }
+      else {
+        game_state.mode = MODE_EDITOR;
+      }
     }
 
     if (key_pressed[GLFW_KEY_0]) {
@@ -181,11 +201,8 @@ void game_run() {
         }
       }
     }
-
-    editor_update();
-    editor_render();
-
     tilemap_render(&game_state.level.tile_map);
+    ui_render();
 
     if (game_state.should_move) {
       entity_do_tiled_move(game_state.level.entities, game_state.level.entity_count, &game_state.level);
@@ -197,6 +214,48 @@ void game_run() {
     }
     window_swapbuffers();
     window_clear();
+  }
+}
+
+#define UI_TEXT_BUFF_SIZE 512
+static char ui_text[UI_TEXT_BUFF_SIZE] = {0};
+
+void ui_render() {
+{
+  i32 w = 140;
+  i32 h = 35;
+  i32 x = window.width - (w + 10);
+  i32 y = 10;
+  if (game_state.mode == MODE_PAUSE) {
+    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[game paused]");
+    render_simple_text(textures[TEXTURE_FONT],
+      x, y, // x, y
+      0.9f, // z
+      w,   // Width
+      h, // Height
+      12, // Font size
+      0.7f, // Font kerning
+      0.7f, // Line spacing
+      12.0f, // Margin
+      ui_text,
+      UI_TEXT_BUFF_SIZE
+    );
+  }
+}
+  if (camera.has_target && camera.target != NULL) {
+    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[camera locked]");
+    render_simple_text(textures[TEXTURE_FONT],
+      window.width - 10 - 160, window.height - 10 - 35, // x, y
+      0.9f, // z
+      160,   // Width
+      35, // Height
+      12, // Font size
+      0.7f, // Font kerning
+      0.7f, // Line spacing
+      12.0f, // Margin
+      ui_text,
+      UI_TEXT_BUFF_SIZE
+    );
   }
 }
 
