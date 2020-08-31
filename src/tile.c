@@ -83,8 +83,8 @@ void tilemap_render(struct Tile_map* tile_map) {
         i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->type);
         render_texture_region(
           sheet.texture,
-          (x * TILE_SIZE) - camera.x,
-          (y * TILE_SIZE) - camera.y,
+          (x * TILE_SIZE) - (i32)camera.x,
+          (y * TILE_SIZE) - (i32)camera.y,
           -0.1f,
           TILE_SIZE, TILE_SIZE,
           0,
@@ -96,8 +96,8 @@ void tilemap_render(struct Tile_map* tile_map) {
         i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile->background_tile);
         render_texture_region(
           sheet.texture,
-          (x * TILE_SIZE) - camera.x,
-          (y * TILE_SIZE) - camera.y,
+          (x * TILE_SIZE) - (i32)camera.x,
+          (y * TILE_SIZE) - (i32)camera.y,
           -0.1f,
           TILE_SIZE, TILE_SIZE,
           0,
