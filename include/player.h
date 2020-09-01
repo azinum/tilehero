@@ -9,6 +9,8 @@ struct Player {
 
 extern struct Player player;
 
+void player_controller();
+
 void player_update(Entity* e);
 
 #endif

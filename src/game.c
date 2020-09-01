@@ -137,15 +137,15 @@ void game_run() {
   while (game_state.is_running && !window_process_input() && !window_should_close()) {
     time_last = time_now;
     gettimeofday(&time_now, NULL);
-    game_state.delta_time = ((((time_now.tv_sec - time_last.tv_sec) * 1000000) + time_now.tv_usec) - (time_last.tv_usec)) / (1000000.0f);
-    if (game_state.delta_time > MAX_DELTA_TIME)
-      game_state.delta_time = MAX_DELTA_TIME;
+    game->delta_time = ((((time_now.tv_sec - time_last.tv_sec) * 1000000) + time_now.tv_usec) - (time_last.tv_usec)) / (1000000.0f);
+    if (game->delta_time > MAX_DELTA_TIME)
+      game->delta_time = MAX_DELTA_TIME;
 
     window_pollevents();
 
-    switch (game_state.mode) {
+    switch (game->mode) {
       case MODE_GAME: {
-        game_state.time += game_state.delta_time * game_state.time_scale;
+        game->time += game->delta_time * game->time_scale;
         break;
       }
       case MODE_PAUSE:
@@ -158,17 +158,17 @@ void game_run() {
     }
 
     if (key_pressed[GLFW_KEY_P]) {
-      if (game_state.mode == MODE_GAME)
-        game_state.mode = MODE_PAUSE;
+      if (game->mode == MODE_GAME)
+        game->mode = MODE_PAUSE;
       else
-        game_state.mode = MODE_GAME;
+        game->mode = MODE_GAME;
     }
     if (key_pressed[GLFW_KEY_F1]) {
-      if (game_state.mode == MODE_EDITOR) {
-        game_state.mode = MODE_GAME;
+      if (game->mode == MODE_EDITOR) {
+        game->mode = MODE_GAME;
       }
       else {
-        game_state.mode = MODE_EDITOR;
+        game->mode = MODE_EDITOR;
       }
     }
 
@@ -177,10 +177,11 @@ void game_run() {
     }
 
     camera_update();
+    player_controller();
 
-    for (u32 i = 0; i < game_state.level.entity_count; i++) {
-      Entity* e = &game_state.level.entities[i];
-      if (game_state.mode == MODE_GAME) {
+    for (u32 i = 0; i < game->level.entity_count; i++) {
+      Entity* e = &game->level.entities[i];
+      if (game->mode == MODE_GAME) {
         if (e->e_flags & ENTITY_FLAG_PLAYER) {
           player_update(e);
           if (!camera.target) {
@@ -192,17 +193,17 @@ void game_run() {
       entity_render(e);
     }
 
-    tilemap_render(&game_state.level.tile_map);
+    if (game->should_move) {
+      entity_do_tiled_move(game->level.entities, game->level.entity_count, &game->level);
+      game->should_move = 0;
+    }
+
+    tilemap_render(&game->level.tile_map);
     ui_render();
 
-    if (game_state.should_move) {
-      entity_do_tiled_move(game_state.level.entities, game_state.level.entity_count, &game_state.level);
-      game_state.should_move = 0;
-    }
-
-    if (is_fading) {
+    if (is_fading)
       fade_out();
-    }
+
     window_swapbuffers();
     window_clear();
   }
