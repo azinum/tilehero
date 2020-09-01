@@ -35,8 +35,8 @@ static const char* placable_tile_names[] = {
   "Void",
   "Default",
   "Floor",
-  "Gray Brick",
   "Purple Brick",
+  "Gray Brick",
   "Dungeon",
   "Swapper",
   "Grass",
@@ -132,6 +132,7 @@ void editor_update(struct Game_state* game) {
   }
 
   if (key_pressed[GLFW_KEY_9]) {
+    level->entity_count = 0;
     tilemap_init(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
   if (key_pressed[GLFW_KEY_8]) {

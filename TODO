@@ -1,2 +1,0 @@
-- Undefined behaviour. We are randomly crashing. I've got a suspision that it could have something to do with the audio engine. The problem seems only to happen when exiting the program.
-- Fix rectangle rendering (for aspect ratios other than 1:1).

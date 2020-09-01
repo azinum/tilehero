@@ -35,6 +35,8 @@ struct Tile_move {
   i32 x_tile;
   i32 y_tile;
   struct Entity* entity;
+
+  u8 can_move_to_tile;
 };
 
 extern struct Tile_move tile_moves[];

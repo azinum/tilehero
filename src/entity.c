@@ -127,6 +127,10 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
             target->state = STATE_DEAD;
             e->xp += target->max_health * 4;
             audio_play_once(SOUND_HIT, 0.5f);
+            if (target->type == ENTITY_TYPE_PLAYER) {
+              game_restart();
+              return;
+            }
           }
           else {
             audio_play_once(SOUND_GOOD_MORNING, 0.5f);
