@@ -117,9 +117,9 @@ i32 window_process_input() {
   (right_mouse_button_state && !(mouse_state & (1 << 5))) ? mouse_state |= (1 << 4) : (mouse_state &= ~(1 << 4));
   right_mouse_button_state ? mouse_state |= (1 << 5) : (mouse_state &= ~(1 << 5));
 
-  if (key_pressed[GLFW_KEY_ESCAPE]) {
-    glfwSetWindowShouldClose(window.window, 1);
-  }
+  // if (key_pressed[GLFW_KEY_ESCAPE]) {
+  //   glfwSetWindowShouldClose(window.window, 1);
+  // }
   if (key_pressed[GLFW_KEY_F11]) {
     window.windowed_fullscreen = !window.windowed_fullscreen;
     if (window.windowed_fullscreen) {

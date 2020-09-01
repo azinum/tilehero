@@ -14,6 +14,7 @@
 #define TIME_SCALING_MAX (4.0f)
 
 enum Game_mode {
+  MODE_MENU,
   MODE_GAME,
   MODE_PAUSE,
   MODE_EDITOR,

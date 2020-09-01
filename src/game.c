@@ -24,6 +24,8 @@ static u8 is_fading;
 static void game_init(Game_state* game);
 static void game_run();
 static void ui_render();
+static void menu_update();
+static void menu_render();
 static void fade_out();
 
 void game_entity_remove(Entity* e) {
@@ -142,7 +144,6 @@ void game_run() {
       game->delta_time = MAX_DELTA_TIME;
 
     window_pollevents();
-
     switch (game->mode) {
       case MODE_GAME: {
         game->time += game->delta_time * game->time_scale;
@@ -157,49 +158,60 @@ void game_run() {
       }
     }
 
-    if (key_pressed[GLFW_KEY_P]) {
-      if (game->mode == MODE_GAME)
-        game->mode = MODE_PAUSE;
-      else
-        game->mode = MODE_GAME;
+
+    if (game->mode == MODE_MENU) {
+      menu_update();
+      menu_render();
     }
-    if (key_pressed[GLFW_KEY_F1]) {
-      if (game->mode == MODE_EDITOR) {
-        game->mode = MODE_GAME;
+    else {
+      if (key_pressed[GLFW_KEY_P]) {
+        if (game->mode == MODE_GAME)
+          game->mode = MODE_PAUSE;
+        else
+          game->mode = MODE_GAME;
       }
-      else {
-        game->mode = MODE_EDITOR;
-      }
-    }
-
-    if (key_pressed[GLFW_KEY_0]) {
-      game_restart();
-    }
-
-    camera_update();
-    player_controller();
-
-    for (u32 i = 0; i < game->level.entity_count; i++) {
-      Entity* e = &game->level.entities[i];
-      if (game->mode == MODE_GAME) {
-        if (e->e_flags & ENTITY_FLAG_PLAYER) {
-          player_update(e);
-          if (!camera.target) {
-            camera.target = e;
-          }
+      if (key_pressed[GLFW_KEY_F1]) {
+        if (game->mode == MODE_EDITOR) {
+          game->mode = MODE_GAME;
         }
-        entity_update(e);
+        else {
+          game->mode = MODE_EDITOR;
+        }
       }
-      entity_render(e);
-    }
 
-    if (game->should_move) {
-      entity_do_tiled_move(game->level.entities, game->level.entity_count, &game->level);
-      game->should_move = 0;
-    }
+      if (key_pressed[GLFW_KEY_0]) {
+        game_restart();
+      }
 
-    tilemap_render(&game->level.tile_map);
-    ui_render();
+      if (key_pressed[GLFW_KEY_ESCAPE]) {
+        game->mode = MODE_MENU;
+      }
+
+      camera_update();
+      player_controller();
+
+      for (u32 i = 0; i < game->level.entity_count; i++) {
+        Entity* e = &game->level.entities[i];
+        if (game->mode == MODE_GAME) {
+          if (e->e_flags & ENTITY_FLAG_PLAYER) {
+            player_update(e);
+            if (!camera.target) {
+              camera.target = e;
+            }
+          }
+          entity_update(e);
+        }
+        entity_render(e);
+      }
+
+      if (game->should_move) {
+        entity_do_tiled_move(game->level.entities, game->level.entity_count, &game->level);
+        game->should_move = 0;
+      }
+
+      tilemap_render(&game->level.tile_map);
+      ui_render();
+    }
 
     if (is_fading)
       fade_out();
@@ -209,8 +221,35 @@ void game_run() {
   }
 }
 
+void menu_update() {
+  Game_state* game = &game_state;
+
+  if (key_pressed[GLFW_KEY_ENTER]) {
+    game->mode = MODE_GAME;
+  }
+  if (key_pressed[GLFW_KEY_ESCAPE]) {
+    game->is_running = 0;
+  }
+}
+
 #define UI_TEXT_BUFF_SIZE 512
 static char ui_text[UI_TEXT_BUFF_SIZE] = {0};
+
+#define render_simple_menu_text(text, x, y, font_size) \
+  snprintf(ui_text, UI_TEXT_BUFF_SIZE, text); \
+  render_simple_text(textures[TEXTURE_FONT], \
+    x, y, 0.9f, \
+    500, 500, \
+    font_size, \
+    0.7f, 0.7f, 12.0f, \
+    ui_text, UI_TEXT_BUFF_SIZE)
+
+void menu_render() {
+  render_filled_rect(0, 0, 0, window.width, window.height, 0, 0, 0, 1, 0);
+  render_simple_menu_text("Tile Hero", 10, 10, 36);
+  render_simple_menu_text("Press ESC to exit game", 10, window.height - (32 * 2), 18);
+  render_simple_menu_text("Press ENTER to start game", 10, window.height - (32 * 3), 18);
+}
 
 void ui_render() {
 {
