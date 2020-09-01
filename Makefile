@@ -30,5 +30,9 @@ debug_profile:
 	gprof -b ./${BUILD_DIR}/${PROG_NAME} gmon.out > ./${PROF_DIR}/analysis.out
 	mv gmon.out ./${PROF_DIR}
 
+debug_mem:
+	${CC} ${FLAGS} ${LIBS} -O2 -g
+	valgrind --tool=memcheck --leak-check=full --leak-resolution=med --track-origins=yes ${BUILD_DIR}/${PROG_NAME}
+
 run:
 	./${BUILD_DIR}/${PROG_NAME}

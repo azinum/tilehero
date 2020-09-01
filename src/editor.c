@@ -109,7 +109,6 @@ void add_random_attack(Entity* e, const Arg* arg) {
 }
 
 void editor_update(struct Game_state* game) {
-#if USE_EDITOR
   Level* level = &game->level;
   i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
   i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
@@ -202,14 +201,12 @@ void editor_update(struct Game_state* game) {
       }
     }
   }
-#endif
 }
 
 #define UI_TEXT_BUFF_SIZE (256)
 char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 
 void editor_render(struct Game_state* game) {
-#if USE_EDITOR
   Level* level = &game->level;
 {
   i32 x = 10;
@@ -304,8 +301,5 @@ void editor_render(struct Game_state* game) {
     ui_text,
     UI_TEXT_BUFF_SIZE
   );
-
-#else
-#endif
 }
 

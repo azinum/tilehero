@@ -53,7 +53,6 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_FOCUSED, GL_TRUE);
   glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-  // glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE); // NOTE(lucas): This causes flickering
 #if defined(__APPLE__)
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
@@ -138,6 +137,7 @@ i32 window_process_input() {
 }
 
 void window_close() {
+  renderer_free();
   if (window.window) {
     glfwDestroyWindow(window.window);
     glfwTerminate();
