@@ -118,8 +118,6 @@ void game_init(Game_state* game) {
 
   memset(&game->level, 0, sizeof(Level));
 
-  level_load(&game->level, 0);
-
   game_fade_from_black();
   camera_init(0, 0);
   move_count = 0;
@@ -147,6 +145,8 @@ void game_run() {
     switch (game->mode) {
       case MODE_GAME: {
         game->time += game->delta_time * game->time_scale;
+        ui_update();
+        ui_render();
         break;
       }
       case MODE_PAUSE:
@@ -209,15 +209,12 @@ void game_run() {
         game->should_move = 0;
       }
 
-      tilemap_render(&game->level.tile_map);
       game_hud_render();
-      ui_update();
-      ui_render();
+      tilemap_render(&game->level.tile_map);
     }
 
     if (is_fading)
       fade_out();
-
     window_swapbuffers();
     window_clear();
   }
@@ -275,10 +272,10 @@ void game_hud_render() {
     );
   }
 }
-  if (camera.has_target && camera.target != NULL) {
+  if (camera.has_target) {
     snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[camera locked]");
   }
-  else if (!camera.has_target || !camera.target) {
+  else {
     snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[free camera]");
   }
   render_simple_text(textures[TEXTURE_FONT],

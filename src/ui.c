@@ -48,7 +48,7 @@ struct UI_state {
 static struct UI_state ui = {0};
 
 static struct UI_element* add_ui_element(i32 x, i32 y, i32 w, i32 h, u16 type, const char* text, event_func event);
-static void test_event(void* p);
+static void event_restart_game(void* p);
 
 static struct UI_element* add_ui_element(i32 x, i32 y, i32 w, i32 h, u16 type, const char* text, event_func event) {
   if (ui.element_count >= MAX_UI_ELEMENTS) {
@@ -75,20 +75,20 @@ static struct UI_element* add_ui_element(i32 x, i32 y, i32 w, i32 h, u16 type, c
   return e;
 }
 
-void test_event(void* p) {
+void event_restart_game(void* p) {
   (void)p;
-  printf("Event!\n");
+  game_restart();
 }
 
 void ui_init() {
   ui.element_count = 0;
 
 {
-  struct UI_element* e = add_ui_element(140, 10, 200, 200, ELEMENT_TEXT, "Hello this is a string! This ui element has some text that we need to display. We can resize this ui element too!", NULL);
+  struct UI_element* e = add_ui_element(16, 16 * 4, 200, 200, ELEMENT_TEXT, "Hello this is a string! This ui element displays some text. We can resize and move this ui element!", NULL);
   (void)e;
 }
 {
-  struct UI_element* e = add_ui_element(16, 16, 16 * 5, 36, ELEMENT_TEXT, "Button", test_event);
+  struct UI_element* e = add_ui_element(16, 16, 16 * 6, 36, ELEMENT_TEXT, "Restart", event_restart_game);
   (void)e;
   e->movable = 0;
   // e->snap_to_grid = 0;
