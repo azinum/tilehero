@@ -77,6 +77,20 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   return 0;
 }
 
+void window_toggle_fullscreen() {
+  window.windowed_fullscreen = !window.windowed_fullscreen;
+  if (window.windowed_fullscreen) {
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    window.width = mode->width;
+    window.height = mode->height;
+  }
+  else {
+    window.width = window.init_width;
+    window.height = window.init_height;
+  }
+  glfwSetWindowSize(window.window, window.width, window.height);
+}
+
 void window_clear() {
   glClearColor(0, 0, 0, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -117,21 +131,8 @@ i32 window_process_input() {
   (right_mouse_button_state && !(mouse_state & (1 << 5))) ? mouse_state |= (1 << 4) : (mouse_state &= ~(1 << 4));
   right_mouse_button_state ? mouse_state |= (1 << 5) : (mouse_state &= ~(1 << 5));
 
-  // if (key_pressed[GLFW_KEY_ESCAPE]) {
-  //   glfwSetWindowShouldClose(window.window, 1);
-  // }
   if (key_pressed[GLFW_KEY_F11]) {
-    window.windowed_fullscreen = !window.windowed_fullscreen;
-    if (window.windowed_fullscreen) {
-      const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-      window.width = mode->width;
-      window.height = mode->height;
-    }
-    else {
-      window.width = window.init_width;
-      window.height = window.init_height;
-    }
-    glfwSetWindowSize(window.window, window.width, window.height);
+    window_toggle_fullscreen();
   }
   return 0;
 }

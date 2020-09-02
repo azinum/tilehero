@@ -34,6 +34,7 @@ typedef struct Audio_engine {
   u32 sound_count;
   float master_volume;
   float pan;
+  u8 muted;
 } Audio_engine;
 
 extern struct Audio_engine audio_engine;

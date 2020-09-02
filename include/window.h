@@ -27,6 +27,8 @@ extern i8 key_pressed[];
 
 i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title);
 
+void window_toggle_fullscreen();
+
 void window_clear();
 
 void window_swapbuffers();

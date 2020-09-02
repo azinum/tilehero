@@ -53,8 +53,8 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
   u32 chunk_count = frames_per_buffer / 4;
   for (u32 chunk_index = 0; chunk_index < chunk_count; chunk_index++) {
     audio_engine.tick += 4;
-    __m128 frame0 = _mm_set1_ps(0.0f);
-    __m128 frame1 = _mm_set1_ps(0.0f);
+    __m128 frame0 = zero;
+    __m128 frame1 = zero;
     for (u32 i = 0; i < MAX_CHANNEL + audio_engine.sound_count; i++) {
       struct Sound_state* sound = &audio_engine.sounds[i];
       const struct Audio_source* source = &sounds[sound->id];
@@ -91,6 +91,11 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
         sound->sample_index += (4 * source->channel_count);
       }
     }
+    if (audio_engine.muted) {
+      _mm_store_ps((float*)dest++, zero);
+      _mm_store_ps((float*)dest++, zero);
+      continue;
+    }
     frame0 = _mm_mul_ps(frame0, master_volume);
     frame1 = _mm_mul_ps(frame1, master_volume);
     _mm_store_ps((float*)dest++, frame0);
@@ -103,6 +108,10 @@ i32 stereo_callback(const void* in_buff, void* out_buff, unsigned long frames_pe
     float l_frame = 0, r_frame = 0;
 
     for (u32 i = 0; i < MAX_CHANNEL + audio_engine.sound_count; i++) {
+      if (audio_engine.muted) {
+        l_frame = r_frame = 0;
+        continue;
+      }
       struct Sound_state* sound = &audio_engine.sounds[i];
       const struct Audio_source* source = &sounds[sound->id];
       if (!source->sample_buffer) {
@@ -157,6 +166,8 @@ i32 audio_engine_init(i32 sample_rate, i32 frames_per_buffer, callback_func call
   audio_engine.sound_count = 0;
   audio_engine.master_volume = MASTER_VOLUME;
   audio_engine.pan = 0.5f;
+  audio_engine.muted = 0;
+
   memset(audio_engine.sounds, 0, sizeof(struct Sound_state) * MAX_CHANNEL);
 
   i32 output_device = Pa_GetDefaultOutputDevice();

@@ -17,6 +17,7 @@ static i32 y_delta = 0;
 enum Element_type {
   ELEMENT_TEXT,
   ELEMENT_BUTTON,
+  ELEMENT_CHECKBOX,
 };
 
 struct UI_element {
@@ -29,7 +30,7 @@ struct UI_element {
 
   union {
     struct {
-      i32 value;
+      u8 toggle_value;
     };
   };
 
@@ -51,7 +52,6 @@ static struct UI_state ui = {0};
 static void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text);
 static void ui_button_init(struct UI_element* e);
 static void ui_element(struct UI_element* e);
-static u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size);
 
 void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text) {
   assert(e);
@@ -122,6 +122,41 @@ void ui_element(struct UI_element* e) {
     e->w = e->grid_size * PIXEL_TO_GRID(e->w, e->grid_size);
     e->h = e->grid_size * PIXEL_TO_GRID(e->h, e->grid_size);
   }
+  if (e->pressed) {
+    switch (e->type) {
+      case ELEMENT_TEXT: {
+        break;
+      }
+      case ELEMENT_BUTTON: {
+        break;
+      }
+      case ELEMENT_CHECKBOX: {
+        e->toggle_value = !e->toggle_value;
+        break;
+      }
+    }
+  }
+}
+
+void ui_init() {
+  ui.element_count = 0;
+}
+
+void ui_update() {
+  Game_state* game = &game_state;
+
+  if (ui_do_button(0, 16, 16, 16 * 6, 16 * 2, "Restart", 14)) {
+    game_restart();
+  }
+  if (ui_do_button(1, 16, 16 * 4, 16 * 8, 16 * 2, "Next level", 14)) {
+    game_load_level(game->level.index + 1);
+  }
+  if (ui_do_button(2, 16, 16 * 7, 16 * 8, 16 * 2, "Prev level", 14)) {
+    if (game->level.index > 0) {
+      game_load_level(game->level.index - 1);
+    }
+  }
+  audio_engine.muted = ui_do_checkbox(3, 16, 16 * 10, 32, 32, audio_engine.muted, NULL, 0);
 }
 
 u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size) {
@@ -137,28 +172,31 @@ u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_s
     e = &ui.elements[id];
   }
   assert(e);
+  e->text = text;
   ui_element(e);
   return e->pressed;
 }
 
-void ui_init() {
-  ui.element_count = 0;
-}
+u8 ui_do_checkbox(u32 id, i32 x, i32 y, i32 w, i32 h, u8 toggle_value, const char* text, u16 font_size) {
+  struct UI_element* e = NULL;
 
-void ui_update() {
-  Game_state* game = &game_state;
-
-  if (ui_do_button(UI_ID, 16, 16, 16 * 6, 16 * 2, "Restart", 14)) {
-    game_restart();
+  if (id >= ui.element_count) {
+    e = &ui.elements[id];
+    ui_element_init(e, id, x, y, w, h, ELEMENT_CHECKBOX, font_size, text);
+    e->movable = 0;
+    ui.element_count++;
   }
-  if (ui_do_button(UI_ID, 16, 16 * 4, 16 * 8, 16 * 2, "Next level", 14)) {
-    game_load_level(game->level.index + 1);
+  else {
+    e = &ui.elements[id];
   }
-  if (ui_do_button(UI_ID, 16, 16 * 7, 16 * 8, 16 * 2, "Prev level", 14)) {
-    if (game->level.index > 0) {
-      game_load_level(game->level.index - 1);
-    }
+  assert(e);
+  e->text = text;
+  ui_element(e);
+  if (e->pressed) {
+    toggle_value = !toggle_value;
+    e->toggle_value = toggle_value;
   }
+  return toggle_value;
 }
 
 void ui_render() {
@@ -168,7 +206,6 @@ void ui_render() {
     if (e->text) {
       render_simple_text(textures[TEXTURE_FONT], e->x, e->y, z_index + 0.01f, e->w, e->h, e->font_size, 0.7f, 0.7f, 10.0f, e->text, ELEMENT_TEXT_BUFFER_SIZE);
     }
-
     if (e->pressed_down) {
       render_rect(e->x, e->y, z_index, e->w, e->h, 1, 1, 1, 1, 0, 1.0f / e->w);
     }
@@ -178,6 +215,21 @@ void ui_render() {
     else {
       render_rect(e->x, e->y, z_index, e->w, e->h, 0.3f, 0.05f, 0.3f, 1.0f, 0, 1.0f / e->w);
     }
+    switch (e->type) {
+      case ELEMENT_TEXT: {
+        break;
+      }
+      case ELEMENT_BUTTON: {
+        break;
+      }
+      case ELEMENT_CHECKBOX: {
+        if (e->toggle_value) {
+          render_filled_rect(e->x, e->y, z_index, e->w, e->h, 1, 0, 0, 1, 0);
+        }
+        break;
+      }
+    }
+
     render_filled_rect(e->x, e->y, z_index, e->w, e->h, 0, 0, 0, 1, 0);
   }
 }
