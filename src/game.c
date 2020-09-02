@@ -23,7 +23,7 @@ static u8 is_fading;
 
 static void game_init(Game_state* game);
 static void game_run();
-static void ui_render();
+static void game_hud_render();
 static void menu_update();
 static void menu_render();
 static void fade_out();
@@ -126,13 +126,13 @@ void game_init(Game_state* game) {
   move_time = 0;
 
   game_load_level(0);
-
   audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
 }
 
 void game_run() {
   Game_state* game = &game_state;
   game_init(game);
+  ui_init();
   struct timeval time_now = {0};
   struct timeval time_last = {0};
 
@@ -210,6 +210,8 @@ void game_run() {
       }
 
       tilemap_render(&game->level.tile_map);
+      game_hud_render();
+      ui_update();
       ui_render();
     }
 
@@ -247,11 +249,11 @@ static char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 void menu_render() {
   render_filled_rect(0, 0, 0, window.width, window.height, 0, 0, 0, 1, 0);
   render_simple_menu_text("Tile Hero", 10, 10, 36);
+  render_simple_menu_text("Press ENTER to resume game", 10, window.height - (32 * 3), 18);
   render_simple_menu_text("Press ESC to exit game", 10, window.height - (32 * 2), 18);
-  render_simple_menu_text("Press ENTER to start game", 10, window.height - (32 * 3), 18);
 }
 
-void ui_render() {
+void game_hud_render() {
 {
   i32 w = 140;
   i32 h = 35;

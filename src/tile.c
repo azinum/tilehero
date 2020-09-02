@@ -106,7 +106,7 @@ void tilemap_render(struct Tile_map* tile_map) {
       }
     }
   }
-  render_rect(0 - camera.x, 0 - camera.y, 0.9f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 0.85f, 0.32f, 0.85f, 0.25f, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
+  render_rect(0 - camera.x, 0 - camera.y, 0.7f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 0.85f, 0.32f, 0.85f, 0.25f, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
 #endif
 }
 
