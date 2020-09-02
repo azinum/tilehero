@@ -6,11 +6,13 @@
 #include "window.h"
 #include "ui.h"
 
-#define MAX_UI_ELEMENTS 64
+#define MAX_UI_ELEMENTS 512
+#define UI_ID (__LINE__)
 #define ELEMENT_TEXT_BUFFER_SIZE (256)
 #define PIXEL_TO_GRID(PX, GRID_SIZE) (i32)(PX / GRID_SIZE)
 
-typedef void (*event_func)(void*);
+static i32 x_delta = 0;
+static i32 y_delta = 0;
 
 enum Element_type {
   ELEMENT_TEXT,
@@ -18,19 +20,18 @@ enum Element_type {
 };
 
 struct UI_element {
+  u32 id;
   i32 x, y, w, h;
   u16 type;
   u16 font_size;
   vec3 font_color;
-  char text[ELEMENT_TEXT_BUFFER_SIZE];
+  const char* text;
 
   union {
     struct {
       i32 value;
     };
   };
-
-  event_func event;
 
   u8 movable;
   u8 hover;
@@ -47,24 +48,23 @@ struct UI_state {
 
 static struct UI_state ui = {0};
 
-static struct UI_element* add_ui_element(i32 x, i32 y, i32 w, i32 h, u16 type, const char* text, event_func event);
-static void event_restart_game(void* p);
+static void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text);
+static void ui_button_init(struct UI_element* e);
+static void ui_element(struct UI_element* e);
+static u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size);
 
-static struct UI_element* add_ui_element(i32 x, i32 y, i32 w, i32 h, u16 type, const char* text, event_func event) {
-  if (ui.element_count >= MAX_UI_ELEMENTS) {
-    return NULL;
-  }
-  struct UI_element* e = &ui.elements[ui.element_count++];
+void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text) {
+  assert(e);
+
+  e->id = id;
   e->x = x;
   e->y = y;
   e->w = w;
   e->h = h;
   e->type = type;
-  e->font_size = 14;
+  e->font_size = font_size;
   e->font_color = VEC3(1, 1, 1);
-  strncpy(e->text, text, ELEMENT_TEXT_BUFFER_SIZE);
-
-  e->event = event;
+  e->text = text;
 
   e->movable = 1;
   e->hover = 0;
@@ -72,82 +72,91 @@ static struct UI_element* add_ui_element(i32 x, i32 y, i32 w, i32 h, u16 type, c
   e->pressed_down = 0;
   e->snap_to_grid = 1;
   e->grid_size = 16;
-  return e;
 }
 
-void event_restart_game(void* p) {
-  (void)p;
-  game_restart();
+void ui_button_init(struct UI_element* e) {
+  e->movable = 0;
+}
+
+void ui_element(struct UI_element* e) {
+  if (mouse_over(window.mouse_x, window.mouse_y, e->x, e->y, e->w, e->h)) {
+    e->hover = 1;
+  }
+  else {
+    e->hover = 0;
+  }
+  if (e->hover) {
+    if (left_mouse_pressed | right_mouse_pressed) {
+      e->pressed = 1;
+      x_delta = e->x - window.mouse_x;
+      y_delta = e->y - window.mouse_y;
+    }
+    else {
+      e->pressed = 0;
+    }
+    if (left_mouse_down) {
+      e->pressed_down = 1;
+      if (e->movable) {
+        e->x = window.mouse_x + x_delta;
+        e->y = window.mouse_y + y_delta;
+      }
+    }
+    else if (right_mouse_down) {
+      e->pressed_down = 1;
+      if (e->movable) {
+        e->w = (window.mouse_x - e->x) + e->grid_size + 6;
+        e->h = (window.mouse_y - e->y) + e->grid_size + 6;
+      }
+    }
+    else {
+      e->pressed_down = 0;
+    }
+  }
+  else {
+    e->pressed = 0;
+    e->pressed_down = 0;
+  }
+  if (e->snap_to_grid) {
+    e->x = e->grid_size * PIXEL_TO_GRID(e->x, e->grid_size);
+    e->y = e->grid_size * PIXEL_TO_GRID(e->y, e->grid_size);
+    e->w = e->grid_size * PIXEL_TO_GRID(e->w, e->grid_size);
+    e->h = e->grid_size * PIXEL_TO_GRID(e->h, e->grid_size);
+  }
+}
+
+u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size) {
+  struct UI_element* e = NULL;
+
+  if (id >= ui.element_count) {
+    e = &ui.elements[id];
+    ui_element_init(e, id, x, y, w, h, ELEMENT_BUTTON, font_size, text);
+    ui_button_init(e);
+    ui.element_count++;
+  }
+  else {
+    e = &ui.elements[id];
+  }
+  assert(e);
+  ui_element(e);
+  return e->pressed;
 }
 
 void ui_init() {
   ui.element_count = 0;
-
-{
-  struct UI_element* e = add_ui_element(16, 16 * 4, 200, 200, ELEMENT_TEXT, "Hello this is a string! This ui element displays some text. We can resize and move this ui element!", NULL);
-  (void)e;
 }
-{
-  struct UI_element* e = add_ui_element(16, 16, 16 * 6, 36, ELEMENT_TEXT, "Restart", event_restart_game);
-  (void)e;
-  e->movable = 0;
-  // e->snap_to_grid = 0;
-}
-}
-
-static i32 x_delta = 0;
-static i32 y_delta = 0;
 
 void ui_update() {
-  for (u32 i = 0; i < ui.element_count; i++) {
-    struct UI_element* e = &ui.elements[i];
-    if (mouse_over(window.mouse_x, window.mouse_y, e->x, e->y, e->w, e->h)) {
-      e->hover = 1;
-    }
-    else {
-      e->hover = 0;
-    }
+  Game_state* game = &game_state;
 
-    if (e->hover) {
-      if (left_mouse_pressed | right_mouse_pressed) {
-        e->pressed = 1;
-        if (e->event) {
-          e->event(NULL);
-        }
-
-        x_delta = e->x - window.mouse_x;
-        y_delta = e->y - window.mouse_y;
-      }
-      else {
-        e->pressed = 0;
-      }
-      if (left_mouse_down) {
-        e->pressed_down = 1;
-        if (e->movable) {
-          e->x = window.mouse_x + x_delta;
-          e->y = window.mouse_y + y_delta;
-        }
-      }
-      else if (right_mouse_down) {
-        e->pressed_down = 1;
-        if (e->movable) {
-          e->w = (window.mouse_x - e->x) + e->grid_size + 6;
-          e->h = (window.mouse_y - e->y) + e->grid_size + 6;
-        }
-      }
-      else {
-        e->pressed_down = 0;
-      }
-    }
-    else {
-      e->pressed = 0;
-      e->pressed_down = 0;
-    }
-    if (e->snap_to_grid) {
-      e->x = e->grid_size * PIXEL_TO_GRID(e->x, e->grid_size);
-      e->y = e->grid_size * PIXEL_TO_GRID(e->y, e->grid_size);
-      e->w = e->grid_size * PIXEL_TO_GRID(e->w, e->grid_size);
-      e->h = e->grid_size * PIXEL_TO_GRID(e->h, e->grid_size);
+  if (ui_do_button(UI_ID, 16, 16, 16 * 6, 16 * 2, "Restart", 14)) {
+    game_restart();
+  }
+  if (ui_do_button(UI_ID, 16, 16 * 4, 16 * 8, 16 * 2, "Next level", 14)) {
+    game_load_level(game->level.index + 1);
+  }
+  if (ui_do_button(UI_ID, 16, 16 * 7, 16 * 8, 16 * 2, "Prev level", 14)) {
+    if (game->level.index > 0) {
+      game_load_level(game->level.index - 1);
     }
   }
 }
@@ -167,7 +176,7 @@ void ui_render() {
       render_rect(e->x, e->y, z_index, e->w, e->h, 0.1f, 0.4f, 0.9f, 1.0f, 0, 1.0f / e->w);
     }
     else {
-      render_rect(e->x, e->y, z_index, e->w, e->h, 0.2f, 0.05f, 0.2f, 1.0f, 0, 1.0f / e->w);
+      render_rect(e->x, e->y, z_index, e->w, e->h, 0.3f, 0.05f, 0.3f, 1.0f, 0, 1.0f / e->w);
     }
     render_filled_rect(e->x, e->y, z_index, e->w, e->h, 0, 0, 0, 1, 0);
   }

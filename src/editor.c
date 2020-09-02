@@ -158,11 +158,11 @@ void editor_update(struct Game_state* game) {
   }
   if (key_pressed[GLFW_KEY_V]) {
     if (level->index > 0) {
-      game_load_level(level->index - 1);
+      level_load(level, level->index - 1);
     }
   }
   if (key_pressed[GLFW_KEY_B]) {
-    game_load_level(level->index + 1);
+    level_load(level, level->index + 1);
   }
 
   if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
