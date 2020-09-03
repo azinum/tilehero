@@ -48,7 +48,6 @@ typedef uint8_t u8;
 typedef float r32;
 typedef double r64;
 
-
 typedef struct vec4 {
   float x, y, z, w;
 } vec4;

@@ -4,12 +4,15 @@
 #include "renderer_common.h"
 #include "renderer.h"
 #include "window.h"
+#include "audio.h"
 #include "ui.h"
 
 #define MAX_UI_ELEMENTS 512
 #define UI_ID (__LINE__)
 #define ELEMENT_TEXT_BUFFER_SIZE (256)
 #define PIXEL_TO_GRID(PX, GRID_SIZE) (i32)(PX / GRID_SIZE)
+
+#define UI_PLAY_CLICK_SOUND() audio_play_once(SOUND_0F, 0.2f)
 
 static i32 x_delta = 0;
 static i32 y_delta = 0;
@@ -20,6 +23,12 @@ enum Element_type {
   ELEMENT_CHECKBOX,
 };
 
+typedef union Element_data {
+  struct {
+    u8 toggle_value;
+  };
+} Element_data;
+
 struct UI_element {
   u32 id;
   i32 x, y, w, h;
@@ -28,11 +37,7 @@ struct UI_element {
   vec3 font_color;
   const char* text;
 
-  union {
-    struct {
-      u8 toggle_value;
-    };
-  };
+  Element_data data;
 
   u8 movable;
   u8 hover;
@@ -49,12 +54,12 @@ struct UI_state {
 
 static struct UI_state ui = {0};
 
-static void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text);
+static void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data);
 static void ui_button_init(struct UI_element* e);
 static void ui_interaction(struct UI_element* e);
-static struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text);
+static struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data);
 
-void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text) {
+void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data) {
   assert(e);
 
   e->id = id;
@@ -66,6 +71,10 @@ void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u
   e->font_size = font_size;
   e->font_color = VEC3(1, 1, 1);
   e->text = text;
+
+  if (data) {
+    e->data = *data;
+  }
 
   e->movable = 1;
   e->hover = 0;
@@ -129,22 +138,24 @@ void ui_interaction(struct UI_element* e) {
         break;
       }
       case ELEMENT_BUTTON: {
+        UI_PLAY_CLICK_SOUND();
         break;
       }
       case ELEMENT_CHECKBOX: {
-        e->toggle_value = !e->toggle_value;
+        UI_PLAY_CLICK_SOUND();
+        e->data.toggle_value = !e->data.toggle_value;
         break;
       }
     }
   }
 }
 
-struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text) {
+struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data) {
   struct UI_element* e = NULL;
 
   if (id >= ui.element_count) {
     e = &ui.elements[id];
-    ui_element_init(e, id, x, y, w, h, type, font_size, text);
+    ui_element_init(e, id, x, y, w, h, type, font_size, text, data);
     ui.element_count++;
     e->movable = 0;
     switch (e->type) {
@@ -185,27 +196,30 @@ void ui_update() {
   }
 
   audio_engine.muted = ui_do_checkbox(3, 16, 16 * 10, 32, 32, audio_engine.muted, NULL, 0);
-  ui_do_text(4, 16 * 12, 16 * 1, 16 * 9, 16 * 8, "Hello World!", 14);
+  camera.has_target = ui_do_checkbox(4, 16, 16 * 13, 32, 32, camera.has_target, NULL, 0);
+
+  ui_do_text(5, 16 * 12, 16 * 1, 16 * 9, 16 * 8, "Hello World!", 14);
 }
 
 u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size) {
-  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_BUTTON, font_size, text);
+  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_BUTTON, font_size, text, NULL);
   ui_interaction(e);
   return e->pressed;
 }
 
 u8 ui_do_checkbox(u32 id, i32 x, i32 y, i32 w, i32 h, u8 toggle_value, const char* text, u16 font_size) {
-  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_CHECKBOX, font_size, text);
+  Element_data data = { .toggle_value = toggle_value };
+  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_CHECKBOX, font_size, text, &data);
   ui_interaction(e);
   if (e->pressed) {
     toggle_value = !toggle_value;
-    e->toggle_value = toggle_value;
+    e->data.toggle_value = toggle_value;
   }
   return toggle_value;
 }
 
 u8 ui_do_text(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size) {
-  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_TEXT, font_size, text);
+  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_TEXT, font_size, text, NULL);
   ui_interaction(e);
   e->text = text;
   return e->pressed;
@@ -235,7 +249,7 @@ void ui_render() {
         break;
       }
       case ELEMENT_CHECKBOX: {
-        if (e->toggle_value) {
+        if (e->data.toggle_value) {
           render_filled_rect(e->x, e->y, z_index, e->w, e->h, 1, 0, 0, 1, 0);
         }
         break;
