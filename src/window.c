@@ -125,11 +125,15 @@ i32 window_process_input() {
 
   i32 left_mouse_button_state = glfwGetMouseButton(window.window, 0);
   i32 right_mouse_button_state = glfwGetMouseButton(window.window, 1);
+  i32 middle_mouse_button_state = glfwGetMouseButton(window.window, 2);
 
   (left_mouse_button_state && !(mouse_state & (1 << 7))) ? mouse_state |= (1 << 6) : (mouse_state &= ~(1 << 6));
   left_mouse_button_state ? mouse_state |= (1 << 7) : (mouse_state &= ~(1 << 7));
   (right_mouse_button_state && !(mouse_state & (1 << 5))) ? mouse_state |= (1 << 4) : (mouse_state &= ~(1 << 4));
   right_mouse_button_state ? mouse_state |= (1 << 5) : (mouse_state &= ~(1 << 5));
+
+  (middle_mouse_button_state && !(mouse_state & (1 << 3))) ? mouse_state |= (1 << 2) : (mouse_state &= ~(1 << 2));
+  middle_mouse_button_state ? mouse_state |= (1 << 3) : (mouse_state &= ~(1 << 3));
 
   if (key_pressed[GLFW_KEY_F11]) {
     window_toggle_fullscreen();

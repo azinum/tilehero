@@ -20,10 +20,13 @@ extern i8 mouse_state;
 extern i8 key_down[];
 extern i8 key_pressed[];
 
-#define left_mouse_down     (mouse_state & (1 << 7))
-#define left_mouse_pressed  (mouse_state & (1 << 6))
-#define right_mouse_down    (mouse_state & (1 << 5))
-#define right_mouse_pressed (mouse_state & (1 << 4))
+#define left_mouse_down      (mouse_state & (1 << 7))
+#define left_mouse_pressed   (mouse_state & (1 << 6))
+#define right_mouse_down     (mouse_state & (1 << 5))
+#define right_mouse_pressed  (mouse_state & (1 << 4))
+
+#define middle_mouse_down    (mouse_state & (1 << 3))
+#define middle_mouse_pressed (mouse_state & (1 << 2))
 
 i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title);
 
