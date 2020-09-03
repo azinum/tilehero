@@ -8,6 +8,8 @@
 #include "ui.h"
 
 #define MAX_UI_ELEMENTS 512
+#define UI_TEXT_BUFFER_SIZE 512
+
 #define UI_ID (__LINE__)
 #define ELEMENT_TEXT_BUFFER_SIZE (256)
 #define PIXEL_TO_GRID(PX, GRID_SIZE) (i32)(PX / GRID_SIZE)
@@ -164,7 +166,7 @@ struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 
         break;
       case ELEMENT_TEXT:
         e->movable = 1;
-        e->snap_to_grid = 0;
+        e->snap_to_grid = 1;
         break;
     }
   }
@@ -198,7 +200,21 @@ void ui_update() {
   audio_engine.muted = ui_do_checkbox(3, 16, 16 * 10, 32, 32, audio_engine.muted, NULL, 0);
   camera.has_target = ui_do_checkbox(4, 16, 16 * 13, 32, 32, camera.has_target, NULL, 0);
 
-  ui_do_text(5, 16 * 12, 16 * 1, 16 * 9, 16 * 8, "Hello World!", 14);
+  static char ui_text[UI_TEXT_BUFFER_SIZE] = {0};
+    snprintf(ui_text, UI_TEXT_BUFFER_SIZE,
+      "entity count: %i/%i\n"
+      "fps: %i\n"
+      "time: %.3f\n"
+      "time scale: %i %%\n"
+      "level: %i\n"
+      ,
+      game->level.entity_count, MAX_ENTITY,
+      (i32)(1.0f / game->delta_time),
+      game->time,
+      (i32)(100 * game->time_scale),
+      game->level.index
+    );
+  ui_do_text(5, 16 * 1, 16 * 16, 16 * 16, 16 * 7, ui_text, 14);
 }
 
 u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size) {

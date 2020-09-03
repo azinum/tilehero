@@ -37,9 +37,7 @@ void camera_update() {
   if (key_down[GLFW_KEY_S]) {
     camera.y_target += CAMERA_MOVE_SPEED * game_state.delta_time;
   }
-  if (key_pressed[GLFW_KEY_Q] && camera.target != NULL) {
-    camera.has_target = !camera.has_target;
-  }
+  camera.has_target = (key_pressed[GLFW_KEY_Q]) ? (!camera.has_target) : (camera.has_target);
 
   if (middle_mouse_pressed) {
     camera_pos = VEC2(camera.x_target, camera.y_target);
