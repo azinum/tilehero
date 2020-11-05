@@ -10,7 +10,6 @@
 #include "entity.h"
 
 #define TEXT_BUFF_SIZE 96
-#define MAX_MOVES 512
 #define INTERP_MOVEMENT 1
 #define INTERP_SPEED 20
 
@@ -41,7 +40,6 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
 void entity_tiled_move(struct Entity* e) {
   if (move_count >= MAX_MOVES) {
     fprintf(stderr, "Move count limit reached!\n");
-    // assert(0);
     return;
   }
   if (!e->x_dir && !e->y_dir)
@@ -239,10 +237,7 @@ void entity_render(Entity* e) {
     render_filled_rect(x_pos - (i32)camera.x, y_pos - (i32)camera.y, 0.15f, (i32)(w * ((float)e->health / e->max_health)), h, 0.2f, 0.85f, 0.2f, 1.0f, 0);
     render_filled_rectangle(x_pos - (i32)camera.x, y_pos - (i32)camera.y, 0.15f, w, h, 0.65f, 0.2f, 0.2f, 1.0f, 0.5f, 0.2f, 0.2f, 1.0f, 0, 1.0f / w);
   }
-  struct Spritesheet sheet = spritesheets[SHEET_ENTITIES];
-  i32 x_offset = SHEET_GET_X_OFFSET(sheet, e->sprite_id);
-  i32 y_offset = SHEET_GET_Y_OFFSET(sheet, e->sprite_id);
-  render_texture_region(sheet.texture, e->x - camera.x, e->y - camera.y, 0, e->w, e->h, 0, x_offset, y_offset, sheet.w, sheet.h);
+  render_sprite(SHEET_ENTITIES, e->sprite_id, e->x - camera.x, e->y - camera.y, 0, e->w, e->h);
 }
 
 void entity_render_highlight(Entity* e) {

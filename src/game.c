@@ -158,7 +158,6 @@ void game_run() {
       }
     }
 
-
     if (game->mode == MODE_MENU) {
       menu_update();
       menu_render();
@@ -210,6 +209,7 @@ void game_run() {
       }
 
       game_hud_render();
+
       tilemap_render(&game->level.tile_map);
     }
 

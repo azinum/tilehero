@@ -113,6 +113,13 @@ void render_texture_region(struct Texture texture, i32 x, i32 y, float z, i32 w,
   glBindVertexArray(0);
 }
 
+void render_sprite(i32 spritesheet_id, i32 sprite_id, i32 x, i32 y, float z, i32 w, i32 h) {
+  struct Spritesheet sheet = spritesheets[spritesheet_id];
+  i32 x_offset = SHEET_GET_X_OFFSET(sheet, sprite_id);
+  i32 y_offset = SHEET_GET_Y_OFFSET(sheet, sprite_id);
+  render_texture_region(sheet.texture, x, y, z, w, h, 0 /* angle */, x_offset, y_offset, sheet.w, sheet.h);
+}
+
 void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, float line_spacing, float margin, const char* text, u32 text_length, u8 background, float rect_r, float rect_g, float rect_b, float rect_a, float border_r, float border_g, float border_b, float border_a, float border_thickness) {
 
   if (background) {

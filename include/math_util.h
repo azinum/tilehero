@@ -116,7 +116,7 @@ inline mat4 mm_perspective(float fov, float aspect_ratio, float z_near, float z_
 
   result.elements[0][0] = 1.0f / (1.0f * fov);
   result.elements[1][1] = -1.0f / (aspect_ratio * fov);
-  result.elements[2][3] = -1.0f;
+  result.elements[2][3] = 1.0f;
   result.elements[2][2] = 0;
   result.elements[3][2] = 1.0f / (2.0f * z_near * z_far) / (z_near - z_far);
   result.elements[3][3] = (z_near + z_far) / (z_near - z_far) / (2 * z_far * z_near) / (z_near - z_far);

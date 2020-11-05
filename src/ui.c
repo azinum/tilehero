@@ -214,7 +214,7 @@ void ui_update() {
       (i32)(100 * game->time_scale),
       game->level.index
     );
-  ui_do_text(5, 16 * 1, 16 * 16, 16 * 16, 16 * 7, ui_text, 14);
+  ui_do_text(5, 16 * 1, 16 * 16, 16 * 16, 16 * 9, ui_text, 14);
 }
 
 u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size) {
@@ -266,7 +266,10 @@ void ui_render() {
       }
       case ELEMENT_CHECKBOX: {
         if (e->data.toggle_value) {
-          render_filled_rect(e->x, e->y, z_index, e->w, e->h, 1, 0, 0, 1, 0);
+          render_sprite(SHEET_UI, UI_SPRITE_CHECK, e->x, e->y, z_index, e->w, e->h);
+        }
+        else {
+          render_sprite(SHEET_UI, UI_SPRITE_CROSS, e->x, e->y, z_index, e->w, e->h);
         }
         break;
       }

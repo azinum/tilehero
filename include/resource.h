@@ -49,9 +49,15 @@ enum Tile_sprite_type {
   MAX_TILE_SPRITE,
 };
 
+enum Ui_sprite_type {
+  UI_SPRITE_CHECK = 0,
+  UI_SPRITE_CROSS,
+};
+
 enum Spritesheet_types {
   SHEET_ENTITIES,
   SHEET_TILES,
+  SHEET_UI,
 
   MAX_SHEET,
 };

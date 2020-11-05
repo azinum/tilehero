@@ -39,6 +39,8 @@ struct Tile_move {
   u8 can_move_to_tile;
 };
 
+#define MAX_MOVES 512
+
 extern struct Tile_move tile_moves[];
 extern u32 move_count;
 extern float move_time; // NOTE(lucas): At which time we are ready to do a move

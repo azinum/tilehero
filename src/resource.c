@@ -30,11 +30,13 @@ static const char* sound_filenames[] = {
 static const char* spritesheet_filenames[] = {
   "entity_spritesheet",
   "tile_spritesheet",
+  "ui_spritesheet",
 };
 
 struct Texture textures[MAX_TEXTURE];
 struct Audio_source sounds[MAX_SOUND];
 struct Spritesheet spritesheets[MAX_SHEET] = {
+  {{0}, 0, 8, 8},
   {{0}, 0, 8, 8},
   {{0}, 0, 8, 8},
 };

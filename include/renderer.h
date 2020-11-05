@@ -32,6 +32,8 @@ void renderer_init();
 
 void render_texture_region(struct Texture texture, i32 x, i32 y, float z, i32 w, i32 h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range);
 
+void render_sprite(i32 spritesheet_id, i32 sprite_id, i32 x, i32 y, float z, i32 w, i32 h);
+
 void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, float size, float kerning, float line_spacing, float margin, const char* text, u32 text_length, u8 background, float rect_r, float rect_g, float rect_b, float rect_a, float border_r, float border_g, float border_b, float border_a, float border_thickness);
 
 void render_rect(i32 x, i32 y, float z, i32 w, i32 h, float r, float g, float b, float a, float angle, float thickness);
