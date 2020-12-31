@@ -3,7 +3,16 @@
 #ifndef _UI_H
 #define _UI_H
 
+#define UI_ID (__LINE__)
+
+enum UI_context {
+  UI_DEFAULT = 0,
+  UI_MAIN_MENU,
+};
+
 void ui_init();
+
+void ui_focus(u8 id);
 
 void ui_update();
 

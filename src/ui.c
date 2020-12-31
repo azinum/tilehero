@@ -7,10 +7,9 @@
 #include "audio.h"
 #include "ui.h"
 
-#define MAX_UI_ELEMENTS 512
+#define MAX_UI_ELEMENTS 256
 #define UI_TEXT_BUFFER_SIZE 512
 
-#define UI_ID (__LINE__)
 #define ELEMENT_TEXT_BUFFER_SIZE (256)
 #define PIXEL_TO_GRID(PX, GRID_SIZE) (i32)(PX / GRID_SIZE)
 
@@ -52,6 +51,9 @@ struct UI_element {
 struct UI_state {
   struct UI_element elements[MAX_UI_ELEMENTS];
   u32 element_count;
+  u32 element_iter;
+  u8 focus_id;
+  u8 prev_focus_id;
 };
 
 static struct UI_state ui = {0};
@@ -155,8 +157,8 @@ void ui_interaction(struct UI_element* e) {
 struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data) {
   struct UI_element* e = NULL;
 
-  if (id >= ui.element_count) {
-    e = &ui.elements[id];
+  if (ui.element_iter >= ui.element_count) {
+    e = &ui.elements[ui.element_iter];
     ui_element_init(e, id, x, y, w, h, type, font_size, text, data);
     ui.element_count++;
     e->movable = 0;
@@ -171,8 +173,9 @@ struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 
     }
   }
   else {
-    e = &ui.elements[id];
+    e = &ui.elements[ui.element_iter];
   }
+  ui.element_iter++;
   e->text = text;
   assert(e);
   return e;
@@ -180,11 +183,22 @@ struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 
 
 void ui_init() {
   ui.element_count = 0;
+  ui.element_iter = 0;
+}
+
+void ui_focus(u8 id) {
+  ui.element_iter = 0;
+  ui.prev_focus_id = ui.focus_id;
+  ui.focus_id = id;
+  if (ui.prev_focus_id != ui.focus_id) {
+    ui.element_count = 0;
+  }
 }
 
 void ui_update() {
   Game_state* game = &game_state;
 
+  ui_focus(UI_DEFAULT);
   if (ui_do_button(0, 16, 16, 16 * 6, 16 * 2, "Restart", 14)) {
     game_restart();
   }
@@ -216,6 +230,7 @@ void ui_update() {
     );
   ui_do_text(5, 16 * 1, 16 * 16, 16 * 16, 16 * 9, ui_text, 14);
 }
+
 
 u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size) {
   struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_BUTTON, font_size, text, NULL);
@@ -249,13 +264,13 @@ void ui_render() {
       render_simple_text(textures[TEXTURE_FONT], e->x, e->y, z_index, e->w, e->h, e->font_size, 0.7f, 0.7f, 10.0f, e->text, ELEMENT_TEXT_BUFFER_SIZE);
     }
     if (e->pressed_down) {
-      render_rect(e->x, e->y, z_index, e->w, e->h, 1, 1, 1, 1, 0, 1.0f / e->w);
+      render_rect(e->x, e->y, z_index, e->w, e->h, 1, 1, 1, 1, 0, 2.0f / e->w);
     }
     else if (e->hover) {
-      render_rect(e->x, e->y, z_index, e->w, e->h, 0.1f, 0.4f, 0.9f, 1.0f, 0, 1.0f / e->w);
+      render_rect(e->x, e->y, z_index, e->w, e->h, 0.1f, 0.4f, 0.9f, 1.0f, 0, 2.0f / e->w);
     }
     else {
-      render_rect(e->x, e->y, z_index, e->w, e->h, 0.3f, 0.05f, 0.3f, 1.0f, 0, 1.0f / e->w);
+      render_rect(e->x, e->y, z_index, e->w, e->h, 0.3f, 0.05f, 0.3f, 1.0f, 0, 2.0f / e->w);
     }
     switch (e->type) {
       case ELEMENT_TEXT: {

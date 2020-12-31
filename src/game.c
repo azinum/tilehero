@@ -244,10 +244,19 @@ static char ui_text[UI_TEXT_BUFF_SIZE] = {0};
     ui_text, UI_TEXT_BUFF_SIZE)
 
 void menu_render() {
+  ui_focus(UI_MAIN_MENU);
+
+  if (ui_do_button(UI_ID, 16 * 1, 16 * 13, 16 * 9, 16 * 2, "Resume game", 14)) {
+    game_state.mode = MODE_GAME;
+  }
+  if (ui_do_button(UI_ID, 16 * 1, 16 * 16, 16 * 5, 16 * 2, "Quit", 14)) {
+    game_state.is_running = 0;
+    return;
+  }
+
   render_filled_rect(0, 0, 0, window.width, window.height, 0, 0, 0, 1, 0);
   render_simple_menu_text("Tile Hero", 10, 10, 36);
-  render_simple_menu_text("Press ENTER to resume game", 10, window.height - (32 * 3), 18);
-  render_simple_menu_text("Press ESC to exit game", 10, window.height - (32 * 2), 18);
+  ui_render();
 }
 
 void game_hud_render() {
