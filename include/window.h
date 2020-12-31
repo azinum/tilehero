@@ -3,6 +3,8 @@
 #ifndef _WINDOW_H
 #define _WINDOW_H
 
+typedef void (*callback)(void);
+
 struct {
   void* window;
   const char* title;
@@ -14,6 +16,7 @@ struct {
   u8 fullscreen;
   double mouse_x;
   double mouse_y;
+  callback framebuffer_callback;
 } window;
 
 extern i8 mouse_state;
@@ -28,7 +31,7 @@ extern i8 key_pressed[];
 #define middle_mouse_down    (mouse_state & (1 << 3))
 #define middle_mouse_pressed (mouse_state & (1 << 2))
 
-i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title);
+i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title, callback framebuffer_callback);
 
 void window_toggle_fullscreen();
 

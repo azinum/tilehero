@@ -18,6 +18,13 @@
 static i32 x_delta = 0;
 static i32 y_delta = 0;
 
+enum Element_state {
+  ELEM_MOVABLE      = 1 << 0,
+  ELEM_HOVER        = 1 << 1,
+  ELEM_PRESSED      = 1 << 2,
+  ELEM_PRESSED_DOWN = 1 << 3,
+};
+
 enum Element_type {
   ELEMENT_TEXT,
   ELEMENT_BUTTON,
@@ -39,6 +46,8 @@ struct UI_element {
   const char* text;
 
   Element_data data;
+
+  u32 state;
 
   u8 movable;
   u8 hover;
@@ -228,7 +237,7 @@ void ui_update() {
       (i32)(100 * game->time_scale),
       game->level.index
     );
-  ui_do_text(5, 16 * 1, 16 * 16, 16 * 16, 16 * 9, ui_text, 14);
+  ui_do_text(5, 16 * 1, window.height - (16 * 11), 16 * 16, 16 * 9, ui_text, 14);
 }
 
 
@@ -290,6 +299,6 @@ void ui_render() {
       }
     }
 
-    render_filled_rect(e->x, e->y, z_index, e->w, e->h, 0, 0, 0, 1, 0);
+    render_filled_rect(e->x, e->y, z_index, e->w, e->h, 0.5, 0.5, 0.5, 1, 0);
   }
 }

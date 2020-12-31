@@ -27,6 +27,7 @@ static void game_hud_render();
 static void menu_update();
 static void menu_render();
 static void fade_out();
+static void framebuffer_change_callback();
 
 void game_entity_remove(Entity* e) {
   if (game_state.level.entity_count > 0) {
@@ -246,10 +247,13 @@ static char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 void menu_render() {
   ui_focus(UI_MAIN_MENU);
 
-  if (ui_do_button(UI_ID, 16 * 1, 16 * 13, 16 * 9, 16 * 2, "Resume game", 14)) {
+  ui_do_text(UI_ID, window.width / 2, 16 * 1, 16 * 8, 16 * 2, "Text here", 14);
+
+  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 6), 16 * 9, 16 * 2, "Resume game", 14)) {
     game_state.mode = MODE_GAME;
+    return;
   }
-  if (ui_do_button(UI_ID, 16 * 1, 16 * 16, 16 * 5, 16 * 2, "Quit", 14)) {
+  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 3), 16 * 5, 16 * 2, "Quit", 14)) {
     game_state.is_running = 0;
     return;
   }
@@ -319,9 +323,13 @@ void fade_out() {
   render_filled_rect(0, 0, 1, window.width, window.height, 0, 0, 0, fade_value, 0);
 }
 
+void framebuffer_change_callback() {
+  ui_focus(0);
+}
+
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
   log_file = fopen(LOG_FILE, "w");
-  if (window_open(window_width, window_height, fullscreen, "Tile Hero") != 0) {
+  if (window_open(window_width, window_height, fullscreen, "Tile Hero", framebuffer_change_callback) != 0) {
     fprintf(stderr, "Failed to open window\n");
     return -1;
   }

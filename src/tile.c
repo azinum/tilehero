@@ -106,13 +106,13 @@ void tilemap_render(struct Tile_map* tile_map) {
       }
     }
   }
-  render_rect(0 - camera.x, 0 - camera.y, 0.7f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 0.85f, 0.32f, 0.85f, 0.25f, 0, 1.0f / (TILE_SIZE * TILE_COUNT_X));
+  render_rect(0 - camera.x, 0 - camera.y, 0.7f, TILE_SIZE * TILE_COUNT_X, TILE_SIZE * TILE_COUNT_Y, 0.85f, 0.32f, 0.85f, 0.25f, 0, 2.0f / (TILE_SIZE * TILE_COUNT_X));
 #endif
 }
 
 void tilemap_render_tile_highlight(struct Tile_map* tile_map, i32 x_tile, i32 y_tile) {
   Tile* tile = tilemap_get_tile(tile_map, x_tile, y_tile);
   if (tile) {
-    render_rect((x_tile * TILE_SIZE) - camera.x, (y_tile * TILE_SIZE) - camera.y, -0.1f, TILE_SIZE, TILE_SIZE, 1, 1, 1, 1, 0, 1.0f / TILE_SIZE);
+    render_rect((x_tile * TILE_SIZE) - camera.x, (y_tile * TILE_SIZE) - camera.y, -0.1f, TILE_SIZE, TILE_SIZE, 1, 1, 1, 1, 0, 2.0f / TILE_SIZE);
   }
 }

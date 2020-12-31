@@ -34,9 +34,12 @@ void framebuffer_size_callback(GLFWwindow* glfw_window, i32 width, i32 height) {
   window.width = width;
   window.height = height;
   projection = mm_orthographic(0, width, height, 0, -1, 1);
+  if (window.framebuffer_callback) {
+    window.framebuffer_callback();
+  }
 }
 
-i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
+i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title, callback framebuffer_callback) {
   window.title = title;
   window.width = width;
   window.height = height;
@@ -46,6 +49,7 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title) {
   window.windowed_fullscreen = 0;
   window.mouse_x = 0;
   window.mouse_y = 0;
+  window.framebuffer_callback = framebuffer_callback;
 
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

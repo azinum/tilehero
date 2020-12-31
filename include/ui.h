@@ -6,7 +6,8 @@
 #define UI_ID (__LINE__)
 
 enum UI_context {
-  UI_DEFAULT = 0,
+  UI_NONE = 0,
+  UI_DEFAULT,
   UI_MAIN_MENU,
 };
 
