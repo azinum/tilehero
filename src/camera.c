@@ -12,8 +12,8 @@
 #define CAMERA_CENTER_X (camera.x + (window.width >> 1))
 #define CAMERA_CENTER_Y (camera.y + (window.height >> 1))
 
-static vec2 camera_pos = VEC2(0, 0);
-static vec2 mouse_pos = VEC2(0, 0);
+static v2 camera_pos = V2(0, 0);
+static v2 mouse_pos = V2(0, 0);
 
 void camera_init(i32 x, i32 y) {
   camera.x = x;
@@ -40,8 +40,8 @@ void camera_update() {
   camera.has_target = (key_pressed[GLFW_KEY_Q]) ? (!camera.has_target) : (camera.has_target);
 
   if (middle_mouse_pressed) {
-    camera_pos = VEC2(camera.x_target, camera.y_target);
-    mouse_pos = VEC2(window.mouse_x, window.mouse_y);
+    camera_pos = V2(camera.x_target, camera.y_target);
+    mouse_pos = V2(window.mouse_x, window.mouse_y);
   }
   else if (middle_mouse_down) {
     camera.x_target = camera_pos.x - (window.mouse_x - mouse_pos.x);

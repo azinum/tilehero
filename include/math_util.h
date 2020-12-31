@@ -12,13 +12,13 @@ typedef union mat4 {
 } mat4;
 
 #define translate2d(MODEL, X, Y) { \
-  MODEL = mm_multiply_mat4(MODEL, mm_translate((vec3) {X, Y, 0})); \
+  MODEL = mm_multiply_mat4(MODEL, mm_translate((v3) {X, Y, 0})); \
 }
 #define scale2d(MODEL, X, Y) { \
-  MODEL = mm_multiply_mat4(MODEL, mm_scale((vec3) {X, Y, 1})); \
+  MODEL = mm_multiply_mat4(MODEL, mm_scale((v3) {X, Y, 1})); \
 }
 #define rotate2d(MODEL, ANGLE) { \
-  MODEL = mm_multiply_mat4(MODEL, mm_rotate(ANGLE, (vec3) {0, 0, 1})); \
+  MODEL = mm_multiply_mat4(MODEL, mm_rotate(ANGLE, (v3) {0, 0, 1})); \
 }
 
 #ifdef USE_SSE
@@ -49,13 +49,13 @@ inline float mm_toradians(float degrees) {
   return result;
 }
 
-inline float mm_dot_vec3(vec3 a, vec3 b) {
+inline float mm_dot_v3(v3 a, v3 b) {
   float result = (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
   return result;
 }
 
-inline vec3 mm_add_vec3(vec3 a, vec3 b) {
-  vec3 result;
+inline v3 mm_add_v3(v3 a, v3 b) {
+  v3 result;
 
   result.x = a.x + b.x;
   result.y = a.y + b.y;
@@ -64,8 +64,8 @@ inline vec3 mm_add_vec3(vec3 a, vec3 b) {
   return result;
 }
 
-inline vec3 mm_subtract_vec3(vec3 a, vec3 b) {
-  vec3 result;
+inline v3 mm_subtract_v3(v3 a, v3 b) {
+  v3 result;
 
   result.x = a.x - b.x;
   result.y = a.y - b.y;
@@ -74,8 +74,8 @@ inline vec3 mm_subtract_vec3(vec3 a, vec3 b) {
   return result;
 }
 
-inline vec3 mm_cross(vec3 a, vec3 b) {
-  vec3 result;
+inline v3 mm_cross(v3 a, v3 b) {
+  v3 result;
 
   result.x = (a.y * b.z) - (a.z * b.y);
   result.y = (a.z * b.x) - (a.x * b.z);
@@ -84,19 +84,19 @@ inline vec3 mm_cross(vec3 a, vec3 b) {
   return result;
 }
 
-inline float mm_length_sq_vec3(vec3 vec) {
-  float result = mm_dot_vec3(vec, vec);
+inline float mm_length_sq_v3(v3 vec) {
+  float result = mm_dot_v3(vec, vec);
   return result;
 }
 
-inline float mm_length_vec3(vec3 vec) {
-  float result = sqrtf(mm_length_sq_vec3(vec));
+inline float mm_length_v3(v3 vec) {
+  float result = sqrtf(mm_length_sq_v3(vec));
   return result;
 }
 
-inline vec3 mm_normalize_vec3(vec3 vec) {
-  vec3 result = {0};
-  float length = mm_length_vec3(vec);
+inline v3 mm_normalize_v3(v3 vec) {
+  v3 result = {0};
+  float length = mm_length_v3(vec);
 
   if (length != 0.0f) {
     result.x = vec.x * (1.0f / length);
@@ -181,10 +181,10 @@ inline mat4 mm_multiply_mat4(mat4 a, mat4 b) {
   return result;
 }
 
-inline mat4 mm_rotate(float angle, vec3 axis) {
+inline mat4 mm_rotate(float angle, v3 axis) {
   mat4 result = mm_mat4d(1.0f);
 
-  axis = mm_normalize_vec3(axis);
+  axis = mm_normalize_v3(axis);
 
   float sin_theta = sinf(mm_toradians(angle));
   float cos_theta = cosf(mm_toradians(angle));
@@ -204,12 +204,12 @@ inline mat4 mm_rotate(float angle, vec3 axis) {
   return result;
 }
 
-inline mat4 mm_lookat(vec3 eye, vec3 center, vec3 up) {
+inline mat4 mm_lookat(v3 eye, v3 center, v3 up) {
   mat4 result;
 
-  vec3 f = mm_normalize_vec3(mm_subtract_vec3(center, eye));
-  vec3 s = mm_normalize_vec3(mm_cross(f, up));
-  vec3 u = mm_cross(s, f);
+  v3 f = mm_normalize_v3(mm_subtract_v3(center, eye));
+  v3 s = mm_normalize_v3(mm_cross(f, up));
+  v3 u = mm_cross(s, f);
 
   result.elements[0][0] = s.x;
   result.elements[0][1] = u.x;
@@ -223,15 +223,15 @@ inline mat4 mm_lookat(vec3 eye, vec3 center, vec3 up) {
   result.elements[2][1] = u.z;
   result.elements[2][2] = -f.z;
 
-  result.elements[3][0] = -mm_dot_vec3(s, eye);
-  result.elements[3][1] = -mm_dot_vec3(u, eye);
-  result.elements[3][2] = mm_dot_vec3(f, eye);
+  result.elements[3][0] = -mm_dot_v3(s, eye);
+  result.elements[3][1] = -mm_dot_v3(u, eye);
+  result.elements[3][2] = mm_dot_v3(f, eye);
   result.elements[3][3] = 1.0f;
 
   return (result);
 }
 
-inline mat4 mm_translate(vec3 translation) {
+inline mat4 mm_translate(v3 translation) {
   mat4 result = mm_mat4d(1.0f);
 
   result.elements[3][0] = translation.x;
@@ -241,7 +241,7 @@ inline mat4 mm_translate(vec3 translation) {
   return result;
 }
 
-inline mat4 mm_scale(vec3 scale) {
+inline mat4 mm_scale(v3 scale) {
   mat4 result = mm_mat4d(1.0f);
 
   result.elements[0][0] = scale.x;
@@ -251,7 +251,7 @@ inline mat4 mm_scale(vec3 scale) {
   return result;
 }
 
-inline mat4 mm_translate_mat4(mat4 a, vec3 translation) {
+inline mat4 mm_translate_mat4(mat4 a, v3 translation) {
   mat4 result = a;
 
   result.elements[3][0] = translation.x;

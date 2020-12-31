@@ -48,7 +48,7 @@ extern float move_time; // NOTE(lucas): At which time we are ready to do a move
 typedef struct Entity {
   i32 x_tile, y_tile;
   float x, y, w, h;
-  vec3i world_position;
+  v3i world_position;
   i8 x_dir, y_dir;
   i32 state;
   i32 e_flags;

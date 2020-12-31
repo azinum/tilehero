@@ -28,14 +28,14 @@
 #define ARR_SIZE(ARR) ((sizeof(ARR)) / (sizeof(ARR[0])))
 #define MAX_PATH_LENGTH (512)
 
-#define VEC2(X, Y) ((vec2) {X, Y})
-#define VEC3(X, Y, Z) ((vec3) {X, Y, Z})
-#define VEC4(X, Y, Z, W) ((vec4) {X, Y, Z, W})
+#define V2(X, Y) ((v2) {X, Y})
+#define V3(X, Y, Z) ((v3) {X, Y, Z})
+#define V4(X, Y, Z, W) ((v4) {X, Y, Z, W})
 #define MAT4(A) mm_mat4d(A)
 
-#define VEC3I(X, Y, Z) ((vec3i) {X, Y, Z})
-#define VEC3I_EQUAL(A, B) (A.x == B.x && A.y == B.y && A.z == B.z)
-#define VEC3I_OFFSET(A, B) VEC3I(A.x - B.x, A.y - B.y, A.z - B.z)
+#define V3I(X, Y, Z) ((v3i) {X, Y, Z})
+#define V3I_EQUAL(A, B) (A.x == B.x && A.y == B.y && A.z == B.z)
+#define V3I_OFFSET(A, B) V3I(A.x - B.x, A.y - B.y, A.z - B.z)
 
 typedef int64_t i64;
 typedef uint64_t u64;
@@ -48,21 +48,21 @@ typedef uint8_t u8;
 typedef float r32;
 typedef double r64;
 
-typedef struct vec4 {
+typedef struct v4 {
   float x, y, z, w;
-} vec4;
+} v4;
 
-typedef struct vec3 {
+typedef struct v3 {
   float x, y, z;
-} vec3;
+} v3;
 
-typedef struct vec2 {
+typedef struct v2 {
   float x, y;
-} vec2;
+} v2;
 
-typedef struct vec3i {
+typedef struct v3i {
   i32 x, y, z;
-} vec3i;
+} v3i;
 
 inline float random_number(float from, float to) {
   return (float)rand() / (float)(RAND_MAX / to) + (float)rand() / (float)(RAND_MAX / from);

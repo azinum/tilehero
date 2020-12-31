@@ -35,7 +35,7 @@ struct UI_element {
   i32 x, y, w, h;
   u16 type;
   u16 font_size;
-  vec3 font_color;
+  v3 font_color;
   const char* text;
 
   Element_data data;
@@ -73,7 +73,7 @@ void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u
   e->h = h;
   e->type = type;
   e->font_size = font_size;
-  e->font_color = VEC3(1, 1, 1);
+  e->font_color = V3(1, 1, 1);
   e->text = text;
 
   if (data) {
