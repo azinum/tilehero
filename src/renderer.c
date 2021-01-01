@@ -120,6 +120,7 @@ void render_sprite(i32 spritesheet_id, i32 sprite_id, i32 x, i32 y, float z, i32
   render_texture_region(sheet.texture, x, y, z, w, h, 0 /* angle */, x_offset, y_offset, sheet.w, sheet.h);
 }
 
+// TODO(lucas): Seperate background rendering from text rendering
 void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, v3 tint, float size, float kerning, float line_spacing, float margin, const char* text, u32 text_length, u8 background, float rect_r, float rect_g, float rect_b, float rect_a, float border_r, float border_g, float border_b, float border_a, float border_thickness) {
 
   if (background) {

@@ -45,6 +45,7 @@ void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u
   e->font_color = V3(1, 1, 1);
   e->background_color = V3(0, 0, 0);
   e->background = 1;
+  e->border = 1;
   e->text = text;
 
   if (data) {
@@ -197,18 +198,33 @@ void ui_render() {
   for (u32 i = 0; i < ui.element_count; i++) {
     struct UI_element* e = &ui.elements[i];
     float z_index = 0.8f + (0.1f / (1 + i));
+    v3 tint = V3(0, 0, 0);
+
     if (e->text) {
       render_text(textures[TEXTURE_FONT], e->x, e->y, z_index, e->w, e->h, e->font_color, e->font_size, 0.7f, 0.7f, 10.0f, e->text, ELEMENT_TEXT_BUFFER_SIZE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
+
     if (e->pressed_down) {
-      render_rect(e->x, e->y, z_index, e->w, e->h, 1, 1, 1, 1, 0, 2.0f / e->w);
+      if (e->border) {
+        render_rect(e->x, e->y, z_index, e->w, e->h, 1, 1, 1, 1, 0, 2.0f / e->w);
+      }
+      tint.x = tint.y = tint.z -= 0.13f;
     }
     else if (e->hover) {
-      render_rect(e->x, e->y, z_index, e->w, e->h, 0.1f, 0.4f, 0.9f, 1.0f, 0, 2.0f / e->w);
+      if (e->border) {
+        render_rect(e->x, e->y, z_index, e->w, e->h, 0.1f, 0.4f, 0.9f, 1.0f, 0, 2.0f / e->w);
+      }
+      tint.x = tint.y = tint.z += 0.05f;
     }
     else {
-      render_rect(e->x, e->y, z_index, e->w, e->h, 0.3f, 0.05f, 0.3f, 1.0f, 0, 2.0f / e->w);
+      if (e->border) {
+        render_rect(e->x, e->y, z_index, e->w, e->h, 0.3f, 0.05f, 0.3f, 1.0f, 0, 2.0f / e->w);
+      }
     }
+    if (e->background) {
+      render_filled_rect(e->x, e->y, z_index, e->w, e->h, e->background_color.x + tint.x, e->background_color.y + tint.y, e->background_color.z + tint.z, 1, 0);
+    }
+
     switch (e->type) {
       case ELEMENT_TEXT: {
         break;
@@ -218,17 +234,13 @@ void ui_render() {
       }
       case ELEMENT_CHECKBOX: {
         if (e->data.toggle_value) {
-          render_sprite(SHEET_UI, UI_SPRITE_CHECK, e->x, e->y, z_index, e->w, e->h);
+          render_sprite(SHEET_UI, UI_SPRITE_CHECK, e->x, e->y, z_index + 0.01f, e->w, e->h);
         }
         else {
-          render_sprite(SHEET_UI, UI_SPRITE_CROSS, e->x, e->y, z_index, e->w, e->h);
+          render_sprite(SHEET_UI, UI_SPRITE_CROSS, e->x, e->y, z_index + 0.01f, e->w, e->h);
         }
         break;
       }
-    }
-
-    if (e->background) {
-      render_filled_rect(e->x, e->y, z_index, e->w, e->h, e->background_color.x, e->background_color.y, e->background_color.z, 1, 0);
     }
   }
 }

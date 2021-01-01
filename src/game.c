@@ -246,26 +246,31 @@ void menu_render() {
   ui_focus(UI_MAIN_MENU);
   struct UI_element* e = NULL;
 
-  ui_do_button(UI_ID, window.width - (16 * 14), 16 * 1, 16 * 13, 16 * 7, "INFO: You have (2) unread messages. \n\nClick here to read them.", 14, &e);
+  ui_do_button(UI_ID, window.width - (16 * 16), 16 * 1, 16 * 15, 16 * 8, "INFO: You have (2) unread messages.\n\nClick here to read them.", 16, &e);
   UI_INIT(e,
-    e->background = 0;
     e->movable = 0;
-    e->font_color = V3(0.9f, 0.85f, 0.2f);
+    e->font_color = COLOR_MESSAGE;
   );
 
-  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 6), 16 * 9, 16 * 2, "Resume game", 14, NULL)) {
+  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 8), 16 * 9, 16 * 3, "Resume game", 24, &e)) {
     game_state.mode = MODE_GAME;
     return;
   }
-  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 3), 16 * 5, 16 * 2, "Quit", 14, &e)) {
+  UI_INIT(e,
+    e->border = 0;
+    e->background_color = COLOR_OK;
+  );
+
+  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 4), 16 * 9, 16 * 3, "Quit", 24, &e)) {
     game_state.is_running = 0;
     return;
   }
   UI_INIT(e,
-    e->background_color = V3(0.8f, 0.23f, 0.32f);
+    e->border = 0;
+    e->background_color = COLOR_WARN;
   );
 
-  render_simple_menu_text("Tile Hero", 10, 10, 36);
+  render_simple_menu_text("Tile Hero", VW(1), VW(1), 42);
 }
 
 void game_hud_render() {
@@ -274,34 +279,38 @@ void game_hud_render() {
   ui_focus(UI_DEFAULT);
   struct UI_element* e = NULL;
 
-  if (ui_do_button(0, 16, 16, 16 * 6, 16 * 2, "Restart", 14, &e)) {
+  if (ui_do_button(UI_ID, VW(2), 16, 16 * 12, 16 * 3, "Restart", 24, &e)) {
     game_restart();
   }
   UI_INIT(e,
-    e->background_color = V3(0.8f, 0.23f, 0.32f);
+    e->background_color = COLOR_WARN;
+    e->border = 0;
   );
 
-  if (ui_do_button(1, 16, 16 * 4, 16 * 8, 16 * 2, "Next level", 14, &e)) {
+  if (ui_do_button(UI_ID, VW(2), 16 * 5, 16 * 12, 16 * 3, "Next level", 24, &e)) {
     game_load_level(game->level.index + 1);
   }
   UI_INIT(e,
-    e->background_color = V3(0.2f, 0.3f, 0.8f);
+    e->background_color = COLOR_OK;
+    e->border = 0;
   );
 
-  if (ui_do_button(2, 16, 16 * 7, 16 * 8, 16 * 2, "Prev level", 14, &e)) {
+  if (ui_do_button(UI_ID, VW(2), 16 * 9, 16 * 12, 16 * 3, "Prev level", 24, &e)) {
     if (game->level.index > 0) {
       game_load_level(game->level.index - 1);
     }
   }
   UI_INIT(e,
-    e->background_color = V3(0.3f, 0.7f, 0.2f);
+    e->background_color = COLOR_ACCEPT;
+    e->border = 0;
   );
 
-  audio_engine.muted = ui_do_checkbox(3, 16, 16 * 10, 32, 32, audio_engine.muted, NULL, 0, NULL);
-  camera.has_target = ui_do_checkbox(4, 16, 16 * 13, 32, 32, camera.has_target, NULL, 0, NULL);
+  audio_engine.muted = ui_do_checkbox(UI_ID, VW(2), 16 * 13, 32, 32, audio_engine.muted, NULL, 0, NULL);
+  render_simple_text(textures[TEXTURE_FONT], VW(2) + 16 * 2, 16 * 13, 0.9f, 11 * 16, 3 * 16, 12, 0.7f, 0.7f, 12.0f, "audio muted", -1);
 
-{
-  static char ui_text[UI_TEXT_BUFFER_SIZE] = {0};
+  camera.has_target = ui_do_checkbox(UI_ID, VW(2), 16 * 16, 32, 32, camera.has_target, NULL, 0, NULL);
+  render_simple_text(textures[TEXTURE_FONT], VW(2) + 16 * 2, 16 * 16, 0.9f, 11 * 16, 3 * 16, 12, 0.7f, 0.7f, 12.0f, "camera has target", -1);
+
   snprintf(ui_text, UI_TEXT_BUFFER_SIZE,
     "entity count: %i/%i\n"
     "fps: %i\n"
@@ -315,47 +324,7 @@ void game_hud_render() {
     (i32)(100 * game->time_scale),
     game->level.index
   );
-  ui_do_text(5, 16 * 1, 16 * 16, 16 * 16, 16 * 9, ui_text, 14, NULL);
-}
-{
-  i32 w = 140;
-  i32 h = 35;
-  i32 x = window.width - (w + 10);
-  i32 y = 10;
-  if (game_state.mode == MODE_PAUSE) {
-    snprintf(ui_text, UI_TEXT_BUFFER_SIZE, "[game paused]");
-    render_simple_text(textures[TEXTURE_FONT],
-      x, y, // x, y
-      0.9f, // z
-      w,   // Width
-      h, // Height
-      12, // Font size
-      0.7f, // Font kerning
-      0.7f, // Line spacing
-      12.0f, // Margin
-      ui_text,
-      UI_TEXT_BUFFER_SIZE
-    );
-  }
-}
-  if (camera.has_target) {
-    snprintf(ui_text, UI_TEXT_BUFFER_SIZE, "[camera locked]");
-  }
-  else {
-    snprintf(ui_text, UI_TEXT_BUFFER_SIZE, "[free camera]");
-  }
-  render_simple_text(textures[TEXTURE_FONT],
-    window.width - 10 - 190, window.height - 10 - 35, // x, y
-    0.9f, // z
-    190,   // Width
-    35, // Height
-    14, // Font size
-    0.7f, // Font kerning
-    0.7f, // Line spacing
-    12.0f, // Margin
-    ui_text,
-    UI_TEXT_BUFFER_SIZE
-  );
+  ui_do_text(UI_ID, VW(2), 16 * 19, 16 * 16, 16 * 9, ui_text, 16, NULL);
 }
 
 void fade_out() {

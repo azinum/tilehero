@@ -55,6 +55,8 @@ void player_controller() {
     }
     else {
       move_time = game->time + INTERVAL;
+      // TODO(lucas): Add walk sound
+      // audio_play_once(SOUND_0F, SFX_VOLUME);
     }
   }
 }

@@ -18,6 +18,9 @@
   } \
 }
 
+#define VW(VALUE) ((VALUE / 100.0f) * window.width)
+#define VH(VALUE) ((VALUE / 100.0f) * window.height)
+
 #define UI_TEXT_BUFFER_SIZE 512
 
 enum UI_context {
@@ -46,6 +49,7 @@ typedef struct UI_element {
   v3 font_color;
   v3 background_color;
   u8 background;
+  u8 border;
   const char* text;
 
   Element_data data;
