@@ -88,11 +88,13 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
   return e;
 }
 
-void game_load_level(u32 index) {
-  game_fade_from_black();
-  move_count = 0;
-  camera.target = NULL;
-  level_load(&game_state.level, index);
+void game_load_level(i32 index) {
+  if (index >= 0) {
+    game_fade_from_black();
+    move_count = 0;
+    camera.target = NULL;
+    level_load(&game_state.level, index);
+  }
 }
 
 void game_fade_to_black() {
@@ -146,6 +148,7 @@ void game_run() {
     switch (game->mode) {
       case MODE_GAME: {
         game->time += game->delta_time * game->time_scale;
+        game_hud_render();
         break;
       }
       case MODE_PAUSE:
@@ -206,8 +209,6 @@ void game_run() {
         entity_do_tiled_move(game->level.entities, game->level.entity_count, &game->level);
         game->should_move = 0;
       }
-
-      game_hud_render();
 
       tilemap_render(&game->level.tile_map);
     }
@@ -296,17 +297,15 @@ void game_hud_render() {
   );
 
   if (ui_do_button(UI_ID, VW(2), 16 * 9, 16 * 12, 16 * 3, "Prev level", 24, &e)) {
-    if (game->level.index > 0) {
-      game_load_level(game->level.index - 1);
-    }
+    game_load_level(game->level.index - 1);
   }
   UI_INIT(e,
     e->background_color = COLOR_ACCEPT;
     e->border = 0;
   );
 
-  audio_engine.muted = ui_do_checkbox(UI_ID, VW(2), 16 * 13, 32, 32, audio_engine.muted, NULL, 0, NULL);
-  render_simple_text(textures[TEXTURE_FONT], VW(2) + 16 * 2, 16 * 13, 0.9f, 11 * 16, 3 * 16, 12, 0.7f, 0.7f, 12.0f, "audio muted", -1);
+  audio_engine.muted = !ui_do_checkbox(UI_ID, VW(2), 16 * 13, 32, 32, !audio_engine.muted, NULL, 0, NULL);
+  render_simple_text(textures[TEXTURE_FONT], VW(2) + 16 * 2, 16 * 13, 0.9f, 11 * 16, 3 * 16, 12, 0.7f, 0.7f, 12.0f, "audio on", -1);
 
   camera.has_target = ui_do_checkbox(UI_ID, VW(2), 16 * 16, 32, 32, camera.has_target, NULL, 0, NULL);
   render_simple_text(textures[TEXTURE_FONT], VW(2) + 16 * 2, 16 * 16, 0.9f, 11 * 16, 3 * 16, 12, 0.7f, 0.7f, 12.0f, "camera has target", -1);

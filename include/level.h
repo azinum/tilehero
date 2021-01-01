@@ -21,9 +21,7 @@ typedef struct World {
   Stats stats;
   Stats stats_old;
   u32 current_level;
-  struct Level level;
 } World;
-
 
 void level_init(Level* level);
 

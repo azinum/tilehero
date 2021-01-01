@@ -27,6 +27,7 @@ enum UI_context {
   UI_NONE = 0,
   UI_DEFAULT,
   UI_MAIN_MENU,
+  UI_EDITOR,
 };
 
 enum Element_type {

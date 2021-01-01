@@ -29,6 +29,7 @@ i32 level_store(Level* level, u32 index) {
     close(fd);
     return -1;
   }
+  fprintf(log_file, "Saved level '%i' to '%s'\n", index, WORLD_STORAGE_FILE);
 
   close(fd);
   return 0;

@@ -86,7 +86,7 @@ static struct Entity_type_def placable_entities[MAX_PLACABLE_ENTITY] = {
   {1, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE, 0, SPRITE_MAD_SCIENTIST, 5, 5, 1, add_random_attack, {.i = 1}},
   {1, 0, ENTITY_FLAG_FRIENDLY    | ENTITY_FLAG_MOVABLE, 0, SPRITE_WIZARD, 2, 2, 1, NULL, {}},
   {1, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, 0, SPRITE_VOID_WALKER, 36, 36, 3, add_random_attack, {.i = 5}},
-  {0, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_FLAG, SPRITE_FLAG, 2, 2, 0, NULL, {}},
+  {0, 0, ENTITY_FLAG_MOVABLE     | ENTITY_FLAG_FLY, ENTITY_TYPE_FLAG, SPRITE_FLAG, 2, 2, 0, NULL, {}},
   {0, 0, ENTITY_FLAG_FRIENDLY    | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_SILVER_KEY, SPRITE_SILVER_KEY, 1, 1, 0, NULL, {}},
 };
 
@@ -139,30 +139,28 @@ void editor_update(struct Game_state* game) {
     tilemap_init_tile(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y, placable_tiles[editor.tile_type]);
   }
 
-  if (left_mouse_down || key_down[GLFW_KEY_R]) {
+  if (left_mouse_down) {
     Tile* tile = tilemap_get_tile(&level->tile_map, x_tile, y_tile);
     if (tile) {
       Tile new_tile = placable_tiles[editor.tile_type];
       *tile = new_tile;
       if (left_mouse_pressed) {
-        audio_play_once(SOUND_0F, 0.5f);
+        audio_play_once(SOUND_0F, UI_VOLUME);
       }
     }
   }
 
+  if (key_pressed[GLFW_KEY_R]) {
+    game_restart();
+  }
   if (key_pressed[GLFW_KEY_N]) {
     level_store(level, level->index);
   }
-  if (key_pressed[GLFW_KEY_M]) {
-    level_load(level, level->index);
-  }
   if (key_pressed[GLFW_KEY_V]) {
-    if (level->index > 0) {
-      level_load(level, level->index - 1);
-    }
+    game_load_level(level->index - 1);
   }
   if (key_pressed[GLFW_KEY_B]) {
-    level_load(level, level->index + 1);
+    game_load_level(level->index + 1);
   }
 
   if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
@@ -184,7 +182,7 @@ void editor_update(struct Game_state* game) {
       if (entity.func) {
         entity.func(e, &entity.arg);
       }
-      audio_play_once(SOUND_0F, 0.5f);
+      audio_play_once(SOUND_0F, UI_VOLUME);
     }
   }
 
@@ -198,7 +196,7 @@ void editor_update(struct Game_state* game) {
       }
       if (key_pressed[GLFW_KEY_X]) {
         game_entity_remove(e);
-        audio_play_once(SOUND_HIT, 0.5f);
+        audio_play_once(SOUND_HIT, UI_VOLUME);
       }
     }
   }
@@ -208,7 +206,42 @@ void editor_update(struct Game_state* game) {
 char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 
 void editor_render(struct Game_state* game) {
+  ui_focus(UI_EDITOR);
+  struct UI_element* e = NULL;
   Level* level = &game->level;
+
+  if (ui_do_button(UI_ID, VW(2), window.height - VW(1) - (16 * 3), 16 * 12, 16 * 3, "Reload [r]", 24, &e)) {
+    game_restart();
+  }
+  UI_INIT(e,
+    e->background_color = COLOR_WARN;
+    e->border = 0;
+  );
+
+  if (ui_do_button(UI_ID, VW(2), window.height - VW(1) - (16 * 7), 16 * 12, 16 * 3, "Save [n]", 24, &e)) {
+    level_store(level, level->index);
+  }
+  UI_INIT(e,
+    e->background_color = COLOR_ACCEPT;
+    e->border = 0;
+  );
+
+  if (ui_do_button(UI_ID, VW(2), window.height - VW(1) - (16 * 13), 16 * 11, 16 * 2, "Prev level [v]", 15, &e)) {
+    game_load_level(level->index - 1);
+  }
+  UI_INIT(e,
+    e->background_color = COLOR_OK;
+    e->border = 0;
+  );
+
+  if (ui_do_button(UI_ID, VW(2), window.height - VW(1) - (16 * 10), 16 * 11, 16 * 2, "Next level [b]", 15, &e)) {
+    game_load_level(level->index + 1);
+  }
+  UI_INIT(e,
+    e->background_color = COLOR_OK;
+    e->border = 0;
+  );
+
 {
   i32 x = 10;
   i32 y = 10;
@@ -218,7 +251,7 @@ void editor_render(struct Game_state* game) {
   struct Spritesheet sheet = spritesheets[SHEET_TILES];
   i32 x_offset = SHEET_GET_X_OFFSET(sheet, tile.type);
   i32 y_offset = SHEET_GET_Y_OFFSET(sheet, tile.type);
-  render_rect(x, y, 0.9f, w, h, 0.8f, 0.1f, 0.1f, 1, 0, 1.0f / TILE_SIZE);
+  render_rect(x, y, 0.9f, w, h, 0.8f, 0.1f, 0.1f, 1, 0, 2.0f / TILE_SIZE);
   render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
   snprintf(ui_text, UI_TEXT_BUFF_SIZE,
     "%s\n"
@@ -247,7 +280,7 @@ void editor_render(struct Game_state* game) {
   struct Entity_type_def entity = placable_entities[editor.entity_type];
   i32 x_offset = SHEET_GET_X_OFFSET(sheet, entity.sprite_id);
   i32 y_offset = SHEET_GET_Y_OFFSET(sheet, entity.sprite_id);
-  render_rect(x, y, 0.9f, w, h, 0.25f, 0.80f, 0.18f, 1, 0, 1.0f / TILE_SIZE);
+  render_rect(x, y, 0.9f, w, h, 0.25f, 0.80f, 0.18f, 1, 0, 2.0f / TILE_SIZE);
   render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
   snprintf(ui_text, UI_TEXT_BUFF_SIZE,
     "%s\n"
@@ -291,7 +324,7 @@ void editor_render(struct Game_state* game) {
     level->index
   );
   render_simple_text(textures[TEXTURE_FONT],
-    10, window.height - 10 - h, // x, y
+    VW(1), h - (2 * 16), // x, y
     0.9f, // z
     w,   // Width
     h, // Height
