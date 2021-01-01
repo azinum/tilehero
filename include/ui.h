@@ -18,6 +18,8 @@
   } \
 }
 
+#define UI_TEXT_BUFFER_SIZE 512
+
 enum UI_context {
   UI_NONE = 0,
   UI_DEFAULT,

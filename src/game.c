@@ -232,17 +232,16 @@ void menu_update() {
   }
 }
 
-#define UI_TEXT_BUFF_SIZE 512
-static char ui_text[UI_TEXT_BUFF_SIZE] = {0};
+static char ui_text[UI_TEXT_BUFFER_SIZE] = {0};
 
 #define render_simple_menu_text(text, x, y, font_size) \
-  snprintf(ui_text, UI_TEXT_BUFF_SIZE, text); \
+  snprintf(ui_text, UI_TEXT_BUFFER_SIZE, text); \
   render_simple_text(textures[TEXTURE_FONT], \
     x, y, 0.9f, \
     500, 500, \
     font_size, \
     0.7f, 0.7f, 12.0f, \
-    ui_text, UI_TEXT_BUFF_SIZE)
+    ui_text, UI_TEXT_BUFFER_SIZE)
 
 void menu_render() {
   ui_focus(UI_MAIN_MENU);
@@ -264,13 +263,61 @@ void menu_render() {
 }
 
 void game_hud_render() {
+  Game_state* game = &game_state;
+
+  ui_focus(UI_DEFAULT);
+  struct UI_element* e = NULL;
+
+  if (ui_do_button(0, 16, 16, 16 * 6, 16 * 2, "Restart", 14, &e)) {
+    game_restart();
+  }
+  UI_INIT(e,
+    e->background_color = V3(0.8f, 0.23f, 0.32f);
+  );
+
+  if (ui_do_button(1, 16, 16 * 4, 16 * 8, 16 * 2, "Next level", 14, &e)) {
+    game_load_level(game->level.index + 1);
+  }
+  UI_INIT(e,
+    e->background_color = V3(0.2f, 0.3f, 0.8f);
+  );
+
+  if (ui_do_button(2, 16, 16 * 7, 16 * 8, 16 * 2, "Prev level", 14, &e)) {
+    if (game->level.index > 0) {
+      game_load_level(game->level.index - 1);
+    }
+  }
+  UI_INIT(e,
+    e->background_color = V3(0.3f, 0.7f, 0.2f);
+  );
+
+  audio_engine.muted = ui_do_checkbox(3, 16, 16 * 10, 32, 32, audio_engine.muted, NULL, 0, NULL);
+  camera.has_target = ui_do_checkbox(4, 16, 16 * 13, 32, 32, camera.has_target, NULL, 0, NULL);
+
+{
+  static char ui_text[UI_TEXT_BUFFER_SIZE] = {0};
+  snprintf(ui_text, UI_TEXT_BUFFER_SIZE,
+    "entity count: %i/%i\n"
+    "fps: %i\n"
+    "time: %.3f\n"
+    "time scale: %i %%\n"
+    "level: %i\n"
+    ,
+    game->level.entity_count, MAX_ENTITY,
+    (i32)(1.0f / game->delta_time),
+    game->time,
+    (i32)(100 * game->time_scale),
+    game->level.index
+  );
+  ui_do_text(5, 16 * 1, 16 * 16, 16 * 16, 16 * 9, ui_text, 14, NULL);
+}
 {
   i32 w = 140;
   i32 h = 35;
   i32 x = window.width - (w + 10);
   i32 y = 10;
   if (game_state.mode == MODE_PAUSE) {
-    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[game paused]");
+    snprintf(ui_text, UI_TEXT_BUFFER_SIZE, "[game paused]");
     render_simple_text(textures[TEXTURE_FONT],
       x, y, // x, y
       0.9f, // z
@@ -281,15 +328,15 @@ void game_hud_render() {
       0.7f, // Line spacing
       12.0f, // Margin
       ui_text,
-      UI_TEXT_BUFF_SIZE
+      UI_TEXT_BUFFER_SIZE
     );
   }
 }
   if (camera.has_target) {
-    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[camera locked]");
+    snprintf(ui_text, UI_TEXT_BUFFER_SIZE, "[camera locked]");
   }
   else {
-    snprintf(ui_text, UI_TEXT_BUFF_SIZE, "[free camera]");
+    snprintf(ui_text, UI_TEXT_BUFFER_SIZE, "[free camera]");
   }
   render_simple_text(textures[TEXTURE_FONT],
     window.width - 10 - 190, window.height - 10 - 35, // x, y
@@ -301,7 +348,7 @@ void game_hud_render() {
     0.7f, // Line spacing
     12.0f, // Margin
     ui_text,
-    UI_TEXT_BUFF_SIZE
+    UI_TEXT_BUFFER_SIZE
   );
 }
 

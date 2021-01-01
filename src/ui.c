@@ -8,7 +8,6 @@
 #include "ui.h"
 
 #define MAX_UI_ELEMENTS 256
-#define UI_TEXT_BUFFER_SIZE 512
 
 #define ELEMENT_TEXT_BUFFER_SIZE (256)
 #define PIXEL_TO_GRID(PX, GRID_SIZE) (i32)(PX / GRID_SIZE)
@@ -171,54 +170,7 @@ void ui_focus(u8 id) {
 }
 
 void ui_update() {
-  Game_state* game = &game_state;
-
-  ui_focus(UI_DEFAULT);
-  struct UI_element* e = NULL;
-
-  if (ui_do_button(0, 16, 16, 16 * 6, 16 * 2, "Restart", 14, &e)) {
-    game_restart();
-  }
-  UI_INIT(e,
-    e->background_color = V3(0.8f, 0.23f, 0.32f);
-  );
-
-  if (ui_do_button(1, 16, 16 * 4, 16 * 8, 16 * 2, "Next level", 14, &e)) {
-    game_load_level(game->level.index + 1);
-  }
-  UI_INIT(e,
-    e->background_color = V3(0.2f, 0.3f, 0.8f);
-  );
-
-  if (ui_do_button(2, 16, 16 * 7, 16 * 8, 16 * 2, "Prev level", 14, &e)) {
-    if (game->level.index > 0) {
-      game_load_level(game->level.index - 1);
-    }
-  }
-  UI_INIT(e,
-    e->background_color = V3(0.3f, 0.7f, 0.2f);
-  );
-
-  audio_engine.muted = ui_do_checkbox(3, 16, 16 * 10, 32, 32, audio_engine.muted, NULL, 0, NULL);
-  camera.has_target = ui_do_checkbox(4, 16, 16 * 13, 32, 32, camera.has_target, NULL, 0, NULL);
-
-  static char ui_text[UI_TEXT_BUFFER_SIZE] = {0};
-    snprintf(ui_text, UI_TEXT_BUFFER_SIZE,
-      "entity count: %i/%i\n"
-      "fps: %i\n"
-      "time: %.3f\n"
-      "time scale: %i %%\n"
-      "level: %i\n"
-      ,
-      game->level.entity_count, MAX_ENTITY,
-      (i32)(1.0f / game->delta_time),
-      game->time,
-      (i32)(100 * game->time_scale),
-      game->level.index
-    );
-  ui_do_text(5, 16 * 1, 16 * 16, 16 * 16, 16 * 9, ui_text, 14, NULL);
 }
-
 
 u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size, struct UI_element** elem) {
   struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_BUTTON, font_size, text, NULL, elem);
