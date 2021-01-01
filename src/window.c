@@ -7,7 +7,6 @@
 #include "renderer_common.h"
 #include "math_util.h"
 #include "renderer.h"
-#include "shader.h"
 #include "window.h"
 
 i8 mouse_state = 0;

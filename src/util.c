@@ -1,11 +1,10 @@
-// file_loader.c
+// util.c
 
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "common.h"
-#include "file_loader.h"
 
 char* read_entire_file(const char* path) {
   FILE* fp = fopen(path, "rb");
