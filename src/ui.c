@@ -18,45 +18,6 @@
 static i32 x_delta = 0;
 static i32 y_delta = 0;
 
-enum Element_state {
-  ELEM_MOVABLE      = 1 << 0,
-  ELEM_HOVER        = 1 << 1,
-  ELEM_PRESSED      = 1 << 2,
-  ELEM_PRESSED_DOWN = 1 << 3,
-};
-
-enum Element_type {
-  ELEMENT_TEXT,
-  ELEMENT_BUTTON,
-  ELEMENT_CHECKBOX,
-};
-
-typedef union Element_data {
-  struct {
-    u8 toggle_value;
-  };
-} Element_data;
-
-struct UI_element {
-  u32 id;
-  i32 x, y, w, h;
-  u16 type;
-  u16 font_size;
-  v3 font_color;
-  const char* text;
-
-  Element_data data;
-
-  u32 state;
-
-  u8 movable;
-  u8 hover;
-  u8 pressed;
-  u8 pressed_down;
-  u8 snap_to_grid;
-  u16 grid_size;
-};
-
 struct UI_state {
   struct UI_element elements[MAX_UI_ELEMENTS];
   u32 element_count;
@@ -70,7 +31,7 @@ static struct UI_state ui = {0};
 static void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data);
 static void ui_button_init(struct UI_element* e);
 static void ui_interaction(struct UI_element* e);
-static struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data);
+static struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data, struct UI_element** elem);
 
 void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data) {
   assert(e);
@@ -83,6 +44,8 @@ void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u
   e->type = type;
   e->font_size = font_size;
   e->font_color = V3(1, 1, 1);
+  e->background_color = V3(0, 0, 0);
+  e->background = 1;
   e->text = text;
 
   if (data) {
@@ -163,7 +126,7 @@ void ui_interaction(struct UI_element* e) {
   }
 }
 
-struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data) {
+struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data, UI_element** elem) {
   struct UI_element* e = NULL;
 
   if (ui.element_iter >= ui.element_count) {
@@ -179,6 +142,9 @@ struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 
         e->movable = 1;
         e->snap_to_grid = 1;
         break;
+    }
+    if (elem) {
+      *elem = e;
     }
   }
   else {
@@ -208,20 +174,33 @@ void ui_update() {
   Game_state* game = &game_state;
 
   ui_focus(UI_DEFAULT);
-  if (ui_do_button(0, 16, 16, 16 * 6, 16 * 2, "Restart", 14)) {
+  struct UI_element* e = NULL;
+
+  if (ui_do_button(0, 16, 16, 16 * 6, 16 * 2, "Restart", 14, &e)) {
     game_restart();
   }
-  if (ui_do_button(1, 16, 16 * 4, 16 * 8, 16 * 2, "Next level", 14)) {
+  UI_INIT(e,
+    e->background_color = V3(0.8f, 0.23f, 0.32f);
+  );
+
+  if (ui_do_button(1, 16, 16 * 4, 16 * 8, 16 * 2, "Next level", 14, &e)) {
     game_load_level(game->level.index + 1);
   }
-  if (ui_do_button(2, 16, 16 * 7, 16 * 8, 16 * 2, "Prev level", 14)) {
+  UI_INIT(e,
+    e->background_color = V3(0.2f, 0.3f, 0.8f);
+  );
+
+  if (ui_do_button(2, 16, 16 * 7, 16 * 8, 16 * 2, "Prev level", 14, &e)) {
     if (game->level.index > 0) {
       game_load_level(game->level.index - 1);
     }
   }
+  UI_INIT(e,
+    e->background_color = V3(0.3f, 0.7f, 0.2f);
+  );
 
-  audio_engine.muted = ui_do_checkbox(3, 16, 16 * 10, 32, 32, audio_engine.muted, NULL, 0);
-  camera.has_target = ui_do_checkbox(4, 16, 16 * 13, 32, 32, camera.has_target, NULL, 0);
+  audio_engine.muted = ui_do_checkbox(3, 16, 16 * 10, 32, 32, audio_engine.muted, NULL, 0, NULL);
+  camera.has_target = ui_do_checkbox(4, 16, 16 * 13, 32, 32, camera.has_target, NULL, 0, NULL);
 
   static char ui_text[UI_TEXT_BUFFER_SIZE] = {0};
     snprintf(ui_text, UI_TEXT_BUFFER_SIZE,
@@ -237,19 +216,19 @@ void ui_update() {
       (i32)(100 * game->time_scale),
       game->level.index
     );
-  ui_do_text(5, 16 * 1, window.height - (16 * 11), 16 * 16, 16 * 9, ui_text, 14);
+  ui_do_text(5, 16 * 1, 16 * 16, 16 * 16, 16 * 9, ui_text, 14, NULL);
 }
 
 
-u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size) {
-  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_BUTTON, font_size, text, NULL);
+u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size, struct UI_element** elem) {
+  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_BUTTON, font_size, text, NULL, elem);
   ui_interaction(e);
   return e->pressed;
 }
 
-u8 ui_do_checkbox(u32 id, i32 x, i32 y, i32 w, i32 h, u8 toggle_value, const char* text, u16 font_size) {
+u8 ui_do_checkbox(u32 id, i32 x, i32 y, i32 w, i32 h, u8 toggle_value, const char* text, u16 font_size, struct UI_element** elem) {
   Element_data data = { .toggle_value = toggle_value };
-  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_CHECKBOX, font_size, text, &data);
+  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_CHECKBOX, font_size, text, &data, elem);
   ui_interaction(e);
   if (e->pressed) {
     toggle_value = !toggle_value;
@@ -258,8 +237,8 @@ u8 ui_do_checkbox(u32 id, i32 x, i32 y, i32 w, i32 h, u8 toggle_value, const cha
   return toggle_value;
 }
 
-u8 ui_do_text(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size) {
-  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_TEXT, font_size, text, NULL);
+u8 ui_do_text(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size, struct UI_element** elem) {
+  struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_TEXT, font_size, text, NULL, elem);
   ui_interaction(e);
   e->text = text;
   return e->pressed;
@@ -299,6 +278,8 @@ void ui_render() {
       }
     }
 
-    render_filled_rect(e->x, e->y, z_index, e->w, e->h, 0.5, 0.5, 0.5, 1, 0);
+    if (e->background) {
+      render_filled_rect(e->x, e->y, z_index, e->w, e->h, e->background_color.x, e->background_color.y, e->background_color.z, 1, 0);
+    }
   }
 }

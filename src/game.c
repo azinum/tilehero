@@ -247,13 +247,13 @@ static char ui_text[UI_TEXT_BUFF_SIZE] = {0};
 void menu_render() {
   ui_focus(UI_MAIN_MENU);
 
-  ui_do_text(UI_ID, window.width / 2, 16 * 1, 16 * 8, 16 * 2, "Text here", 14);
+  ui_do_text(UI_ID, window.width / 2, 16 * 1, 16 * 8, 16 * 2, "Text here", 14, NULL);
 
-  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 6), 16 * 9, 16 * 2, "Resume game", 14)) {
+  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 6), 16 * 9, 16 * 2, "Resume game", 14, NULL)) {
     game_state.mode = MODE_GAME;
     return;
   }
-  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 3), 16 * 5, 16 * 2, "Quit", 14)) {
+  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 3), 16 * 5, 16 * 2, "Quit", 14, NULL)) {
     game_state.is_running = 0;
     return;
   }
