@@ -169,9 +169,6 @@ void ui_focus(u8 id) {
   }
 }
 
-void ui_update() {
-}
-
 u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size, struct UI_element** elem) {
   struct UI_element* e = ui_init_interactable(id, x, y, w, h, ELEMENT_BUTTON, font_size, text, NULL, elem);
   ui_interaction(e);
@@ -201,7 +198,7 @@ void ui_render() {
     struct UI_element* e = &ui.elements[i];
     float z_index = 0.8f + (0.1f / (1 + i));
     if (e->text) {
-      render_simple_text(textures[TEXTURE_FONT], e->x, e->y, z_index, e->w, e->h, e->font_size, 0.7f, 0.7f, 10.0f, e->text, ELEMENT_TEXT_BUFFER_SIZE);
+      render_text(textures[TEXTURE_FONT], e->x, e->y, z_index, e->w, e->h, e->font_color, e->font_size, 0.7f, 0.7f, 10.0f, e->text, ELEMENT_TEXT_BUFFER_SIZE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
     if (e->pressed_down) {
       render_rect(e->x, e->y, z_index, e->w, e->h, 1, 1, 1, 1, 0, 2.0f / e->w);

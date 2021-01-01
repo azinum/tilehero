@@ -146,8 +146,6 @@ void game_run() {
     switch (game->mode) {
       case MODE_GAME: {
         game->time += game->delta_time * game->time_scale;
-        ui_update();
-        ui_render();
         break;
       }
       case MODE_PAUSE:
@@ -213,6 +211,7 @@ void game_run() {
 
       tilemap_render(&game->level.tile_map);
     }
+    ui_render();
 
     if (is_fading)
       fade_out();
@@ -245,21 +244,28 @@ static char ui_text[UI_TEXT_BUFFER_SIZE] = {0};
 
 void menu_render() {
   ui_focus(UI_MAIN_MENU);
+  struct UI_element* e = NULL;
 
-  ui_do_text(UI_ID, window.width / 2, 16 * 1, 16 * 8, 16 * 2, "Text here", 14, NULL);
+  ui_do_button(UI_ID, window.width - (16 * 14), 16 * 1, 16 * 13, 16 * 7, "INFO: You have (2) unread messages. \n\nClick here to read them.", 14, &e);
+  UI_INIT(e,
+    e->background = 0;
+    e->movable = 0;
+    e->font_color = V3(0.9f, 0.85f, 0.2f);
+  );
 
   if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 6), 16 * 9, 16 * 2, "Resume game", 14, NULL)) {
     game_state.mode = MODE_GAME;
     return;
   }
-  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 3), 16 * 5, 16 * 2, "Quit", 14, NULL)) {
+  if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 3), 16 * 5, 16 * 2, "Quit", 14, &e)) {
     game_state.is_running = 0;
     return;
   }
+  UI_INIT(e,
+    e->background_color = V3(0.8f, 0.23f, 0.32f);
+  );
 
-  render_filled_rect(0, 0, 0, window.width, window.height, 0, 0, 0, 1, 0);
   render_simple_menu_text("Tile Hero", 10, 10, 36);
-  ui_render();
 }
 
 void game_hud_render() {

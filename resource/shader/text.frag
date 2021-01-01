@@ -8,7 +8,7 @@ out vec4 color;
 uniform sampler2D image;
 uniform vec2 uv_offset;
 uniform vec2 uv_range;
-uniform vec4 tint;
+uniform vec3 tint;
 
 void main() {
   // if (gl_FragCoord.x >= clip.x &&
@@ -25,5 +25,5 @@ void main() {
     discard;
     return;
   }
-  color *= tint;
+  color *= vec4(tint.xyz, 1);
 }
