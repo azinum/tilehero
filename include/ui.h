@@ -22,6 +22,7 @@
 #define VH(VALUE) ((VALUE / 100.0f) * window.height)
 
 #define UI_TEXT_BUFFER_SIZE 512
+#define MAX_UI_ELEMENTS 256
 
 enum UI_context {
   UI_NONE = 0,
@@ -63,6 +64,17 @@ typedef struct UI_element {
   u16 grid_size;
 } UI_element;
 
+struct UI_state {
+  struct UI_element elements[MAX_UI_ELEMENTS];
+  u32 element_count;
+  u32 element_iter;
+  u8 focus_id;
+  u8 prev_focus_id;
+  u8 is_interacting;
+};
+
+extern struct UI_state ui;
+
 void ui_init();
 
 void ui_focus(u8 id);
@@ -74,6 +86,8 @@ u8 ui_do_button(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_s
 u8 ui_do_checkbox(u32 id, i32 x, i32 y, i32 w, i32 h, u8 toggle_value, const char* text, u16 font_size, struct UI_element** elem);
 
 u8 ui_do_text(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_size, struct UI_element** elem);
+
+void ui_update();
 
 void ui_render();
 

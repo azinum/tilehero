@@ -154,8 +154,8 @@ void game_run() {
       case MODE_PAUSE:
         break;
       case MODE_EDITOR: {
-        editor_update(game);
         editor_render(game);
+        editor_update(game);
         break;
       }
     }
@@ -212,6 +212,7 @@ void game_run() {
 
       tilemap_render(&game->level.tile_map);
     }
+    ui_update();
     ui_render();
 
     if (is_fading)

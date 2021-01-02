@@ -7,8 +7,6 @@
 #include "audio.h"
 #include "ui.h"
 
-#define MAX_UI_ELEMENTS 256
-
 #define ELEMENT_TEXT_BUFFER_SIZE (256)
 #define PIXEL_TO_GRID(PX, GRID_SIZE) (i32)(PX / GRID_SIZE)
 
@@ -17,15 +15,7 @@
 static i32 x_delta = 0;
 static i32 y_delta = 0;
 
-struct UI_state {
-  struct UI_element elements[MAX_UI_ELEMENTS];
-  u32 element_count;
-  u32 element_iter;
-  u8 focus_id;
-  u8 prev_focus_id;
-};
-
-static struct UI_state ui = {0};
+struct UI_state ui = {0};
 
 static void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data);
 static void ui_button_init(struct UI_element* e);
@@ -67,6 +57,7 @@ void ui_button_init(struct UI_element* e) {
 void ui_interaction(struct UI_element* e) {
   if (mouse_over(window.mouse_x, window.mouse_y, e->x, e->y, e->w, e->h)) {
     e->hover = 1;
+    ui.is_interacting = 1;  // TODO(lucas): Temporary?
   }
   else {
     e->hover = 0;
@@ -159,6 +150,7 @@ struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 h, u16 
 void ui_init() {
   ui.element_count = 0;
   ui.element_iter = 0;
+  ui.is_interacting = 0;
 }
 
 void ui_focus(u8 id) {
@@ -192,6 +184,10 @@ u8 ui_do_text(u32 id, i32 x, i32 y, i32 w, i32 h, const char* text, u16 font_siz
   ui_interaction(e);
   e->text = text;
   return e->pressed;
+}
+
+void ui_update() {
+  ui.is_interacting = 0;
 }
 
 void ui_render() {

@@ -10,11 +10,9 @@
 struct {
   u32 tile_type;
   u32 entity_type;
-  u32 chunk_index;
 } editor = {
   .tile_type = 0,
   .entity_type = 0,
-  .chunk_index = 0,
 };
 
 static Tile placable_tiles[] = {
@@ -139,7 +137,7 @@ void editor_update(struct Game_state* game) {
     tilemap_init_tile(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y, placable_tiles[editor.tile_type]);
   }
 
-  if (left_mouse_down) {
+  if (left_mouse_down && !ui.is_interacting) {
     Tile* tile = tilemap_get_tile(&level->tile_map, x_tile, y_tile);
     if (tile) {
       Tile new_tile = placable_tiles[editor.tile_type];
