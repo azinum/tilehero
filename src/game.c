@@ -174,9 +174,11 @@ void game_run() {
       if (key_pressed[GLFW_KEY_F1]) {
         if (game->mode == MODE_EDITOR) {
           game->mode = MODE_GAME;
+          camera.has_target = 1;
         }
         else {
           game->mode = MODE_EDITOR;
+          camera.has_target = 0;
         }
       }
 
@@ -346,6 +348,7 @@ void fade_out() {
 }
 
 void framebuffer_change_callback() {
+  projection = orthographic(0, window.width, window.height, 0, -1, 1);
   ui_focus(0);
 }
 

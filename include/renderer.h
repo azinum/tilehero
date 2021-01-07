@@ -22,6 +22,9 @@ struct Instanced_list {
 #define render_simple_text(tex, x, y, z, w, h, size, kerning, line_spacing, margin, text, text_length) \
   render_text(tex, x, y, z, w, h, V3(1, 1, 1), size, kerning, line_spacing, margin, text, text_length, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
+#define render_sprite(spritesheet_id, sprite_id, x, y, z, w, h) \
+  render_tinted_sprite(spritesheet_id, sprite_id, x, y, z, w, h, V4(1, 1, 1, 1))
+
 struct Texture;
 
 extern union mat4 model, view, projection;
@@ -32,7 +35,7 @@ void renderer_init();
 
 void render_texture_region(struct Texture texture, i32 x, i32 y, float z, i32 w, i32 h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range);
 
-void render_sprite(i32 spritesheet_id, i32 sprite_id, i32 x, i32 y, float z, i32 w, i32 h);
+void render_tinted_sprite(i32 spritesheet_id, i32 sprite_id, i32 x, i32 y, float z, i32 w, i32 h, v4 tint);
 
 void render_text(struct Texture font_texture, float x, float y, float z, float w, float h, v3 tint, float size, float kerning, float line_spacing, float margin, const char* text, u32 text_length, u8 background, float rect_r, float rect_g, float rect_b, float rect_a, float border_r, float border_g, float border_b, float border_a, float border_thickness);
 

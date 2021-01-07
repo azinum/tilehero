@@ -32,7 +32,6 @@ void framebuffer_size_callback(GLFWwindow* glfw_window, i32 width, i32 height) {
   glfwGetWindowSize(glfw_window, &width, &height);
   window.width = width;
   window.height = height;
-  projection = mm_orthographic(0, width, height, 0, -1, 1);
   if (window.framebuffer_callback) {
     window.framebuffer_callback();
   }
@@ -67,7 +66,7 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title, callbac
   }
   glfwMakeContextCurrent(window.window);
   glfwSetFramebufferSizeCallback(window.window, framebuffer_size_callback);
-  // glfwSetInputMode(window.window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+  // glfwSetInputMode(window.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   i32 glew_err = glewInit();
   if (glew_err != GLEW_OK) {

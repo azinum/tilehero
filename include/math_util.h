@@ -111,7 +111,7 @@ inline mat4 mat4_zero(void) {
   return result;
 }
 
-inline mat4 mm_perspective(float fov, float aspect_ratio, float z_near, float z_far) {
+inline mat4 perspective(float fov, float aspect_ratio, float z_near, float z_far) {
   mat4 result = mat4_zero();
 
   result.elements[0][0] = 1.0f / (1.0f * fov);
@@ -124,7 +124,7 @@ inline mat4 mm_perspective(float fov, float aspect_ratio, float z_near, float z_
   return result;
 }
 
-inline mat4 mm_orthographic(float left, float right, float bottom, float top, float z_near, float z_far) {
+inline mat4 orthographic(float left, float right, float bottom, float top, float z_near, float z_far) {
   mat4 result = mat4_zero();
 
   result.elements[0][0] = 2.0f / (right - left);

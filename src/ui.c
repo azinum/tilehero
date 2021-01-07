@@ -24,7 +24,6 @@ static struct UI_element* ui_init_interactable(u32 id, i32 x, i32 y, i32 w, i32 
 
 void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u16 type, u16 font_size, const char* text, Element_data* data) {
   assert(e);
-
   e->id = id;
   e->x = x;
   e->y = y;
@@ -204,13 +203,13 @@ void ui_render() {
       if (e->border) {
         render_rect(e->x, e->y, z_index, e->w, e->h, 1, 1, 1, 1, 0, 2.0f / e->w);
       }
-      tint.x = tint.y = tint.z -= 0.13f;
+      tint.x = tint.y = tint.z -= 0.10f;
     }
     else if (e->hover) {
       if (e->border) {
         render_rect(e->x, e->y, z_index, e->w, e->h, 0.1f, 0.4f, 0.9f, 1.0f, 0, 2.0f / e->w);
       }
-      tint.x = tint.y = tint.z += 0.05f;
+      tint.x = tint.y = tint.z += 0.10f;
     }
     else {
       if (e->border) {

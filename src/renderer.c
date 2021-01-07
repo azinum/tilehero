@@ -150,7 +150,7 @@ void renderer_init() {
   init_quad_data();
   model = MAT4(1.0f);
   view = MAT4(1.0f);
-  projection = mm_orthographic(0, window.width, window.height, 0, -1, 1);
+  projection = orthographic(0, window.width, window.height, 0, -1, 1);
   load_texture_shader(&texture_program, "resource/shader/texture");
   rect_shader = shader_compile("resource/shader/rect");
   filled_rect_shader = shader_compile("resource/shader/filled_rect");
@@ -185,11 +185,13 @@ void render_texture_region(struct Texture texture, i32 x, i32 y, float z, i32 w,
   glBindVertexArray(0);
 }
 
-void render_sprite(i32 spritesheet_id, i32 sprite_id, i32 x, i32 y, float z, i32 w, i32 h) {
+void render_tinted_sprite(i32 spritesheet_id, i32 sprite_id, i32 x, i32 y, float z, i32 w, i32 h, v4 tint_) {
   struct Spritesheet sheet = spritesheets[spritesheet_id];
   i32 x_offset = SHEET_GET_X_OFFSET(sheet, sprite_id);
   i32 y_offset = SHEET_GET_Y_OFFSET(sheet, sprite_id);
+  tint = tint_;
   render_texture_region(sheet.texture, x, y, z, w, h, 0 /* angle */, x_offset, y_offset, sheet.w, sheet.h);
+  tint = V4(1, 1, 1, 1);
 }
 
 // TODO(lucas): Seperate background rendering from text rendering

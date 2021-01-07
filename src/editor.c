@@ -258,6 +258,8 @@ void editor_render(struct Game_state* game) {
   );
   render_simple_text(textures[TEXTURE_FONT], x + w + 5, y, 0.9f, 500, 600, 12, 0.7f, 0.7f, 5.0f, ui_text, UI_TEXT_BUFF_SIZE);
 }
+
+  // render_sprite(SHEET_TILES, editor.tile_type, window.mouse_x - (TILE_SIZE / 2), window.mouse_y - (TILE_SIZE / 2), 1.0f, TILE_SIZE, TILE_SIZE);
 {
   i32 w = TILE_SIZE >> 1;
   i32 h = w;

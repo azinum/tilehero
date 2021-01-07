@@ -16,6 +16,6 @@ void main() {
 		color = border_color;
 	}
 	else {
-    color = in_color;
+		color = in_color;
 	}
 }
