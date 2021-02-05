@@ -12,6 +12,7 @@ mat4 model, view, projection;
 
 static v4 tint = (v4) {1, 1, 1, 1};
 static u32 quad_vao = 0;
+static u32 quad_vbo = 0;
 static u32 rect_shader,
   filled_rect_shader,
   text_shader;
@@ -119,12 +120,10 @@ void shader_delete(i32 shader_program) {
   }
 }
 void init_quad_data() {
-  u32 vbo;  // TODO(lucas): Delete this later?
-
   glGenVertexArrays(1, &quad_vao);
-  glGenBuffers(1, &vbo);
+  glGenBuffers(1, &quad_vbo);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
 
   glBindVertexArray(quad_vao);
@@ -388,4 +387,5 @@ void renderer_free() {
   shader_delete(text_shader);
   shader_delete(tile_shader);
   glDeleteVertexArrays(1, &quad_vao);
+  glDeleteVertexArrays(1, &quad_vbo);
 }

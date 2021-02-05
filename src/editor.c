@@ -186,7 +186,9 @@ void editor_update(struct Game_state* game) {
 
   i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
   i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-  tilemap_render_tile_highlight(&level->tile_map, x_tile, y_tile);
+  if (!ui.is_interacting) {
+    tilemap_render_tile_highlight(&level->tile_map, x_tile, y_tile);
+  }
 
   if (left_mouse_down && !ui.is_interacting) {
     Tile* tile = tilemap_get_tile(&level->tile_map, x_tile, y_tile);
@@ -203,6 +205,24 @@ void editor_update(struct Game_state* game) {
       editor.has_target = 0;
       editor.target = NULL;
     }
+  }
+
+  if (editor.has_target && editor.target) {
+    struct Entity* e = editor.target;
+    if (key_pressed[GLFW_KEY_LEFT]) {
+      e->x_tile -= 1;
+    }
+    if (key_pressed[GLFW_KEY_RIGHT]) {
+      e->x_tile += 1;
+    }
+    if (key_pressed[GLFW_KEY_UP]) {
+      e->y_tile -= 1;
+    }
+    if (key_pressed[GLFW_KEY_DOWN]) {
+      e->y_tile += 1;
+    }
+    e->x = TILE_SIZE * e->x_tile;
+    e->y = TILE_SIZE * e->y_tile;
   }
 
   for (u32 i = 0; i < level->entity_count; i++) {
@@ -362,6 +382,9 @@ void editor_update(struct Game_state* game) {
       else {
         game_send_message("Failed to paste entity");
       }
+    }
+    else {
+      game_send_message("Failed to paste entity");
     }
   }
 
