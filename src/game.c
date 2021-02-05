@@ -1,5 +1,7 @@
 // game.c
 
+#include <stdarg.h>
+
 #include "common.h"
 #include "window.h"
 #include "audio.h"
@@ -17,6 +19,13 @@
 
 Game_state game_state;
 
+#define MESSAGE_LENGTH 64
+#define MAX_MESSAGE 12
+#define MESSAGE_TIME 1.0f // How fast we empty the message queue
+
+static char messages[MAX_MESSAGE][MESSAGE_LENGTH] = {};
+static i32 message_count = 0;
+static float last_message_time = 0.0f;
 static float fade_value;
 static u8 fade_from_black;
 static u8 is_fading;
@@ -26,6 +35,8 @@ static void game_run();
 static void game_hud_render();
 static void menu_update();
 static void menu_render();
+static void messages_update();
+static void messages_render();
 static void fade_out();
 static void framebuffer_change_callback();
 
@@ -112,6 +123,7 @@ void game_fade_from_black() {
 void game_init(Game_state* game) {
   srand((u32)time(NULL));
   game->time = 0;
+  game->total_time = 0;
   game->time_scale = 1;
   game->delta_time = 0;
   game->move_timer = 0;
@@ -127,7 +139,7 @@ void game_init(Game_state* game) {
   move_time = 0;
 
   game_load_level(0);
-  audio_play_once_on_channel(SOUND_SONG_METAKING, 0, MUSIC_VOLUME);
+  audio_play_once_on_channel(SOUND_SONG_REMADE, 1, MUSIC_VOLUME);
 }
 
 void game_run() {
@@ -144,6 +156,8 @@ void game_run() {
     if (game->delta_time > MAX_DELTA_TIME)
       game->delta_time = MAX_DELTA_TIME;
 
+    game->total_time += game->delta_time * game->time_scale;
+
     window_pollevents();
     switch (game->mode) {
       case MODE_GAME: {
@@ -154,7 +168,6 @@ void game_run() {
       case MODE_PAUSE:
         break;
       case MODE_EDITOR: {
-        editor_render(game);
         editor_update(game);
         break;
       }
@@ -216,6 +229,8 @@ void game_run() {
     }
     ui_update();
     ui_render();
+    messages_update();
+    messages_render();
 
     if (is_fading)
       fade_out();
@@ -249,12 +264,6 @@ static char ui_text[UI_TEXT_BUFFER_SIZE] = {0};
 void menu_render() {
   ui_focus(UI_MAIN_MENU);
   struct UI_element* e = NULL;
-
-  ui_do_button(UI_ID, window.width - (16 * 16), 16 * 1, 16 * 15, 16 * 8, "INFO: You have (2) unread messages.\n\nClick here to read them.", 16, &e);
-  UI_INIT(e,
-    e->movable = 0;
-    e->font_color = COLOR_MESSAGE;
-  );
 
   if (ui_do_button(UI_ID, 16 * 1, window.height - (16 * 8), 16 * 9, 16 * 3, "Resume game", 24, &e)) {
     game_state.mode = MODE_GAME;
@@ -312,21 +321,24 @@ void game_hud_render() {
 
   camera.has_target = ui_do_checkbox(UI_ID, VW(2), 16 * 16, 32, 32, camera.has_target, NULL, 0, NULL);
   render_simple_text(textures[TEXTURE_FONT], VW(2) + 16 * 2, 16 * 16, 0.9f, 11 * 16, 3 * 16, 12, 0.7f, 0.7f, 12.0f, "camera has target", -1);
+}
 
-  snprintf(ui_text, UI_TEXT_BUFFER_SIZE,
-    "entity count: %i/%i\n"
-    "fps: %i\n"
-    "time: %.3f\n"
-    "time scale: %i %%\n"
-    "level: %i\n"
-    ,
-    game->level.entity_count, MAX_ENTITY,
-    (i32)(1.0f / game->delta_time),
-    game->time,
-    (i32)(100 * game->time_scale),
-    game->level.index
-  );
-  ui_do_text(UI_ID, VW(2), 16 * 19, 16 * 16, 16 * 9, ui_text, 16, NULL);
+void messages_update() {
+  struct Game_state* game = &game_state;
+  if (game->total_time >= last_message_time + MESSAGE_TIME) {
+    message_count = 0;
+  }
+}
+
+void messages_render() {
+  i32 text_size = 12;
+  i32 x_pos = (window.width >> 1) - (text_size >> 1);
+  i32 y_pos = 16;
+  for (i32 i = 0; i < message_count; i++) {
+    char* message = (char*)&messages[i];
+    render_simple_text(textures[TEXTURE_FONT], x_pos, y_pos, 0.9f, text_size * MESSAGE_LENGTH, text_size * 1.5f, text_size, 0.7f, 0.7f, 0.0f /* margin */, message, MESSAGE_LENGTH);
+    y_pos += text_size * 1.5f;
+  }
 }
 
 void fade_out() {
@@ -348,8 +360,25 @@ void fade_out() {
 }
 
 void framebuffer_change_callback() {
-  projection = orthographic(0, window.width, window.height, 0, -1, 1);
+  renderer_on_update_framebuffer();
   ui_focus(0);
+}
+
+void game_send_message(char* fmt, ...) {
+  for (i32 i = message_count; i > 0; i--) {
+    if (i < MAX_MESSAGE) {
+      strncpy(messages[i], messages[i - 1], MESSAGE_LENGTH);
+    }
+  }
+  va_list args;
+  va_start(args, fmt);
+  char* buff = (char*)&messages[0];
+  vsnprintf(buff, MESSAGE_LENGTH, fmt, args);
+  last_message_time = game_state.total_time;
+  if (message_count < MAX_MESSAGE) {
+    message_count++;
+  }
+  va_end(args);
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {

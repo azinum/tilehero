@@ -10,6 +10,7 @@ struct RIFF_header {
   char chunk_id[4];
   i32 size;
   char wave_id[4];
+
   char format_chunk[4];
   i32 format_chunk_size;
   i16 format_type;
@@ -18,6 +19,7 @@ struct RIFF_header {
   i32 data_rate;  // (sample rate * bits per sample * channels) / 8
   i16 data_block_size;  // (bits per sample * channels) / 8 => bytes per frame / sample
   i16 bits_per_sample;
+
   char data_chunk_header[4];
   i32 data_size;
 } __attribute__((packed));

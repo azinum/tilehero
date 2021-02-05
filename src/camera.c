@@ -20,6 +20,7 @@ void camera_init(i32 x, i32 y) {
   camera.y = y;
   camera.x_target = x;
   camera.y_target = y;
+  camera.zoom = 1.0f;
   camera.target = NULL;
   camera.has_target = 1;
 }

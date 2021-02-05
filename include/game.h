@@ -25,6 +25,7 @@ enum Game_mode {
 typedef struct Game_state {
   Level level;
   float time;
+  float total_time;
   float time_scale;
   float delta_time;
   float move_timer;
@@ -50,6 +51,8 @@ void game_load_level(i32 index);
 void game_fade_to_black();
 
 void game_fade_from_black();
+
+void game_send_message(char* fmt, ...);
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen);
 

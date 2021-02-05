@@ -8,6 +8,7 @@ struct {
   float y;
   float x_target;
   float y_target;
+  float zoom;
   struct Entity* target;
   u8 has_target;
 } camera;

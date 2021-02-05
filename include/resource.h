@@ -19,7 +19,7 @@ enum Sound_type {
   SOUND_HIT,
   SOUND_0F,
 
-  SOUND_SONG_METAKING,
+  SOUND_SONG_REMADE,
   MAX_SOUND,
 };
 

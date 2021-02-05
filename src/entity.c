@@ -253,6 +253,6 @@ void entity_render_highlight(Entity* e) {
   );
 }
 
-void entity_render_highlight_color(Entity* e, float r, float g, float b) {
-  render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, r, g, b, 1.0f, 0, 1);
+void entity_render_highlight_color(Entity* e, float r, float g, float b, float a) {
+  render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, r, g, b, a, 0, 2.0f / (e->w));
 }

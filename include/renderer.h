@@ -33,6 +33,8 @@ extern u32 tile_shader;
 
 void renderer_init();
 
+void renderer_on_update_framebuffer();
+
 void render_texture_region(struct Texture texture, i32 x, i32 y, float z, i32 w, i32 h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range);
 
 void render_tinted_sprite(i32 spritesheet_id, i32 sprite_id, i32 x, i32 y, float z, i32 w, i32 h, v4 tint);

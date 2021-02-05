@@ -4,7 +4,7 @@
 #define _CONFIG_H
 
 #define MASTER_VOLUME 1.0f
-#define MUSIC_VOLUME  0.0f
+#define MUSIC_VOLUME  0.5f
 #define SFX_VOLUME    0.5f
 #define UI_VOLUME     0.4f
 

@@ -7,12 +7,22 @@
 #include "level.h"
 #include "editor.h"
 
+#define UI_TEXT_BUFF_SIZE (256)
+char ui_text[UI_TEXT_BUFF_SIZE] = {0};
+
 struct {
   u32 tile_type;
   u32 entity_type;
+  struct Entity copy;
+  i32 has_copy;
+  struct Entity* target;
+  i32 has_target;
 } editor = {
   .tile_type = 0,
   .entity_type = 0,
+  .has_copy = 0,
+  .target = NULL,
+  .has_target = 0,
 };
 
 static Tile placable_tiles[] = {
@@ -107,7 +117,10 @@ void add_random_attack(Entity* e, const Arg* arg) {
 }
 
 void editor_update(struct Game_state* game) {
+  ui_focus(UI_EDITOR);
+  struct UI_element* e = NULL;
   Level* level = &game->level;
+
   i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
   i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
   tilemap_render_tile_highlight(&level->tile_map, x_tile, y_tile);
@@ -147,18 +160,11 @@ void editor_update(struct Game_state* game) {
       }
     }
   }
-
-  if (key_pressed[GLFW_KEY_R]) {
-    game_restart();
-  }
-  if (key_pressed[GLFW_KEY_N]) {
-    level_store(level, level->index);
-  }
-  if (key_pressed[GLFW_KEY_V]) {
-    game_load_level(level->index - 1);
-  }
-  if (key_pressed[GLFW_KEY_B]) {
-    game_load_level(level->index + 1);
+  if (right_mouse_pressed && !ui.is_interacting) {
+    if (editor.has_target && editor.target) {
+      editor.has_target = 0;
+      editor.target = NULL;
+    }
   }
 
   if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
@@ -184,6 +190,25 @@ void editor_update(struct Game_state* game) {
     }
   }
 
+  if (key_pressed[GLFW_KEY_V]) {
+    if (editor.has_copy) {
+      Entity* e = game_add_empty_entity();
+      if (e) {
+        i16 id = e->id;
+        *e = editor.copy;
+        e->id = id;
+        i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+        i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+        e->x = x_tile * TILE_SIZE;
+        e->y = y_tile * TILE_SIZE;
+        game_send_message("Pasted entity (%i)", e->id);
+      }
+      else {
+        game_send_message("Failed to paste entity");
+      }
+    }
+  }
+
   for (u32 i = 0; i < level->entity_count; i++) {
     Entity* e = &level->entities[i];
     if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
@@ -192,48 +217,62 @@ void editor_update(struct Game_state* game) {
         camera.target = e;
         camera.has_target = 1;
       }
+      if (right_mouse_pressed) {
+        editor.target = e;
+        editor.has_target = 1;
+      }
       if (key_pressed[GLFW_KEY_X]) {
+        editor.copy = *e;
+        editor.has_copy = 1;
+        game_send_message("Cut entity (%i)", editor.copy.id);
+        if (editor.target == e && editor.has_target) {
+          editor.target = NULL;
+          editor.has_target = 0;
+        }
         game_entity_remove(e);
         audio_play_once(SOUND_HIT, UI_VOLUME);
       }
+      if (key_pressed[GLFW_KEY_C]) {
+        editor.copy = *e;
+        editor.has_copy = 1;
+        game_send_message("Copied entity (%i)", editor.copy.id);
+      }
+    }
+    if (editor.target == e && editor.has_target) {
+      entity_render_highlight_color(e, 0.4f, 0.9f, 1.0f, 0.7f + 0.3f * sin(game->total_time * 10.0f));
     }
   }
-}
 
-#define UI_TEXT_BUFF_SIZE (256)
-char ui_text[UI_TEXT_BUFF_SIZE] = {0};
-
-void editor_render(struct Game_state* game) {
-  ui_focus(UI_EDITOR);
-  struct UI_element* e = NULL;
-  Level* level = &game->level;
-
-  if (ui_do_button(UI_ID, VW(2), window.height - VW(1) - (16 * 3), 16 * 12, 16 * 3, "Reload [r]", 24, &e)) {
+  if (ui_do_button(UI_ID, VW(2), window.height - (16 * 4), 16 * 12, 16 * 3, "Reload [r]", 24, &e) || key_pressed[GLFW_KEY_R]) {
     game_restart();
+    game_send_message("Loaded level %i", level->index);
   }
   UI_INIT(e,
     e->background_color = COLOR_WARN;
     e->border = 0;
   );
 
-  if (ui_do_button(UI_ID, VW(2), window.height - VW(1) - (16 * 7), 16 * 12, 16 * 3, "Save [n]", 24, &e)) {
+  if (ui_do_button(UI_ID, VW(2), window.height - (16 * 8), 16 * 12, 16 * 3, "Save [m]", 24, &e) || key_pressed[GLFW_KEY_M]) {
     level_store(level, level->index);
+    game_send_message("Level %i saved!", level->index);
   }
   UI_INIT(e,
     e->background_color = COLOR_ACCEPT;
     e->border = 0;
   );
 
-  if (ui_do_button(UI_ID, VW(2), window.height - VW(1) - (16 * 13), 16 * 11, 16 * 2, "Prev level [v]", 15, &e)) {
+  if (ui_do_button(UI_ID, VW(2), window.height - (16 * 14), 16 * 11, 16 * 2, "Prev level [b]", 15, &e) || key_pressed[GLFW_KEY_B]) {
     game_load_level(level->index - 1);
+    game_send_message("Loaded level %i", level->index);
   }
   UI_INIT(e,
     e->background_color = COLOR_OK;
     e->border = 0;
   );
 
-  if (ui_do_button(UI_ID, VW(2), window.height - VW(1) - (16 * 10), 16 * 11, 16 * 2, "Next level [b]", 15, &e)) {
+  if (ui_do_button(UI_ID, VW(2), window.height - (16 * 11), 16 * 11, 16 * 2, "Next level [n]", 15, &e) || key_pressed[GLFW_KEY_N]) {
     game_load_level(level->index + 1);
+    game_send_message("Loaded level %i", level->index);
   }
   UI_INIT(e,
     e->background_color = COLOR_OK;
@@ -241,6 +280,33 @@ void editor_render(struct Game_state* game) {
   );
 
 {
+  snprintf(
+    ui_text,
+    UI_TEXT_BUFF_SIZE,
+    "camera x: %i, y: %i\n"
+    "window size: %ix%i\n"
+    "time: %.3f\n"
+    "time scale: %i %%\n"
+    "fps: %i\n"
+    "entity count: %i/%i\n"
+    "master volume: %.2f\n"
+    "active sounds: %i/%i\n"
+    "level: %i\n"
+    ,
+    (i32)camera.x, (i32)camera.y,
+    window.width, window.height,
+    game_state.time,
+    (i32)(100 * game_state.time_scale),
+    (i32)(1.0f / game_state.delta_time),
+    game_state.level.entity_count, MAX_ENTITY,
+    audio_engine.master_volume,
+    audio_engine.sound_count, MAX_ACTIVE_SOUNDS,
+    level->index
+  );
+  ui_do_text(UI_ID, window.width - (VW(2) + (16 * 14)), window.height - (16 * 15), 16 * 15, 16 * 14, ui_text, 12, NULL);
+}
+{
+  char ui_text[UI_TEXT_BUFF_SIZE] = {0};
   i32 x = 10;
   i32 y = 10;
   i32 w = TILE_SIZE;
@@ -259,7 +325,6 @@ void editor_render(struct Game_state* game) {
   render_simple_text(textures[TEXTURE_FONT], x + w + 5, y, 0.9f, 500, 600, 12, 0.7f, 0.7f, 5.0f, ui_text, UI_TEXT_BUFF_SIZE);
 }
 
-  // render_sprite(SHEET_TILES, editor.tile_type, window.mouse_x - (TILE_SIZE / 2), window.mouse_y - (TILE_SIZE / 2), 1.0f, TILE_SIZE, TILE_SIZE);
 {
   i32 w = TILE_SIZE >> 1;
   i32 h = w;
@@ -272,6 +337,7 @@ void editor_render(struct Game_state* game) {
   render_texture_region(sheet.texture, x, y, 0.9f, w, h, 0, x_offset, y_offset, sheet.w, sheet.h);
 }
 {
+  char ui_text[UI_TEXT_BUFF_SIZE] = {0};
   i32 x = 10;
   i32 y = 10 + 10 + (1 * TILE_SIZE);
   i32 w = TILE_SIZE;
@@ -297,43 +363,5 @@ void editor_render(struct Game_state* game) {
   );
   render_simple_text(textures[TEXTURE_FONT], x + w + 5, y, 0.9f, 500, 600, 12, 0.7f, 0.7f, 5.0f, ui_text, UI_TEXT_BUFF_SIZE);
 }
-
-  i32 w = 230;
-  i32 h = 200;
-  snprintf(
-    ui_text,
-    UI_TEXT_BUFF_SIZE,
-    "camera x: %i, y: %i\n"
-    "window size: %ix%i\n"
-    "time: %.3f\n"
-    "time scale: %i %%\n"
-    "fps: %i\n"
-    "entity count: %i/%i\n"
-    "master volume: %.2f\n"
-    "active sounds: %i/%i\n"
-    "level: %i\n"
-    ,
-    (i32)camera.x, (i32)camera.y,
-    window.width, window.height,
-    game_state.time,
-    (i32)(100 * game_state.time_scale),
-    (i32)(1.0f / game_state.delta_time),
-    game_state.level.entity_count, MAX_ENTITY,
-    audio_engine.master_volume,
-    audio_engine.sound_count, MAX_ACTIVE_SOUNDS,
-    level->index
-  );
-  render_simple_text(textures[TEXTURE_FONT],
-    VW(1), h - (2 * 16), // x, y
-    0.9f, // z
-    w,   // Width
-    h, // Height
-    12, // Font size
-    0.7f, // Font kerning
-    0.7f, // Line spacing
-    12.0f, // Margin
-    ui_text,
-    UI_TEXT_BUFF_SIZE
-  );
+  tilemap_render_boundary();
 }
-

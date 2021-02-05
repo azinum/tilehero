@@ -10,7 +10,7 @@
 #define ELEMENT_TEXT_BUFFER_SIZE (256)
 #define PIXEL_TO_GRID(PX, GRID_SIZE) (i32)(PX / GRID_SIZE)
 
-#define UI_PLAY_CLICK_SOUND() audio_play_once(SOUND_0F, 0.2f)
+#define UI_PLAY_CLICK_SOUND() audio_play_once(SOUND_0F, UI_VOLUME)
 
 static i32 x_delta = 0;
 static i32 y_delta = 0;

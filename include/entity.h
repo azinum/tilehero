@@ -75,6 +75,6 @@ void entity_render(Entity* e);
 
 void entity_render_highlight(Entity* e);
 
-void entity_render_highlight_color(Entity* e, float r, float g, float b);
+void entity_render_highlight_color(Entity* e, float r, float g, float b, float a);
 
 #endif

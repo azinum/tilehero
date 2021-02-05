@@ -1,1 +1,4 @@
 - Implement tiled sprite rendering
+- Camera zooming
+- Embedding shaders in code
+- Configuration files

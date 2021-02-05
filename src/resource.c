@@ -24,7 +24,7 @@ static const char* sound_filenames[] = {
   "hit",
   "0F",
 
-  "metaking",
+  "remade",
 };
 
 static const char* spritesheet_filenames[] = {

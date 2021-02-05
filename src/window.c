@@ -66,7 +66,6 @@ i32 window_open(i32 width, i32 height, u8 fullscreen, const char* title, callbac
   }
   glfwMakeContextCurrent(window.window);
   glfwSetFramebufferSizeCallback(window.window, framebuffer_size_callback);
-  // glfwSetInputMode(window.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   i32 glew_err = glewInit();
   if (glew_err != GLEW_OK) {

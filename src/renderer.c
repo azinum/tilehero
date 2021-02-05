@@ -150,12 +150,16 @@ void renderer_init() {
   init_quad_data();
   model = MAT4(1.0f);
   view = MAT4(1.0f);
-  projection = orthographic(0, window.width, window.height, 0, -1, 1);
+  renderer_on_update_framebuffer();
   load_texture_shader(&texture_program, "resource/shader/texture");
   rect_shader = shader_compile("resource/shader/rect");
   filled_rect_shader = shader_compile("resource/shader/filled_rect");
   text_shader = shader_compile("resource/shader/text");
   tile_shader = shader_compile("resource/shader/tile");
+}
+
+void renderer_on_update_framebuffer() {
+  projection = orthographic(0, window.width, window.height, 0, -1, 1);
 }
 
 void render_texture_region(struct Texture texture, i32 x, i32 y, float z, i32 w, i32 h, float angle, i32 x_offset, i32 y_offset, i32 x_range, i32 y_range) {
