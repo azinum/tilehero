@@ -116,132 +116,11 @@ void add_random_attack(Entity* e, const Arg* arg) {
   e->attack += rand() % arg->i;
 }
 
+// NOTE(lucas): Make sure this function is split up into: ui code (should be first), rendering only code and other (keyboard input e.t.c.).
 void editor_update(struct Game_state* game) {
   ui_focus(UI_EDITOR);
   struct UI_element* e = NULL;
   Level* level = &game->level;
-
-  i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
-  i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-  tilemap_render_tile_highlight(&level->tile_map, x_tile, y_tile);
-
-  if (key_pressed[GLFW_KEY_E]) {
-    editor.tile_type = (editor.tile_type + 1) % ARR_SIZE(placable_tiles);
-  }
-  if (key_pressed[GLFW_KEY_1]) {
-    game_state.time_scale -= 0.05f;
-    if (game_state.time_scale <= TIME_SCALING_MIN)
-      game_state.time_scale = TIME_SCALING_MIN;
-  }
-  if (key_pressed[GLFW_KEY_2]) {
-    game_state.time_scale += 0.05f;
-    if (game_state.time_scale >= TIME_SCALING_MAX)
-      game_state.time_scale = TIME_SCALING_MAX;
-  }
-  if (key_pressed[GLFW_KEY_3]) {
-    game_state.time_scale = 1;
-  }
-
-  if (key_pressed[GLFW_KEY_9]) {
-    level->entity_count = 0;
-    tilemap_init(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
-  }
-  if (key_pressed[GLFW_KEY_8]) {
-    tilemap_init_tile(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y, placable_tiles[editor.tile_type]);
-  }
-
-  if (left_mouse_down && !ui.is_interacting) {
-    Tile* tile = tilemap_get_tile(&level->tile_map, x_tile, y_tile);
-    if (tile) {
-      Tile new_tile = placable_tiles[editor.tile_type];
-      *tile = new_tile;
-      if (left_mouse_pressed) {
-        audio_play_once(SOUND_0F, UI_VOLUME);
-      }
-    }
-  }
-  if (right_mouse_pressed && !ui.is_interacting) {
-    if (editor.has_target && editor.target) {
-      editor.has_target = 0;
-      editor.target = NULL;
-    }
-  }
-
-  if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
-    editor.entity_type--;
-  }
-  if (key_pressed[GLFW_KEY_5] && editor.entity_type < (MAX_PLACABLE_ENTITY - 1)) {
-    editor.entity_type++;
-  }
-
-  if (key_pressed[GLFW_KEY_Z]) {
-    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
-    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-    struct Entity_type_def entity = placable_entities[editor.entity_type];
-    Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, entity.x_dir, entity.y_dir, entity.health, entity.max_health, entity.attack);
-    if (e) {
-      e->sprite_id = entity.sprite_id;
-      e->type = entity.type;
-      e->e_flags = entity.e_flags;
-      if (entity.func) {
-        entity.func(e, &entity.arg);
-      }
-      audio_play_once(SOUND_0F, UI_VOLUME);
-    }
-  }
-
-  if (key_pressed[GLFW_KEY_V]) {
-    if (editor.has_copy) {
-      Entity* e = game_add_empty_entity();
-      if (e) {
-        i16 id = e->id;
-        *e = editor.copy;
-        e->id = id;
-        i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
-        i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-        e->x = x_tile * TILE_SIZE;
-        e->y = y_tile * TILE_SIZE;
-        game_send_message("Pasted entity (%i)", e->id);
-      }
-      else {
-        game_send_message("Failed to paste entity");
-      }
-    }
-  }
-
-  for (u32 i = 0; i < level->entity_count; i++) {
-    Entity* e = &level->entities[i];
-    if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
-      entity_render_highlight(e);
-      if (key_pressed[GLFW_KEY_F]) {
-        camera.target = e;
-        camera.has_target = 1;
-      }
-      if (right_mouse_pressed) {
-        editor.target = e;
-        editor.has_target = 1;
-      }
-      if (key_pressed[GLFW_KEY_X]) {
-        editor.copy = *e;
-        editor.has_copy = 1;
-        game_send_message("Cut entity (%i)", editor.copy.id);
-        if (editor.target == e && editor.has_target) {
-          editor.target = NULL;
-          editor.has_target = 0;
-        }
-        game_entity_remove(e);
-        audio_play_once(SOUND_HIT, UI_VOLUME);
-      }
-      if (key_pressed[GLFW_KEY_C]) {
-        editor.copy = *e;
-        editor.has_copy = 1;
-        game_send_message("Copied entity (%i)", editor.copy.id);
-      }
-    }
-    if (editor.target == e && editor.has_target) {
-      entity_render_highlight_color(e, 0.4f, 0.9f, 1.0f, 0.7f + 0.3f * sin(game->total_time * 10.0f));
-    }
-  }
 
   if (ui_do_button(UI_ID, VW(2), window.height - (16 * 4), 16 * 12, 16 * 3, "Reload [r]", 24, &e) || key_pressed[GLFW_KEY_R]) {
     game_restart();
@@ -278,7 +157,6 @@ void editor_update(struct Game_state* game) {
     e->background_color = COLOR_OK;
     e->border = 0;
   );
-
 {
   snprintf(
     ui_text,
@@ -305,6 +183,61 @@ void editor_update(struct Game_state* game) {
   );
   ui_do_text(UI_ID, window.width - (VW(2) + (16 * 14)), window.height - (16 * 15), 16 * 15, 16 * 14, ui_text, 12, NULL);
 }
+
+  i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+  i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+  tilemap_render_tile_highlight(&level->tile_map, x_tile, y_tile);
+
+  if (left_mouse_down && !ui.is_interacting) {
+    Tile* tile = tilemap_get_tile(&level->tile_map, x_tile, y_tile);
+    if (tile) {
+      Tile new_tile = placable_tiles[editor.tile_type];
+      *tile = new_tile;
+      if (left_mouse_pressed) {
+        audio_play_once(SOUND_0F, UI_VOLUME);
+      }
+    }
+  }
+  if (right_mouse_pressed && !ui.is_interacting) {
+    if (editor.has_target && editor.target) {
+      editor.has_target = 0;
+      editor.target = NULL;
+    }
+  }
+
+  for (u32 i = 0; i < level->entity_count; i++) {
+    Entity* e = &level->entities[i];
+    if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
+      entity_render_highlight(e);
+      if (key_pressed[GLFW_KEY_F]) {
+        camera.target = e;
+        camera.has_target = 1;
+      }
+      if (right_mouse_pressed) {
+        editor.target = e;
+        editor.has_target = 1;
+      }
+      if (key_pressed[GLFW_KEY_X]) {
+        editor.copy = *e;
+        editor.has_copy = 1;
+        game_send_message("Cut entity (%i)", editor.copy.id);
+        if (editor.target == e && editor.has_target) {
+          editor.target = NULL;
+          editor.has_target = 0;
+        }
+        game_entity_remove(e);
+        audio_play_once(SOUND_HIT, UI_VOLUME);
+      }
+      if (key_pressed[GLFW_KEY_C]) {
+        editor.copy = *e;
+        editor.has_copy = 1;
+        game_send_message("Copied entity (%i)", editor.copy.id);
+      }
+    }
+    if (editor.target == e && editor.has_target) {
+      entity_render_highlight_color(e, 0.4f, 0.9f, 1.0f, 0.7f + 0.3f * sin(game->total_time * 10.0f));
+    }
+  }
 {
   char ui_text[UI_TEXT_BUFF_SIZE] = {0};
   i32 x = 10;
@@ -363,5 +296,74 @@ void editor_update(struct Game_state* game) {
   );
   render_simple_text(textures[TEXTURE_FONT], x + w + 5, y, 0.9f, 500, 600, 12, 0.7f, 0.7f, 5.0f, ui_text, UI_TEXT_BUFF_SIZE);
 }
+  if (key_pressed[GLFW_KEY_E]) {
+    editor.tile_type = (editor.tile_type + 1) % ARR_SIZE(placable_tiles);
+  }
+  if (key_pressed[GLFW_KEY_1]) {
+    game_state.time_scale -= 0.05f;
+    if (game_state.time_scale <= TIME_SCALING_MIN)
+      game_state.time_scale = TIME_SCALING_MIN;
+  }
+  if (key_pressed[GLFW_KEY_2]) {
+    game_state.time_scale += 0.05f;
+    if (game_state.time_scale >= TIME_SCALING_MAX)
+      game_state.time_scale = TIME_SCALING_MAX;
+  }
+  if (key_pressed[GLFW_KEY_3]) {
+    game_state.time_scale = 1;
+  }
+
+  if (key_pressed[GLFW_KEY_9]) {
+    level->entity_count = 0;
+    tilemap_init(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
+  }
+  if (key_pressed[GLFW_KEY_8]) {
+    tilemap_init_tile(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y, placable_tiles[editor.tile_type]);
+  }
+
+  if (key_pressed[GLFW_KEY_4] && editor.entity_type > 0) {
+    editor.entity_type--;
+  }
+  if (key_pressed[GLFW_KEY_5] && editor.entity_type < (MAX_PLACABLE_ENTITY - 1)) {
+    editor.entity_type++;
+  }
+
+  if (key_pressed[GLFW_KEY_Z]) {
+    i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+    i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+    struct Entity_type_def entity = placable_entities[editor.entity_type];
+    Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, entity.x_dir, entity.y_dir, entity.health, entity.max_health, entity.attack);
+    if (e) {
+      e->sprite_id = entity.sprite_id;
+      e->type = entity.type;
+      e->e_flags = entity.e_flags;
+      if (entity.func) {
+        entity.func(e, &entity.arg);
+      }
+      audio_play_once(SOUND_0F, UI_VOLUME);
+    }
+  }
+
+  if (key_pressed[GLFW_KEY_V]) {
+    if (editor.has_copy) {
+      Entity* e = game_add_empty_entity();
+      if (e) {
+        i16 id = e->id;
+        *e = editor.copy;
+        e->id = id;
+        i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
+        i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
+        e->x = x_tile * TILE_SIZE;
+        e->y = y_tile * TILE_SIZE;
+        e->x_tile = x_tile;
+        e->y_tile = y_tile;
+        game_send_message("Pasted entity (%i)", e->id);
+      }
+      else {
+        game_send_message("Failed to paste entity");
+      }
+    }
+  }
+
   tilemap_render_boundary();
 }

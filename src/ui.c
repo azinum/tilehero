@@ -56,7 +56,7 @@ void ui_button_init(struct UI_element* e) {
 void ui_interaction(struct UI_element* e) {
   if (mouse_over(window.mouse_x, window.mouse_y, e->x, e->y, e->w, e->h)) {
     e->hover = 1;
-    ui.is_interacting = 1;  // TODO(lucas): Temporary?
+    ui.is_interacting = 1;
   }
   else {
     e->hover = 0;
@@ -97,6 +97,9 @@ void ui_interaction(struct UI_element* e) {
     e->y = e->grid_size * PIXEL_TO_GRID(e->y, e->grid_size);
     e->w = e->grid_size * PIXEL_TO_GRID(e->w, e->grid_size);
     e->h = e->grid_size * PIXEL_TO_GRID(e->h, e->grid_size);
+  }
+  if (e->pressed || e->pressed_down) {
+    ui.is_interacting = 1;
   }
   if (e->pressed) {
     switch (e->type) {

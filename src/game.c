@@ -227,11 +227,11 @@ void game_run() {
 
       tilemap_render(&game->level.tile_map);
     }
-    ui_update();
-    ui_render();
+
     messages_update();
     messages_render();
-
+    ui_update();
+    ui_render();
     if (is_fading)
       fade_out();
     window_swapbuffers();
