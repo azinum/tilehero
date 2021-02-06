@@ -52,6 +52,8 @@ void player_controller() {
     game->should_move = 1;
     if (player.stunned) {
       player.stunned--;
+      input.x_dir = 0;
+      input.y_dir = 0;
     }
     else {
       move_time = game->time + INTERVAL;

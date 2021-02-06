@@ -13,17 +13,17 @@
 #include "player.h"
 #include "game.h"
 
-#define MAX_DELTA_TIME (0.2f)
+#define MAX_DELTA_TIME (0.3f)
 
-#define FADE_SPEED 2.0f
+#define FADE_SPEED 2.5f
 
 Game_state game_state;
 
 #define MESSAGE_LENGTH 64
 #define MAX_MESSAGE 12
-#define MESSAGE_TIME 1.0f // How fast we empty the message queue
+#define MESSAGE_TIME 2.0f // How fast we empty the message queue
 
-static char messages[MAX_MESSAGE][MESSAGE_LENGTH] = {};
+static char messages[MAX_MESSAGE][MESSAGE_LENGTH] = {0};
 static i32 message_count = 0;
 static float last_message_time = 0.0f;
 static float fade_value;
@@ -99,13 +99,15 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
   return e;
 }
 
-void game_load_level(i32 index) {
+i32 game_load_level(i32 index) {
   if (index >= 0) {
     game_fade_from_black();
     move_count = 0;
     camera.target = NULL;
     level_load(&game_state.level, index);
+    return NO_ERR;
   }
+  return ERR;
 }
 
 void game_fade_to_black() {
@@ -294,6 +296,7 @@ void game_hud_render() {
 
   if (ui_do_button(UI_ID, VW(2), 16, 16 * 12, 16 * 3, "Restart", 24, &e)) {
     game_restart();
+    game_send_message("Loaded level %i", game->level.index);
   }
   UI_INIT(e,
     e->background_color = COLOR_WARN;
@@ -302,6 +305,7 @@ void game_hud_render() {
 
   if (ui_do_button(UI_ID, VW(2), 16 * 5, 16 * 12, 16 * 3, "Next level", 24, &e)) {
     game_load_level(game->level.index + 1);
+    game_send_message("Loaded level %i", game->level.index);
   }
   UI_INIT(e,
     e->background_color = COLOR_OK;
@@ -309,7 +313,10 @@ void game_hud_render() {
   );
 
   if (ui_do_button(UI_ID, VW(2), 16 * 9, 16 * 12, 16 * 3, "Prev level", 24, &e)) {
-    game_load_level(game->level.index - 1);
+    i32 result = game_load_level(game->level.index - 1);
+    if (result == NO_ERR) {
+      game_send_message("Loaded level %i", game->level.index);
+    }
   }
   UI_INIT(e,
     e->background_color = COLOR_ACCEPT;
@@ -331,8 +338,8 @@ void messages_update() {
 }
 
 void messages_render() {
-  i32 text_size = 12;
-  i32 x_pos = (window.width >> 1) - (text_size >> 1);
+  i32 text_size = 14;
+  i32 x_pos = (window.width >> 1);
   i32 y_pos = 16;
   for (i32 i = 0; i < message_count; i++) {
     char* message = (char*)&messages[i];

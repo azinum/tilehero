@@ -23,6 +23,8 @@ static const char* sound_filenames[] = {
   "good_morning",
   "hit",
   "0F",
+  "hurt",
+  "button",
 
   "remade",
 };

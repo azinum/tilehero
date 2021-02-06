@@ -89,19 +89,21 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
         if (target->type == ENTITY_TYPE_SILVER_KEY) {
           if (e->type == ENTITY_TYPE_NPC) {
             target->state = STATE_DEAD;
-          }
-          else {
-            target->x_dir = e->x_dir;
-            target->y_dir = e->y_dir;
-            entity_tiled_move(target);
-            target->x_dir = 0;
-            target->y_dir = 0;
-            entity_tiled_move(e);
-            e->x_dir = 0;
-            e->y_dir = 0;
+            game_send_message(M_SILVER_KEY_DESTROYED);
           }
         }
+        if (target->e_flags & ENTITY_FLAG_PUSHABLE) {
+          target->x_dir = e->x_dir;
+          target->y_dir = e->y_dir;
+          entity_tiled_move(target);
+          target->x_dir = 0;
+          target->y_dir = 0;
+          entity_tiled_move(e);
+          e->x_dir = 0;
+          e->y_dir = 0;
+        }
         if (target->type == ENTITY_TYPE_FLAG && e->type == ENTITY_TYPE_PLAYER) {
+          game_send_message("Level %i complete!", level->index);
           game_load_level(level->index + 1);
           return;
         }
@@ -118,22 +120,21 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
           target->state = STATE_DEAD;
         }
         if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY) && !(e->type == ENTITY_TYPE_PLAYER && target->type == ENTITY_TYPE_PLAYER) && !(e->type == target->type)) {
-#if 1
           target->health -= e->attack;
           if (target->health <= 0) {
             target->health = 0;
             target->state = STATE_DEAD;
             e->xp += target->max_health * 4;
-            audio_play_once(SOUND_HIT, 0.5f);
+            audio_play_once(SOUND_HIT, SFX_VOLUME);
             if (target->type == ENTITY_TYPE_PLAYER) {
+              game_send_message(M_DIED);
               game_restart();
               return;
             }
           }
           else {
-            audio_play_once(SOUND_GOOD_MORNING, 0.5f);
+            audio_play_once(SOUND_HURT, SFX_VOLUME);
           }
-#endif
         }
       }
       else { // We hit a non-walkable tile!
@@ -145,12 +146,24 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
             }
             break;
           }
-
           case ENTITY_TYPE_SILVER_KEY: {
             if (tile->type == TILE_SILVER_DOOR) {
               tile->type = 0;
               tile->walkable = 1;
               e->state = STATE_DEAD;
+            }
+            break;
+          }
+          case ENTITY_TYPE_PUSHER: {
+            i8 x_dir = move->x_tile - e->x_tile;
+            i8 y_dir = move->y_tile - e->y_tile;
+            Tile* current = tilemap_get_tile(&level->tile_map, move->x_tile, move->y_tile);
+            Tile* next = tilemap_get_tile(&level->tile_map, move->x_tile + x_dir, move->y_tile + y_dir);
+            Tile* prev = tilemap_get_tile(&level->tile_map, move->x_tile - x_dir, move->y_tile - y_dir);
+            if (current && next && prev) {
+              Tile tmp = *current;
+              *current = *prev;
+              *next = tmp;
             }
             break;
           }
@@ -171,7 +184,8 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
             e->y_dir = 0;
           }
           if (e->type == ENTITY_TYPE_PLAYER) {
-            player.stunned = 1; // Player is stunned for 1 move
+            // player.stunned++;
+            // game_send_message("You have been stunned for %i moves(s)", player.stunned);
           }
           break;
         }
@@ -190,7 +204,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
             *t = *b;
             *b = t_tmp;
           }
-          audio_play_once(SOUND_RANDOM_1, 0.3f);
+          audio_play_once(SOUND_RANDOM_1, SFX_VOLUME);
           break;
         }
       }

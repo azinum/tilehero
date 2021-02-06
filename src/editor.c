@@ -81,6 +81,7 @@ enum Placable_entity_type {
   ENTITY_VOID_WALKER,
   ENTITY_FLAG,
   ENTITY_SILVER_KEY,
+  ENTITY_PUSHER,
 
   MAX_PLACABLE_ENTITY,
 };
@@ -95,7 +96,8 @@ static struct Entity_type_def placable_entities[MAX_PLACABLE_ENTITY] = {
   {1, 0, ENTITY_FLAG_FRIENDLY    | ENTITY_FLAG_MOVABLE, 0, SPRITE_WIZARD, 2, 2, 1, NULL, {}},
   {1, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, 0, SPRITE_VOID_WALKER, 36, 36, 3, add_random_attack, {.i = 5}},
   {0, 0, ENTITY_FLAG_MOVABLE     | ENTITY_FLAG_FLY, ENTITY_TYPE_FLAG, SPRITE_FLAG, 2, 2, 0, NULL, {}},
-  {0, 0, ENTITY_FLAG_FRIENDLY    | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_SILVER_KEY, SPRITE_SILVER_KEY, 1, 1, 0, NULL, {}},
+  {0, 0, ENTITY_FLAG_FRIENDLY    | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PUSHABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_SILVER_KEY, SPRITE_SILVER_KEY, 1, 1, 0, NULL, {}},
+  {0, 0, ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PUSHABLE, ENTITY_TYPE_PUSHER, SPRITE_PUSHER, 10, 10, 0, NULL, {}},
 };
 
 static const char* placable_entity_names[MAX_PLACABLE_ENTITY] = {
@@ -106,6 +108,7 @@ static const char* placable_entity_names[MAX_PLACABLE_ENTITY] = {
   "Void Walker",
   "Red Flag",
   "Silver Key",
+  "Pusher",
 };
 
 void add_random_health(Entity* e, const Arg* arg) {
