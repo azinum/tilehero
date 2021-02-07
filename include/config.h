@@ -4,9 +4,9 @@
 #define _CONFIG_H
 
 #define MASTER_VOLUME 1.0f
-#define MUSIC_VOLUME  0.5f
-#define SFX_VOLUME    0.5f
-#define UI_VOLUME     0.4f
+#define MUSIC_VOLUME  0.8f
+#define SFX_VOLUME    1.0f
+#define UI_VOLUME     0.6f
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 960

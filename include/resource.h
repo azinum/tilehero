@@ -20,6 +20,7 @@ enum Sound_type {
   SOUND_0F,
   SOUND_HURT,
   SOUND_BUTTON,
+  SOUND_CRUNCH,
 
   SOUND_SONG_REMADE,
   MAX_SOUND,

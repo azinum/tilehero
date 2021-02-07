@@ -40,6 +40,7 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
 void entity_tiled_move(struct Entity* e) {
   if (move_count >= MAX_MOVES) {
     fprintf(stderr, "Move count limit reached!\n");
+    game_send_message("[ERROR]: MOVE COUNT LIMIT REACHED!");
     return;
   }
   if (!e->x_dir && !e->y_dir)
@@ -71,6 +72,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
       }
     }
 
+    i32 can_move_after = 0;
     Tile* tile = tilemap_get_tile(&level->tile_map, move->x_tile, move->y_tile);
 
     if (!tile) {  // Outside the map
@@ -98,9 +100,10 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
           entity_tiled_move(target);
           target->x_dir = 0;
           target->y_dir = 0;
-          entity_tiled_move(e);
-          e->x_dir = 0;
-          e->y_dir = 0;
+          can_move_after = 1;
+          // entity_tiled_move(e);
+          // e->x_dir = 0;
+          // e->y_dir = 0;
         }
         if (target->type == ENTITY_TYPE_FLAG && e->type == ENTITY_TYPE_PLAYER) {
           game_send_message("Level %i complete!", level->index);
@@ -164,6 +167,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
               Tile tmp = *current;
               *current = *prev;
               *next = tmp;
+              audio_play_once(SOUND_CRUNCH, SFX_VOLUME * 0.8f);
             }
             break;
           }
@@ -210,6 +214,11 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
       }
     }
     else {
+      e->x_tile = move->x_tile;
+      e->y_tile = move->y_tile;
+    }
+    // Ok, this is pretty funky!
+    if (can_move_after) {
       e->x_tile = move->x_tile;
       e->y_tile = move->y_tile;
     }
