@@ -41,6 +41,7 @@ void ui_element_init(struct UI_element* e, u32 id, i32 x, i32 y, i32 w, i32 h, u
     e->data = *data;
   }
 
+  e->align = ALIGN_LEFT;
   e->movable = 1;
   e->hover = 0;
   e->pressed = 0;
@@ -153,6 +154,13 @@ void ui_init() {
   ui.element_count = 0;
   ui.element_iter = 0;
   ui.is_interacting = 0;
+}
+
+void ui_element_post_init(struct UI_element* e) {
+  assert(e);
+  if (e->align == ALIGN_RIGHT) {
+    e->x -= e->w;
+  }
 }
 
 void ui_focus(u8 id) {

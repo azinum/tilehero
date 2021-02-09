@@ -7,6 +7,7 @@
 #define UI_INIT(ELEM, BODY) { \
   if (ELEM) { \
     BODY \
+    ui_element_post_init(ELEM); \
     ELEM = NULL; \
   } \
 }
@@ -14,6 +15,7 @@
 #define UI_INIT_DEFAULT(ELEM, CALLBACK) { \
   if (ELEM) { \
     CALLBACK(ELEM); \
+    ui_element_post_init(ELEM); \
     ELEM = NULL; \
   } \
 }
@@ -37,6 +39,11 @@ enum Element_type {
   ELEMENT_CHECKBOX,
 };
 
+enum Element_alignment {
+  ALIGN_LEFT = 0, // Default
+  ALIGN_RIGHT,
+};
+
 typedef union Element_data {
   struct {
     u8 toggle_value;
@@ -56,6 +63,7 @@ typedef struct UI_element {
 
   Element_data data;
 
+  u8 align; // Unused
   u8 movable;
   u8 hover;
   u8 pressed;
@@ -76,6 +84,8 @@ struct UI_state {
 extern struct UI_state ui;
 
 void ui_init();
+
+void ui_element_post_init(struct UI_element* e);
 
 void ui_focus(u8 id);
 

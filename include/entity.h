@@ -31,6 +31,9 @@ enum Entity_type {
   ENTITY_TYPE_FLAG,
   ENTITY_TYPE_SILVER_KEY,
   ENTITY_TYPE_PUSHER,
+  ENTITY_TYPE_SILVER_DOOR,
+
+  MAX_ENTITY_TYPE,
 };
 
 struct Tile_move {

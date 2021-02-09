@@ -16,12 +16,12 @@
 #define MAX_DELTA_TIME (0.3f)
 
 #define FADE_SPEED 2.5f
-
-Game_state game_state;
-
 #define MESSAGE_LENGTH 64
 #define MAX_MESSAGE 12
 #define MESSAGE_TIME 2.0f // How fast we empty the message queue
+#define MAX_EVENT 32
+
+Game_state game_state;
 
 static char messages[MAX_MESSAGE][MESSAGE_LENGTH] = {0};
 static i32 message_count = 0;
@@ -29,6 +29,15 @@ static float last_message_time = 0.0f;
 static float fade_value;
 static u8 fade_from_black;
 static u8 is_fading;
+static Event events[MAX_EVENT] = {0};
+static i32 event_count = 0;
+
+static void event_kill(Entity* e, Event_arg arg);
+
+void event_kill(Entity* e, Event_arg arg) {
+  (void)arg;
+  e->state = STATE_DEAD;
+}
 
 static void game_init(Game_state* game);
 static void game_run();
@@ -108,6 +117,10 @@ i32 game_load_level(i32 index) {
     return NO_ERR;
   }
   return ERR;
+}
+
+i32 game_load_level_on_complete(i32 index) {
+  return game_load_level(index);
 }
 
 void game_fade_to_black() {
@@ -197,8 +210,13 @@ void game_run() {
         }
       }
 
-      if (key_pressed[GLFW_KEY_0]) {
+      if (key_pressed[GLFW_KEY_R] || key_pressed[GLFW_KEY_0]) {
         game_restart();
+        game_send_message("Loaded level %i", game->level.index);
+      }
+      if (key_pressed[GLFW_KEY_K]) {
+        game_create_event(ENTITY_TYPE_NPC, 0, event_kill, (Event_arg) {0});
+        game_send_message("You used an almighty force to kill all enemies");
       }
 
       if (key_pressed[GLFW_KEY_ESCAPE]) {
@@ -208,6 +226,7 @@ void game_run() {
       camera_update();
       player_controller();
 
+      u8 did_events = 0;
       for (u32 i = 0; i < game->level.entity_count; i++) {
         Entity* e = &game->level.entities[i];
         if (game->mode == MODE_GAME) {
@@ -218,8 +237,27 @@ void game_run() {
             }
           }
           entity_update(e);
+          if (event_count > 0) {
+            for (i32 event_index = 0; event_index < event_count; event_index++) {
+              Event* event = &events[event_index];
+              if (!event->func) {
+                continue;
+              }
+              if (event->target_type == e->type || event->target_type == EVENT_TARGET_TYPE_ANY) {
+                // Do event only if target flags (a) is a subset of entity flags (b)
+                // (a | b) == b
+                if ((event->target_flags | e->e_flags) == e->e_flags || event->target_flags == 0) {
+                  event->func(e, event->arg);
+                }
+              }
+              did_events = 1;
+            }
+          }
         }
         entity_render(e);
+      }
+      if (did_events) {
+        event_count = 0;
       }
 
       if (game->should_move) {
@@ -294,7 +332,7 @@ void game_hud_render() {
   ui_focus(UI_DEFAULT);
   struct UI_element* e = NULL;
 
-  if (ui_do_button(UI_ID, VW(2), 16, 16 * 12, 16 * 3, "Restart", 24, &e)) {
+  if (ui_do_button(UI_ID, VW(2), 16, 16 * 13, 16 * 3, "Restart [r]", 24, &e)) {
     game_restart();
     game_send_message("Loaded level %i", game->level.index);
   }
@@ -303,31 +341,25 @@ void game_hud_render() {
     e->border = 0;
   );
 
-  if (ui_do_button(UI_ID, VW(2), 16 * 5, 16 * 12, 16 * 3, "Next level", 24, &e)) {
-    game_load_level(game->level.index + 1);
-    game_send_message("Loaded level %i", game->level.index);
-  }
-  UI_INIT(e,
-    e->background_color = COLOR_OK;
-    e->border = 0;
-  );
-
-  if (ui_do_button(UI_ID, VW(2), 16 * 9, 16 * 12, 16 * 3, "Prev level", 24, &e)) {
+  if (ui_do_button(UI_ID, VW(2), 16 * 5, 16 * 13, 16 * 3, "Prev level", 24, &e)) {
     i32 result = game_load_level(game->level.index - 1);
     if (result == NO_ERR) {
       game_send_message("Loaded level %i", game->level.index);
     }
   }
   UI_INIT(e,
-    e->background_color = COLOR_ACCEPT;
+    e->background_color = COLOR_OK;
     e->border = 0;
   );
 
-  audio_engine.muted = !ui_do_checkbox(UI_ID, VW(2), 16 * 13, 32, 32, !audio_engine.muted, NULL, 0, NULL);
-  render_simple_text(textures[TEXTURE_FONT], VW(2) + 16 * 2, 16 * 13, 0.9f, 11 * 16, 3 * 16, 12, 0.7f, 0.7f, 12.0f, "audio on", -1);
-
-  camera.has_target = ui_do_checkbox(UI_ID, VW(2), 16 * 16, 32, 32, camera.has_target, NULL, 0, NULL);
-  render_simple_text(textures[TEXTURE_FONT], VW(2) + 16 * 2, 16 * 16, 0.9f, 11 * 16, 3 * 16, 12, 0.7f, 0.7f, 12.0f, "camera has target", -1);
+  if (ui_do_button(UI_ID, VW(2), 16 * 9, 16 * 13, 16 * 3, "Next level", 24, &e)) {
+    game_load_level(game->level.index + 1);
+    game_send_message("Loaded level %i", game->level.index);
+  }
+  UI_INIT(e,
+    e->background_color = COLOR_ACCEPT;
+    e->border = 0;
+  );
 }
 
 void messages_update() {
@@ -339,8 +371,8 @@ void messages_update() {
 
 void messages_render() {
   i32 text_size = 14;
-  i32 x_pos = (window.width >> 1);
-  i32 y_pos = 16;
+  i32 x_pos = window.width >> 1;
+  i32 y_pos = VW(1);
   for (i32 i = 0; i < message_count; i++) {
     char* message = (char*)&messages[i];
     render_simple_text(textures[TEXTURE_FONT], x_pos, y_pos, 0.9f, text_size * MESSAGE_LENGTH, text_size * 1.5f, text_size, 0.7f, 0.7f, 0.0f /* margin */, message, MESSAGE_LENGTH);
@@ -386,6 +418,20 @@ void game_send_message(char* fmt, ...) {
     message_count++;
   }
   va_end(args);
+}
+
+i32 game_create_event(i32 type, i32 flags, event_func func, Event_arg arg) {
+  Event e = (Event) {
+    .target_type = type,
+    .target_flags = flags,
+    .func = func,
+    .arg = arg,
+  };
+  if (event_count < MAX_EVENT) {
+    events[event_count++] = e;
+    return NO_ERR;
+  }
+  return ERR;
 }
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {

@@ -39,6 +39,26 @@ typedef struct Game_state {
   u8 mode;
 } Game_state;
 
+typedef union Event_arg {
+  i32 i;
+  float f;
+  Entity* entity;
+  void* p;
+} Event_arg;
+
+typedef void (*event_func)(struct Entity*, Event_arg arg);
+
+typedef struct Event {
+  i32 target_type;
+  i32 target_flags;
+  event_func func;
+  Event_arg arg;
+} Event;
+
+enum Event_target_type {
+  EVENT_TARGET_TYPE_ANY = MAX_ENTITY_TYPE,
+};
+
 extern struct Game_state game_state;
 
 void game_entity_remove(struct Entity* e);
@@ -53,11 +73,15 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
 
 i32 game_load_level(i32 index);
 
+i32 game_load_level_on_complete(i32 index);
+
 void game_fade_to_black();
 
 void game_fade_from_black();
 
 void game_send_message(char* fmt, ...);
+
+i32 game_create_event(i32 type, i32 flags, event_func func, Event_arg arg);
 
 i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen);
 

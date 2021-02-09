@@ -12,16 +12,10 @@ typedef struct Level {
   struct Tile_map tile_map;
 } Level;
 
-typedef struct Stats {
-  u32 score;
-  float time_played;
-} Stats;
-
-typedef struct World {
-  Stats stats;
-  Stats stats_old;
-  u32 current_level;
-} World;
+typedef struct Save_state {
+  i32 score;
+  i32 level;
+} Save_state;
 
 void level_init(Level* level);
 

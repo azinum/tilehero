@@ -3,9 +3,9 @@
 #ifndef _EDITOR_H
 #define _EDITOR_H
 
-#define USE_EDITOR 1
-
 struct Game_state;
+
+extern Tile placable_tiles[];
 
 void editor_update(struct Game_state* game);
 

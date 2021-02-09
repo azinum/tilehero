@@ -7,6 +7,7 @@
 #include "resource.h"
 #include "audio.h"
 #include "player.h"
+#include "editor.h"
 #include "entity.h"
 
 #define TEXT_BUFF_SIZE 96
@@ -94,20 +95,27 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
             game_send_message(M_SILVER_KEY_DESTROYED);
           }
         }
+        if (e->type == ENTITY_TYPE_SILVER_KEY && target->type == ENTITY_TYPE_SILVER_DOOR) {
+          e->state = STATE_DEAD;
+          target->state = STATE_DEAD;
+        }
         if (target->e_flags & ENTITY_FLAG_PUSHABLE) {
           target->x_dir = e->x_dir;
           target->y_dir = e->y_dir;
           entity_tiled_move(target);
           target->x_dir = 0;
           target->y_dir = 0;
+#if 1
           can_move_after = 1;
-          // entity_tiled_move(e);
-          // e->x_dir = 0;
-          // e->y_dir = 0;
+#else
+          entity_tiled_move(e);
+          e->x_dir = 0;
+          e->y_dir = 0;
+#endif
         }
         if (target->type == ENTITY_TYPE_FLAG && e->type == ENTITY_TYPE_PLAYER) {
           game_send_message("Level %i complete!", level->index);
-          game_load_level(level->index + 1);
+          game_load_level_on_complete(level->index + 1);
           return;
         }
         if (e->type == ENTITY_TYPE_CONSUMABLE) {
@@ -149,14 +157,6 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
             }
             break;
           }
-          case ENTITY_TYPE_SILVER_KEY: {
-            if (tile->type == TILE_SILVER_DOOR) {
-              tile->type = 0;
-              tile->walkable = 1;
-              e->state = STATE_DEAD;
-            }
-            break;
-          }
           case ENTITY_TYPE_PUSHER: {
             i8 x_dir = move->x_tile - e->x_tile;
             i8 y_dir = move->y_tile - e->y_tile;
@@ -168,6 +168,7 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
               *current = *prev;
               *next = tmp;
               audio_play_once(SOUND_CRUNCH, SFX_VOLUME * 0.8f);
+              e->state = STATE_DEAD;
             }
             break;
           }
@@ -179,12 +180,14 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
       e->y_tile = move->y_tile;
       switch (tile->type) {
         case TILE_DUNGEON: {
+          i8 x_dir = e->x_dir;
+          i8 y_dir = e->y_dir;
           if (abs(e->x_dir) == 1) {
-            e->y_dir = e->x_dir;
+            e->y_dir = x_dir;
             e->x_dir = 0;
           }
           else if (abs(e->y_dir) == 1) {
-            e->x_dir = e->y_dir;
+            e->x_dir = y_dir;
             e->y_dir = 0;
           }
           if (e->type == ENTITY_TYPE_PLAYER) {
@@ -211,13 +214,25 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
           audio_play_once(SOUND_RANDOM_1, SFX_VOLUME);
           break;
         }
+        case TILE_PORTAL: {
+          if (e->type != ENTITY_TYPE_PLAYER) {
+            game_copy_add_entity(*e);
+            audio_play_once(SOUND_BLIP, SFX_VOLUME * 0.4f);
+            i8 x_dir = e->x_dir;
+            i8 y_dir = e->y_dir;
+            e->x_dir = y_dir;
+            e->y_dir = -x_dir;
+            // *tile = placable_tiles[rand() % MAX_TILE];
+          }
+          break;
+        }
       }
     }
     else {
       e->x_tile = move->x_tile;
       e->y_tile = move->y_tile;
     }
-    // Ok, this is pretty funky!
+    // Ok, this is pretty funky! Has bugs as well. TODO(lucas): Fix, and rework the movement system
     if (can_move_after) {
       e->x_tile = move->x_tile;
       e->y_tile = move->y_tile;

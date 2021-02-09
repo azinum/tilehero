@@ -26,6 +26,7 @@ static const char* sound_filenames[] = {
   "hurt",
   "button",
   "crunch",
+  "blip",
 
   "remade",
 };

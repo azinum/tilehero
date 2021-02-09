@@ -20,7 +20,7 @@ enum Tile_type {
   TILE_SWAPPER,
   TILE_GRASS,
   TILE_TREE,
-  TILE_SILVER_DOOR,
+  TILE_PORTAL,
 
   MAX_TILE,
 };
