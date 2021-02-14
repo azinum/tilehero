@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "game.h"
+#include "editor.h" // Probably want to abstract this out; we don't need to couple the editor to the level loader like this.
 #include "level.h"
 
 void level_init(Level* level) {
@@ -12,14 +13,24 @@ void level_init(Level* level) {
   tilemap_init(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
 }
 
-i32 level_store(Level* level, u32 index) {
+i32 level_store(World* world, u32 index) {
   i32 fd = open(WORLD_STORAGE_FILE, O_RDWR | O_CREAT, 0644);
   if (fd < 0) {
     fprintf(stderr, "Failed to open file '%s'\n", WORLD_STORAGE_FILE);
     return -1;
   }
 
+  Level* level = &world->level;
   level->index = index;
+  level->entity_count = 0;
+
+  for (u32 i = 0; i < world->entity_count; i++) {
+    Entity* e = &world->entities[i];
+    Entity_def def;
+    if (entity_to_def(e, &def) == NO_ERR) {
+      level->entities[level->entity_count++] = def;
+    }
+  }
 
   u32 address = sizeof(Level) * index;
   lseek(fd, address, SEEK_SET);
@@ -35,7 +46,7 @@ i32 level_store(Level* level, u32 index) {
   return 0;
 }
 
-i32 level_load(Level* level, u32 index) {
+i32 level_load(World* world, u32 index) {
   i32 fd = open(WORLD_STORAGE_FILE, O_RDWR | O_CREAT, 0644);
   if (fd < 0) {
     fprintf(stderr, "Failed to open file '%s'\n", WORLD_STORAGE_FILE);
@@ -43,7 +54,8 @@ i32 level_load(Level* level, u32 index) {
   }
   u32 address = sizeof(Level) * index;
   lseek(fd, address, SEEK_SET);
-  
+
+  Level* level = &world->level;
   Level level_read = {0};
   level_init(&level_read);
   level_read.index = index;
@@ -60,6 +72,11 @@ i32 level_load(Level* level, u32 index) {
   }
 
   *level = level_read;
+  world->entity_count = 0;
+  for (u32 i = 0; i < level->entity_count; i++) {
+    Entity_def* def = &level->entities[i];
+    editor_place_entity_from_def(def);
+  }
 
   close(fd);
   return 0;

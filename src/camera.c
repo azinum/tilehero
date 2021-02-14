@@ -8,7 +8,7 @@
 #include "camera.h"
 
 #define CAMERA_MOVE_SPEED (600.0f)
-#define CAMERA_TARGET_SPEED (7.0f)
+#define CAMERA_TARGET_SPEED (10.0f)
 #define CAMERA_CENTER_X (camera.x + (window.width >> 1))
 #define CAMERA_CENTER_Y (camera.y + (window.height >> 1))
 

@@ -40,7 +40,6 @@ struct Tile_move {
   i32 x_tile;
   i32 y_tile;
   struct Entity* entity;
-
   u8 can_move_to_tile;
 };
 
@@ -50,16 +49,32 @@ extern struct Tile_move tile_moves[];
 extern u32 move_count;
 extern float move_time; // NOTE(lucas): At which time we are ready to do a move
 
+// NOTE(lucas): Entity for permanent storage
+typedef struct Entity_def {
+  i16 id;
+  i16 x_tile;
+  i16 y_tile;
+  i16 target_id;
+  i16 placable_id;
+} Entity_def;
+
 typedef struct Entity {
-  i32 x_tile, y_tile;
-  float x, y, w, h;
-  v3i world_position;
-  i8 x_dir, y_dir;
+  i16 id;
+  i16 x_tile;
+  i16 y_tile;
+  i16 target_id;
+  i16 placable_id;
+
+  float x;
+  float y;
+  float w;
+  float h;
+  i8 x_dir;
+  i8 y_dir;
   i32 state;
   i32 e_flags;
   i16 type;
   i16 sprite_id;
-  i16 id;
   i16 health;
   i16 max_health;
   i16 attack;
@@ -70,9 +85,11 @@ void entity_init(Entity* e, float x, float y, float w, float h);
 
 void entity_tiled_move(Entity* e);
 
+i32 entity_to_def(Entity* e, struct Entity_def* def);
+
 void entity_do_tiled_move(Entity* entities, i32 entity_count, struct Level* level);
 
-void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h);
+void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile);
 
 void entity_update(Entity* e);
 

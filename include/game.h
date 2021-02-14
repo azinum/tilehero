@@ -28,7 +28,7 @@ enum Game_mode {
 };
 
 typedef struct Game_state {
-  Level level;
+  World world;
   float time;
   float total_time;
   float time_scale;

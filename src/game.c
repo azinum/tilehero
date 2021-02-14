@@ -50,15 +50,15 @@ static void fade_out();
 static void framebuffer_change_callback();
 
 void game_entity_remove(Entity* e) {
-  if (game_state.level.entity_count > 0) {
-    Entity* top = &game_state.level.entities[--game_state.level.entity_count];
+  if (game_state.world.entity_count > 0) {
+    Entity* top = &game_state.world.entities[--game_state.world.entity_count];
     if (e == camera.target) {
       camera.target = NULL;
     }
     if (top == camera.target) {
       camera.target = e;
     }
-    if (game_state.level.entity_count == 0) {
+    if (game_state.world.entity_count == 0) {
       return;
     }
     *e = *top;
@@ -68,11 +68,11 @@ void game_entity_remove(Entity* e) {
 }
 
 Entity* game_copy_add_entity(Entity copy) {
-  Level* level = &game_state.level;
-  if (level->entity_count >= MAX_ENTITY) {
+  World* world = &game_state.world;
+  if (world->entity_count >= MAX_ENTITY) {
     return NULL;
   }
-  Entity* e = &level->entities[level->entity_count++];
+  Entity* e = &world->entities[world->entity_count++];
   *e = copy;
   return e;
 }
@@ -84,12 +84,11 @@ Entity* game_add_entity(float x, float y, float w, float h) {
 }
 
 Entity* game_add_empty_entity() {
-  Level* level = &game_state.level;
-  if (level->entity_count >= MAX_ENTITY) {
+  World* world = &game_state.world;
+  if (world->entity_count >= MAX_ENTITY) {
     return NULL;
   }
-  Entity* e = &level->entities[level->entity_count++];
-  entity_init(e, 0, 0, 0, 0);
+  Entity* e = &world->entities[world->entity_count++];
   return e;
 }
 
@@ -97,7 +96,8 @@ Entity* game_add_living_entity(i32 x_tile, i32 y_tile, float w, float h, i8 x_di
   Entity* e = game_add_empty_entity();
   if (!e)
     return NULL;
-  entity_init_tilepos(e, x_tile, y_tile, w, h);
+  entity_init(e, 0, 0, w, h);
+  entity_init_tilepos(e, x_tile, y_tile);
   e->x_dir = x_dir;
   e->y_dir = y_dir;
   e->state = STATE_ACTIVE;
@@ -113,7 +113,7 @@ i32 game_load_level(i32 index) {
     game_fade_from_black();
     move_count = 0;
     camera.target = NULL;
-    level_load(&game_state.level, index);
+    level_load(&game_state.world, index);
     return NO_ERR;
   }
   return ERR;
@@ -146,7 +146,7 @@ void game_init(Game_state* game) {
   game->is_running = 1;
   game->mode = MODE_GAME;
 
-  memset(&game->level, 0, sizeof(Level));
+  memset(&game->world, 0, sizeof(World));
 
   game_fade_from_black();
   camera_init(0, 0);
@@ -154,7 +154,7 @@ void game_init(Game_state* game) {
   move_time = 0;
 
   game_load_level(0);
-  audio_play_once_on_channel(SOUND_SONG_REMADE, 1, MUSIC_VOLUME);
+  // audio_play_once_on_channel(SOUND_SONG_REMADE, 1, MUSIC_VOLUME);
 }
 
 void game_run() {
@@ -212,7 +212,7 @@ void game_run() {
 
       if (key_pressed[GLFW_KEY_R] || key_pressed[GLFW_KEY_0]) {
         game_restart();
-        game_send_message("Loaded level %i", game->level.index);
+        game_send_message("Loaded level %i", game->world.level.index);
       }
       if (key_pressed[GLFW_KEY_K]) {
         game_create_event(ENTITY_TYPE_NPC, 0, event_kill, (Event_arg) {0});
@@ -227,8 +227,8 @@ void game_run() {
       player_controller();
 
       u8 did_events = 0;
-      for (u32 i = 0; i < game->level.entity_count; i++) {
-        Entity* e = &game->level.entities[i];
+      for (u32 i = 0; i < game->world.entity_count; i++) {
+        Entity* e = &game->world.entities[i];
         if (game->mode == MODE_GAME) {
           if (e->e_flags & ENTITY_FLAG_PLAYER) {
             player_update(e);
@@ -261,11 +261,11 @@ void game_run() {
       }
 
       if (game->should_move) {
-        entity_do_tiled_move(game->level.entities, game->level.entity_count, &game->level);
+        entity_do_tiled_move(game->world.entities, game->world.entity_count, &game->world.level);
         game->should_move = 0;
       }
 
-      tilemap_render(&game->level.tile_map);
+      tilemap_render(&game->world.level.tile_map);
     }
 
     messages_update();
@@ -334,7 +334,7 @@ void game_hud_render() {
 
   if (ui_do_button(UI_ID, VW(2), 16, 16 * 13, 16 * 3, "Restart [r]", 24, &e)) {
     game_restart();
-    game_send_message("Loaded level %i", game->level.index);
+    game_send_message("Loaded level %i", game->world.level.index);
   }
   UI_INIT(e,
     e->background_color = COLOR_WARN;
@@ -342,9 +342,9 @@ void game_hud_render() {
   );
 
   if (ui_do_button(UI_ID, VW(2), 16 * 5, 16 * 13, 16 * 3, "Prev level", 24, &e)) {
-    i32 result = game_load_level(game->level.index - 1);
+    i32 result = game_load_level(game->world.level.index - 1);
     if (result == NO_ERR) {
-      game_send_message("Loaded level %i", game->level.index);
+      game_send_message("Loaded level %i", game->world.level.index);
     }
   }
   UI_INIT(e,
@@ -353,8 +353,8 @@ void game_hud_render() {
   );
 
   if (ui_do_button(UI_ID, VW(2), 16 * 9, 16 * 13, 16 * 3, "Next level", 24, &e)) {
-    game_load_level(game->level.index + 1);
-    game_send_message("Loaded level %i", game->level.index);
+    game_load_level(game->world.level.index + 1);
+    game_send_message("Loaded level %i", game->world.level.index);
   }
   UI_INIT(e,
     e->background_color = COLOR_ACCEPT;
@@ -456,7 +456,6 @@ i32 game_execute(i32 window_width, i32 window_height, u8 fullscreen) {
 }
 
 void game_restart() {
-  // game_init(&game_state);
-  game_load_level(game_state.level.index);
+  game_load_level(game_state.world.level.index);
 }
 

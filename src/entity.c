@@ -22,6 +22,13 @@ static char temp_text[TEXT_BUFF_SIZE];
 
 void entity_init(Entity* e, float x, float y, float w, float h) {
   memset(e, 0, sizeof(Entity));
+
+  e->id = id_count++;
+  e->x_tile = 0;
+  e->y_tile = 0;
+  e->target_id = -1;
+  e->placable_id = -1;
+
   e->x = x;
   e->y = y;
   e->w = w;
@@ -32,7 +39,6 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->e_flags = 0;
   e->type = 0;
   e->sprite_id = 0;
-  e->id = id_count++;
   e->health = e->max_health = 0;
   e->attack = 0;
   e->xp = 0;
@@ -52,6 +58,19 @@ void entity_tiled_move(struct Entity* e) {
     .entity = e,
   };
   tile_moves[move_count++] = move;
+}
+
+i32 entity_to_def(Entity* e, struct Entity_def* def) {
+  if (e->placable_id < 0 || e->placable_id >= MAX_PLACABLE_ENTITY) {
+    // Ok, this is no storage entity
+    return ERR;
+  }
+  def->id = e->id;
+  def->x_tile = e->x_tile;
+  def->y_tile = e->y_tile;
+  def->target_id = e->target_id;
+  def->placable_id = e->placable_id;
+  return NO_ERR;
 }
 
 void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
@@ -241,10 +260,11 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
   move_count = 0;
 }
 
-void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile, float w, float h) {
-  entity_init(e, x_tile * TILE_SIZE, y_tile * TILE_SIZE, w, h);
+void entity_init_tilepos(Entity* e, i32 x_tile, i32 y_tile) {
   e->x_tile = x_tile;
   e->y_tile = y_tile;
+  e->x = x_tile * TILE_SIZE;
+  e->y = y_tile * TILE_SIZE;
 }
 
 void entity_update(Entity* e) {
@@ -278,9 +298,10 @@ void entity_render(Entity* e) {
   render_sprite(SHEET_ENTITIES, e->sprite_id, e->x - camera.x, e->y - camera.y, 0, e->w, e->h);
 }
 
+// TODO(lucas): Seperate this out to the editor instead
 void entity_render_highlight(Entity* e) {
   render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 1.0f, 0, 2.0f / (e->w));
-  snprintf(temp_text, TEXT_BUFF_SIZE, "id: %i\nx: %i\ny: %i\nhp: %i/%i\nattack: %i\nxp: %i\ndir: %i, %i\n", e->id, (i32)e->x, (i32)e->y, e->health, e->max_health, e->attack, e->xp, e->x_dir, e->y_dir);
+  snprintf(temp_text, TEXT_BUFF_SIZE, "id: %i\nx: %i\ny: %i\nhp: %i/%i\nattack: %i\ndir: %i, %i\np_id: %i\n", e->id, e->x_tile, e->y_tile, e->health, e->max_health, e->attack, e->x_dir, e->y_dir, e->placable_id);
   render_text(textures[TEXTURE_FONT],
     e->x - camera.x + e->w + 2,
     e->y - camera.y + e->h + 2, 0.2f, 130, 120, V3(1, 1, 1), 14, 0.7f, 0.5f, 6, temp_text, TEXT_BUFF_SIZE,

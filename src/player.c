@@ -77,7 +77,7 @@ void player_update(Entity* e) {
   }
   else if (key_pressed[GLFW_KEY_C]) {
     Entity* item = game_add_empty_entity();
-    entity_init_tilepos(item, e->x_tile, e->y_tile, TILE_SIZE, TILE_SIZE);
+    entity_init_tilepos(item, e->x_tile, e->y_tile);
     item->x_dir = e->x_dir;
     item->y_dir = e->y_dir;
     item->e_flags = ENTITY_FLAG_FRIENDLY | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY;

@@ -73,20 +73,6 @@ struct Entity_type_def {
   const Arg arg;
 };
 
-enum Placable_entity_type {
-  ENTITY_PLAYER,
-  ENTITY_RED_MONSTER,
-  ENTITY_MAD_SCIENTIST,
-  ENTITY_WIZARD,
-  ENTITY_VOID_WALKER,
-  ENTITY_FLAG,
-  ENTITY_SILVER_KEY,
-  ENTITY_PUSHER,
-  ENTITY_SILVER_DOOR,
-
-  MAX_PLACABLE_ENTITY,
-};
-
 static void add_random_health(Entity* e, const Arg* arg);
 static void add_random_attack(Entity* e, const Arg* arg);
 
@@ -126,7 +112,8 @@ void add_random_attack(Entity* e, const Arg* arg) {
 void editor_update(struct Game_state* game) {
   ui_focus(UI_EDITOR);
   struct UI_element* e = NULL;
-  Level* level = &game->level;
+  World* world = &game->world;
+  Level* level = &world->level;
 
   if (ui_do_button(UI_ID, VW(2), window.height - (16 * 4), 16 * 12, 16 * 3, "Reload [r]", 24, &e) || key_pressed[GLFW_KEY_R]) {
     game_restart();
@@ -138,7 +125,7 @@ void editor_update(struct Game_state* game) {
   );
 
   if (ui_do_button(UI_ID, VW(2), window.height - (16 * 8), 16 * 12, 16 * 3, "Save [m]", 24, &e) || key_pressed[GLFW_KEY_M]) {
-    level_store(level, level->index);
+    level_store(world, level->index);
     game_send_message("Level %i saved!", level->index);
   }
   UI_INIT(e,
@@ -182,7 +169,7 @@ void editor_update(struct Game_state* game) {
     game_state.time,
     (i32)(100 * game_state.time_scale),
     (i32)(1.0f / game_state.delta_time),
-    game_state.level.entity_count, MAX_ENTITY,
+    world->entity_count, MAX_ENTITY,
     audio_engine.master_volume,
     audio_engine.sound_count, MAX_ACTIVE_SOUNDS,
     level->index
@@ -231,8 +218,8 @@ void editor_update(struct Game_state* game) {
     e->y = TILE_SIZE * e->y_tile;
   }
 
-  for (u32 i = 0; i < level->entity_count; i++) {
-    Entity* e = &level->entities[i];
+  for (u32 i = 0; i < world->entity_count; i++) {
+    Entity* e = &world->entities[i];
     if (mouse_over(window.mouse_x + camera.x, window.mouse_y + camera.y, e->x, e->y, e->w, e->h)) {
       entity_render_highlight(e);
       if (key_pressed[GLFW_KEY_F]) {
@@ -340,7 +327,7 @@ void editor_update(struct Game_state* game) {
   }
 
   if (key_pressed[GLFW_KEY_9]) {
-    level->entity_count = 0;
+    world->entity_count = 0;
     tilemap_init(&level->tile_map, TILE_COUNT_X, TILE_COUNT_Y);
   }
   if (key_pressed[GLFW_KEY_8]) {
@@ -357,32 +344,18 @@ void editor_update(struct Game_state* game) {
   if (key_pressed[GLFW_KEY_Z]) {
     i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
     i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-    struct Entity_type_def entity = placable_entities[editor.entity_type];
-    Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, entity.x_dir, entity.y_dir, entity.health, entity.max_health, entity.attack);
-    if (e) {
-      e->sprite_id = entity.sprite_id;
-      e->type = entity.type;
-      e->e_flags = entity.e_flags;
-      if (entity.func) {
-        entity.func(e, &entity.arg);
-      }
-      audio_play_once(SOUND_0F, UI_VOLUME);
-    }
+    editor_place_entity(game, editor.entity_type, x_tile, y_tile);
+    audio_play_once(SOUND_0F, UI_VOLUME);
   }
 
   if (key_pressed[GLFW_KEY_V]) {
     if (editor.has_copy) {
       Entity* e = game_add_empty_entity();
       if (e) {
-        i16 id = e->id;
         *e = editor.copy;
-        e->id = id;
         i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
         i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-        e->x = x_tile * TILE_SIZE;
-        e->y = y_tile * TILE_SIZE;
-        e->x_tile = x_tile;
-        e->y_tile = y_tile;
+        entity_init_tilepos(e, x_tile, y_tile);
         game_send_message("Pasted entity (%i)", e->id);
       }
       else {
@@ -395,4 +368,47 @@ void editor_update(struct Game_state* game) {
   }
 
   tilemap_render_boundary();
+}
+
+struct Entity* editor_place_entity(struct Game_state* game, i16 placable_id, i32 x_tile, i32 y_tile) {
+  if (placable_id >= MAX_PLACABLE_ENTITY) {
+    return NULL;
+  }
+  struct Entity_type_def entity = placable_entities[placable_id];
+  Entity* e = game_add_living_entity(x_tile, y_tile, TILE_SIZE, TILE_SIZE, entity.x_dir, entity.y_dir, entity.health, entity.max_health, entity.attack);
+  if (e) {
+    e->placable_id = placable_id;
+    e->sprite_id = entity.sprite_id;
+    e->type = entity.type;
+    e->e_flags = entity.e_flags;
+    if (entity.func) {
+      entity.func(e, &entity.arg);
+    }
+    return e;
+  }
+  return NULL;
+}
+
+struct Entity* editor_place_entity_from_def(struct Entity_def* def) {
+  assert(def);
+  if (def->placable_id < 0 || def->placable_id >= MAX_PLACABLE_ENTITY) {
+    return NULL;
+  }
+  struct Entity_type_def entity = placable_entities[def->placable_id];
+  Entity* e = game_add_living_entity(def->x_tile, def->y_tile, TILE_SIZE, TILE_SIZE, entity.x_dir, entity.y_dir, entity.health, entity.max_health, entity.attack);
+  if (e) {
+    e->id = def->id;
+    e->target_id = def->target_id;
+    e->placable_id = def->placable_id;
+
+    e->e_flags = entity.e_flags;
+    e->type = entity.type;
+    e->sprite_id = entity.sprite_id;
+
+    if (entity.func) {
+      entity.func(e, &entity.arg);
+    }
+    return e;
+  }
+  return NULL;
 }
