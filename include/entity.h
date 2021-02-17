@@ -83,6 +83,10 @@ typedef struct Entity {
 
 void entity_init(Entity* e, float x, float y, float w, float h);
 
+void entity_hurt_from_foe(Entity* e, Entity* target);
+
+void entity_hurt(Entity* e, i16 amount);
+
 void entity_tiled_move(Entity* e);
 
 i32 entity_to_def(Entity* e, struct Entity_def* def);

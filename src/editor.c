@@ -37,6 +37,8 @@ Tile placable_tiles[] = {
   {TILE_GRASS, 1, 0},
   {TILE_TREE, 0, TILE_GRASS},
   {TILE_PORTAL, 1, 0},
+  {TILE_WATER, 0, 0},
+  {TILE_FLOOR_2, 1, 0},
 };
 
 static const char* placable_tile_names[] = {
@@ -50,6 +52,8 @@ static const char* placable_tile_names[] = {
   "Grass",
   "Pine Tree",
   "Portal",
+  "Water",
+  "Floor 2",
 };
 
 typedef union Arg {
@@ -86,6 +90,7 @@ struct Entity_type_def placable_entities[MAX_PLACABLE_ENTITY] = {
   {0, 0, ENTITY_FLAG_FRIENDLY, ENTITY_TYPE_SILVER_DOOR, SPRITE_SILVER_DOOR, 10, 10, 0, NULL, {}},
   {0, 0, ENTITY_FLAG_FRIENDLY    | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PUSHABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_SILVER_KEY, SPRITE_SILVER_KEY, 1, 1, 0, NULL, {}},
   {0, 0, ENTITY_FLAG_MOVABLE | ENTITY_FLAG_PUSHABLE, ENTITY_TYPE_PUSHER, SPRITE_PUSHER, 10, 10, 0, NULL, {}},
+  {1, 0, ENTITY_FLAG_DRAW_HEALTH | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY, ENTITY_TYPE_NPC, SPRITE_HAND, 8, 8, 1, NULL, {}},
 };
 
 static const char* placable_entity_names[MAX_PLACABLE_ENTITY] = {
@@ -98,6 +103,7 @@ static const char* placable_entity_names[MAX_PLACABLE_ENTITY] = {
   "Silver Door",
   "Silver Key",
   "Pusher",
+  "Hand",
 };
 
 void add_random_health(Entity* e, const Arg* arg) {
@@ -134,8 +140,9 @@ void editor_update(struct Game_state* game) {
   );
 
   if (ui_do_button(UI_ID, VW(2), window.height - (16 * 14), 16 * 11, 16 * 2, "Prev level [b]", 15, &e) || key_pressed[GLFW_KEY_B]) {
-    game_load_level(level->index - 1);
-    game_send_message("Loaded level %i", level->index);
+    if (game_load_level(level->index - 1) == NO_ERR) {
+      game_send_message("Loaded level %i", level->index);
+    }
   }
   UI_INIT(e,
     e->background_color = COLOR_OK;
@@ -344,7 +351,7 @@ void editor_update(struct Game_state* game) {
   if (key_pressed[GLFW_KEY_Z]) {
     i32 x_tile = PIXEL_TO_TILE_POS(window.mouse_x + camera.x);
     i32 y_tile = PIXEL_TO_TILE_POS(window.mouse_y + camera.y);
-    editor_place_entity(game, editor.entity_type, x_tile, y_tile);
+    editor_place_entity(editor.entity_type, x_tile, y_tile);
     audio_play_once(SOUND_0F, UI_VOLUME);
   }
 
@@ -370,7 +377,7 @@ void editor_update(struct Game_state* game) {
   tilemap_render_boundary();
 }
 
-struct Entity* editor_place_entity(struct Game_state* game, i16 placable_id, i32 x_tile, i32 y_tile) {
+struct Entity* editor_place_entity(i16 placable_id, i32 x_tile, i32 y_tile) {
   if (placable_id >= MAX_PLACABLE_ENTITY) {
     return NULL;
   }

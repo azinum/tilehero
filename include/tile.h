@@ -21,6 +21,8 @@ enum Tile_type {
   TILE_GRASS,
   TILE_TREE,
   TILE_PORTAL,
+  TILE_WATER,
+  TILE_FLOOR_2,
 
   MAX_TILE,
 };

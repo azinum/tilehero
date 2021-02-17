@@ -17,13 +17,14 @@ enum Placable_entity_type {
   ENTITY_SILVER_KEY,
   ENTITY_PUSHER,
   ENTITY_SILVER_DOOR,
+  ENTITY_HAND,
 
   MAX_PLACABLE_ENTITY,
 };
 
 void editor_update(struct Game_state* game);
 
-struct Entity* editor_place_entity(struct Game_state* game, i16 placable_id, i32 x_tile, i32 y_tile);
+struct Entity* editor_place_entity(i16 placable_id, i32 x_tile, i32 y_tile);
 
 struct Entity* editor_place_entity_from_def(struct Entity_def* def);
 

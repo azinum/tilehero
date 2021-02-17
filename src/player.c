@@ -5,6 +5,7 @@
 #include "window.h"
 #include "renderer_common.h"
 #include "renderer.h"
+#include "editor.h"
 #include "player.h"
 
 struct Player player = {
@@ -75,17 +76,16 @@ void player_update(Entity* e) {
     e->y_dir = 0;
     return;
   }
+  // TEMP
   else if (key_pressed[GLFW_KEY_C]) {
-    Entity* item = game_add_empty_entity();
-    entity_init_tilepos(item, e->x_tile, e->y_tile);
-    item->x_dir = e->x_dir;
-    item->y_dir = e->y_dir;
-    item->e_flags = ENTITY_FLAG_FRIENDLY | ENTITY_FLAG_MOVABLE | ENTITY_FLAG_FLY;
-    item->type = ENTITY_TYPE_CONSUMABLE;
-    item->sprite_id = SPRITE_COOKIE;
-    item->health = item->max_health = 1;
-    e->x_dir = 0;
-    e->y_dir = 0;
+    Entity* item = editor_place_entity(ENTITY_HAND, e->x_tile, e->y_tile);
+    if (item) {
+      item->x_dir = e->x_dir;
+      item->y_dir = e->y_dir;
+      e->x_dir = 0;
+      e->y_dir = 0;
+      entity_hurt(e, 2);
+    }
   }
 }
 

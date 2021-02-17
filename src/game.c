@@ -342,8 +342,7 @@ void game_hud_render() {
   );
 
   if (ui_do_button(UI_ID, VW(2), 16 * 5, 16 * 13, 16 * 3, "Prev level", 24, &e)) {
-    i32 result = game_load_level(game->world.level.index - 1);
-    if (result == NO_ERR) {
+    if (game_load_level(game->world.level.index - 1) == NO_ERR) {
       game_send_message("Loaded level %i", game->world.level.index);
     }
   }

@@ -44,6 +44,46 @@ void entity_init(Entity* e, float x, float y, float w, float h) {
   e->xp = 0;
 }
 
+void entity_hurt_from_foe(Entity* e, Entity* foe) {
+  e->health -= foe->attack;
+  if (e->health > e->max_health)
+    e->health = e->max_health;
+  if (e->health <= 0) {
+    e->health = 0;
+    e->state = STATE_DEAD;
+    foe->xp += e->max_health * 4;
+    audio_play_once(SOUND_HIT, SFX_VOLUME);
+    if (e->type == ENTITY_TYPE_PLAYER) {
+      game_send_message(M_DIED);
+      game_restart();
+      return;
+    }
+  }
+  else {
+    audio_play_once(SOUND_HURT, SFX_VOLUME);
+  }
+}
+
+// Copypasta from entity_hurt_from_foe. Make better, unify.
+void entity_hurt(Entity* e, i16 amount) {
+  e->health -= amount;
+  if (e->health > e->max_health)
+    e->health = e->max_health;
+  if (e->health <= 0) {
+    e->health = 0;
+    e->state = STATE_DEAD;
+    audio_play_once(SOUND_HIT, SFX_VOLUME);
+    if (e->type == ENTITY_TYPE_PLAYER) {
+      game_send_message(M_DIED);
+      game_restart();
+      return;
+    }
+  }
+  else {
+    audio_play_once(SOUND_HURT, SFX_VOLUME);
+  }
+}
+
 void entity_tiled_move(struct Entity* e) {
   if (move_count >= MAX_MOVES) {
     fprintf(stderr, "Move count limit reached!\n");
@@ -137,34 +177,32 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
           game_load_level_on_complete(level->index + 1);
           return;
         }
+#if 0
         if (e->type == ENTITY_TYPE_CONSUMABLE) {
-          target->health += e->health;
-          if (target->health > target->max_health)
-            target->health = target->max_health;
-          e->state = STATE_DEAD;
-        }
-        if (target->type == ENTITY_TYPE_CONSUMABLE && e->id != target->id) {
-          e->health += target->health;
-          if (e->health > e->max_health)
-            e->health = e->max_health;
-          target->state = STATE_DEAD;
-        }
-        if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY) && !(e->type == ENTITY_TYPE_PLAYER && target->type == ENTITY_TYPE_PLAYER) && !(e->type == target->type)) {
           target->health -= e->attack;
+          if (target->health > target->max_health) {
+            target->health = target->max_health;
+          }
           if (target->health <= 0) {
             target->health = 0;
             target->state = STATE_DEAD;
-            e->xp += target->max_health * 4;
-            audio_play_once(SOUND_HIT, SFX_VOLUME);
-            if (target->type == ENTITY_TYPE_PLAYER) {
-              game_send_message(M_DIED);
-              game_restart();
-              return;
-            }
           }
-          else {
-            audio_play_once(SOUND_HURT, SFX_VOLUME);
+          e->state = STATE_DEAD;
+        }
+        if (target->type == ENTITY_TYPE_CONSUMABLE && e->id != target->id) {
+          e->health -= target->attack;
+          if (e->health > e->max_health) {
+            e->health = e->max_health;
           }
+          if (e->health <= 0) {
+            e->health = 0;
+            e->state = STATE_DEAD;
+          }
+          target->state = STATE_DEAD;
+        }
+#endif
+        if (!(e->e_flags & ENTITY_FLAG_FRIENDLY) && !(target->e_flags & ENTITY_FLAG_FRIENDLY) && !(e->type == ENTITY_TYPE_PLAYER && target->type == ENTITY_TYPE_PLAYER) && !(e->type == target->type)) {
+          entity_hurt_from_foe(target, e);
         }
       }
       else { // We hit a non-walkable tile!
@@ -201,11 +239,11 @@ void entity_do_tiled_move(Entity* entities, i32 entity_count, Level* level) {
         case TILE_DUNGEON: {
           i8 x_dir = e->x_dir;
           i8 y_dir = e->y_dir;
-          if (abs(e->x_dir) == 1) {
+          if (abs(e->x_dir) >= 1) {
             e->y_dir = x_dir;
             e->x_dir = 0;
           }
-          else if (abs(e->y_dir) == 1) {
+          else if (abs(e->y_dir) >= 1) {
             e->x_dir = y_dir;
             e->y_dir = 0;
           }
