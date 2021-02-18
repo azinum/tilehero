@@ -6,113 +6,227 @@
 
 #define FORMAT_PCM 0x1  // Uncompressed format
 
-struct RIFF_header {
-  char chunk_id[4];
-  i32 size;
-  char wave_id[4];
+#define NoError 0
+#define Error -1
 
-  char format_chunk[4];
-  i32 format_chunk_size;
-  i16 format_type;
-  i16 channel_count;
-  i32 sample_rate;
-  i32 data_rate;  // (sample rate * bits per sample * channels) / 8
-  i16 data_block_size;  // (bits per sample * channels) / 8 => bytes per frame / sample
-  i16 bits_per_sample;
+typedef struct wave_header {
+  char RiffId[4];
+  i32 Size;
+  char WaveId[4];
+} __attribute__((packed)) wave_header;
 
-  char data_chunk_header[4];
-  i32 data_size;
-} __attribute__((packed));
+typedef struct wave_format {
+  char FormatId[4];
+  i32 Size;
+  i16 Type;
+  i16 ChannelCount;
+  i32 SampleRate;
+  i32 DataRate;
+  i16 DataBlockSize;
+  i16 BitsPerSample;
+} __attribute__((packed)) wave_format;
 
-static void print_riff_header(const char* filename, struct RIFF_header* header);
+typedef struct wave_chunk {
+  char ChunkId[4];
+  i32 Size;
+} __attribute__((packed)) wave_chunk;
 
-void print_riff_header(const char* filename, struct RIFF_header* header) {
+#define WaveMinSize ((i32)(sizeof(wave_header) + sizeof(wave_format) + sizeof(wave_chunk)))
+
+static void PrintWaveHeader(wave_header* Header) {
   printf(
-    "RIFF header(%s):\n"
-    "  chunk_id: %.4s\n"
-    "  size: %i\n"
-    "  wave_id: %.4s\n"
-    "  format_chunk: %.4s\n"
-    "  format_chunk_size: %i\n"
-    "  format_type: 0x%x\n"
-    "  channel_count: %i\n"
-    "  sample_rate: %i\n"
-    "  data_rate: %i\n"
-    "  data_block_size: %i\n"
-    "  bits_per_sample: %i\n"
-    "  data_chunk_header: %.4s\n"
-    "  data_size: %i\n"
+    "RiffId:  %.4s\n"
+    "Size:    %i\n"
+    "WaveId:  %.4s\n"
     ,
-    filename,
-    header->chunk_id,
-    header->size,
-    header->wave_id,
-    header->format_chunk,
-    header->format_chunk_size,
-    header->format_type,
-    header->channel_count,
-    header->sample_rate,
-    header->data_rate,
-    header->data_block_size,
-    header->bits_per_sample,
-    header->data_chunk_header,
-    header->data_size
+    Header->RiffId,
+    Header->Size,
+    Header->WaveId
   );
 }
 
-inline void i16_to_f32(float* out, const i16* in, i32 sample_count) {
-  assert(out != NULL && in != NULL);
-
-  for (i32 i = 0; i < sample_count; i++) {
-    *out++ = in[i] / 32768.0f;
-  }
+static void PrintWaveFormat(wave_format* Header) {
+  printf(
+    "FormatId:      %.4s\n"
+    "Size:          %i\n"
+    "Type:          0x%x\n"
+    "ChannelCount:  %i\n"
+    "SampleRate:    %i\n"
+    "DataRate:      %i\n"
+    "DataBlockSize: %i\n"
+    "BitsPerSample: %i\n"
+    ,
+    Header->FormatId,
+    Header->Size,
+    Header->Type,
+    Header->ChannelCount,
+    Header->SampleRate,
+    Header->DataRate,
+    Header->DataBlockSize,
+    Header->BitsPerSample
+  );
 }
 
-i32 load_wav_from_file(const char* filename, struct Audio_source* source) {
-  i32 status = 0;
-  FILE* fp = fopen(filename, "rb");
-  if (!fp) {
-    fprintf(stderr, "Failed to open file '%s'\n", filename);
-    return -1;
-  }
-  struct RIFF_header header = {0};
+static void PrintWaveChunk(wave_chunk* Header) {
+  printf(
+    "ChunkId: %.4s\n"
+    "Size:    %i\n"
+    ,
+    Header->ChunkId,
+    Header->Size
+  );
+}
 
-  fseek(fp, 0, SEEK_END);
-  i32 file_size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-  (void)file_size;
-
-  i32 bytes_read = fread(&header, 1, sizeof(struct RIFF_header), fp);
-  if (bytes_read < (i32)sizeof(struct RIFF_header)) {
-    fprintf(stderr, "Invalid WAV file\n");
-    status = -1;
-    goto done;
+static i32 ValidateWaveHeader(wave_header* Header) {
+  char RiffId[] = {'R', 'I', 'F', 'F'};
+  char WaveId[] = {'W', 'A', 'V', 'E'};
+  if (strncmp(Header->RiffId, RiffId, ARR_SIZE(RiffId)) != 0) {
+    return Error;
   }
+  if (strncmp(Header->WaveId, WaveId, ARR_SIZE(WaveId)) != 0) {
+    return Error;
+  }
+  return NoError;
+}
+
+static i32 ValidateWaveFormat(wave_format* Header) {
+  char FormatId[] = {'f', 'm', 't', ' '};
+  if (strncmp(Header->FormatId, FormatId, ARR_SIZE(FormatId)) != 0) {
+    return Error;
+  }
+  if (Header->Type != FORMAT_PCM) {
+    return Error;
+  }
+  return NoError;
+}
+
+static i32 ValidateWaveChunk(wave_chunk* Header, i32* ListTag) {
+  char ChunkId[] = {'d', 'a', 't', 'a'};
+  char ChunkListId[] = {'L', 'I', 'S', 'T'};
+  if (!strncmp(Header->ChunkId, ChunkId, ARR_SIZE(ChunkId))) {
+    return NoError;
+  }
+  if (!strncmp(Header->ChunkId, ChunkListId, ARR_SIZE(ChunkListId))) {
+    *ListTag = 1;
+    return NoError;
+  }
+  return Error;
+}
+
+static i32 IterateWaveFile(void* Dest, i32 Size, FILE* File, const char* Path) {
+  i32 ReadSize = 0;
+
+  ReadSize = fread(Dest, 1, Size, File);
+
+  if (ReadSize != Size) {
+    fprintf(stderr, "Failed to read WAVE file '%s'\n", Path);
+    return Error;
+  }
+  return NoError;
+}
+
+static i32 ConvertToFloatBuffer(float* OutBuffer, i16* InBuffer, i32 SampleCount) {
+  for (i32 SampleIndex = 0; SampleIndex < SampleCount; ++SampleIndex) {
+    *OutBuffer++ = InBuffer[SampleIndex] / 32768.0f;
+  }
+  return NoError;
+}
+
+i32 load_wav_from_file(const char* Path, struct Audio_source* source) {
+  i32 Result = NoError;
+  FILE* File = fopen(Path, "r");
+  if (!File) {
+    fprintf(stderr, "Failed to open file '%s'\n", Path);
+    return Error;
+  }
+
+  assert(WaveMinSize == 44);
+
+  fseek(File, 0, SEEK_END);
+  i32 FileSize = ftell(File);
+  fseek(File, 0, SEEK_SET);
+  (void)FileSize;
+
+  if (FileSize < WaveMinSize) {
+    fprintf(stderr, "Invalid WAVE file '%s'\n", Path);
+    Result = Error;
+    goto Done;
+  }
+
+  wave_header WaveHeader;
+  if (IterateWaveFile(&WaveHeader, sizeof(wave_header), File, Path) != NoError) {
+    Result = Error;
+    goto Done;
+  }
+
+  if ((Result = ValidateWaveHeader(&WaveHeader)) != NoError) {
+    goto Done;
+  }
+
+  wave_format WaveFormat;
+  if (IterateWaveFile(&WaveFormat, sizeof(wave_format), File, Path) != NoError) {
+    Result = Error;
+    goto Done;
+  }
+
+  if ((Result = ValidateWaveFormat(&WaveFormat)) != NoError) {
+    goto Done;
+  }
+
+  wave_chunk WaveChunk;
+  i32 ListTag = 0;
+  do {
+    if (IterateWaveFile(&WaveChunk, sizeof(wave_chunk), File, Path) != NoError) {
+      Result = Error;
+      goto Done;
+    }
+
+    ListTag = 0;
+    if ((Result = ValidateWaveChunk(&WaveChunk, &ListTag)) != NoError) {
+      goto Done;
+    }
+    // NOTE(lucas): If there is a list tag in this chunk, skip it for now. Might want to use the contents of the list metadata later on.
+    if (ListTag) {
+      i32 ListTagSize = WaveChunk.Size;
+      fseek(File, ListTagSize, SEEK_CUR);
+    }
+  } while (ListTag);
+
+  i32 SampleCount = WaveFormat.ChannelCount * (WaveChunk.Size / WaveFormat.DataBlockSize);
+  void* Buffer = malloc(WaveChunk.Size);
+  if (!Buffer) {
+    fprintf(stderr, "Failed to allocate sample buffer\n");
+    Result = Error;
+    goto Done;
+  }
+
+  if ((Result = IterateWaveFile(Buffer, WaveChunk.Size, File, Path)) != NoError) {
+    fprintf(stderr, "Failed to read sample buffer\n");
+    goto Done;
+  }
+
+  source->sample_buffer = malloc(sizeof(float) * SampleCount);
+  source->sample_count = SampleCount;
+  source->channel_count = WaveFormat.ChannelCount;
+  ConvertToFloatBuffer(source->sample_buffer, (i16*)Buffer, source->sample_count);
+  free(Buffer);
+
 #if 0
-  print_riff_header(filename, &header);
+  printf("Loaded WAVE file '%s':\n", Path);
+  printf("===\n");
+  printf("SampleCount: %i\n", SampleCount);
+  printf("===\n");
+  PrintWaveHeader(&WaveHeader);
+  printf("===\n");
+  PrintWaveFormat(&WaveFormat);
+  printf("===\n");
+  PrintWaveChunk(&WaveChunk);
 #else
-  (void)print_riff_header;
+  (void)PrintWaveHeader;
+  (void)PrintWaveFormat;
+  (void)PrintWaveChunk;
 #endif
-  if (header.format_type != FORMAT_PCM) {
-    fprintf(stderr, "Format not supported (0x%x)\n", header.format_type);
-    status = -1;
-    goto done;
-  }
-
-  const i32 sample_count = header.channel_count * (header.data_size / header.data_block_size);
-  void* sample_data = malloc(header.data_size);
-  i32 sample_data_bytes_read = fread(sample_data, 1, header.data_size, fp);
-
-  assert(sample_data_bytes_read == header.data_size);
-
-  source->sample_buffer = malloc(sample_count * sizeof(float));
-  i16_to_f32(source->sample_buffer, (i16*)sample_data, sample_count);
-  source->sample_count = sample_count;
-  source->sample_rate = header.sample_rate;
-  source->channel_count = header.channel_count;
-  free(sample_data);
-
-done:
-  fclose(fp);
-  return status;
+Done:
+  fclose(File);
+  return Result;
 }

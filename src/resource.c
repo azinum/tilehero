@@ -147,7 +147,6 @@ void resources_unload() {
     if (source->sample_buffer != NULL) {
       free(source->sample_buffer);
       source->sample_count = 0;
-      source->sample_rate = 0;
     }
   }
 }

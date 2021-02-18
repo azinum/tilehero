@@ -16,7 +16,6 @@ enum Channel_type {
 struct Audio_source {
   float* sample_buffer;
   u32 sample_count;
-  u32 sample_rate;
   i16 channel_count;
 };
 

@@ -154,7 +154,7 @@ void game_init(Game_state* game) {
   move_time = 0;
 
   game_load_level(0);
-  // audio_play_once_on_channel(SOUND_SONG_REMADE, 1, MUSIC_VOLUME);
+  audio_play_once_on_channel(SOUND_SONG_REMADE, 1, MUSIC_VOLUME);
 }
 
 void game_run() {
