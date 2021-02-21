@@ -338,7 +338,7 @@ void entity_render(Entity* e) {
 
 // TODO(lucas): Seperate this out to the editor instead
 void entity_render_highlight(Entity* e) {
-  render_rect(e->x - camera.x, e->y - camera.y, 0.1f, e->w, e->h, 0.9f, 0.1f, 0.12f, 1.0f, 0, 2.0f / (e->w));
+  entity_render_highlight_color(e, 0.9f, 0.1f, 0.12f, 1.0f);
   snprintf(temp_text, TEXT_BUFF_SIZE, "id: %i\nx: %i\ny: %i\nhp: %i/%i\nattack: %i\ndir: %i, %i\np_id: %i\n", e->id, e->x_tile, e->y_tile, e->health, e->max_health, e->attack, e->x_dir, e->y_dir, e->placable_id);
   render_text(textures[TEXTURE_FONT],
     e->x - camera.x + e->w + 2,
