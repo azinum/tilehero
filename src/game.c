@@ -120,7 +120,12 @@ i32 game_load_level(i32 index) {
 }
 
 i32 game_load_level_on_complete(i32 index) {
-  return game_load_level(index);
+  i32 result = game_load_level(index);
+  if (result == NO_ERR) {
+    game_state.save_state.level = index;
+    save_state_store(&game_state.save_state);
+  }
+  return result;
 }
 
 void game_fade_to_black() {
@@ -153,8 +158,9 @@ void game_init(Game_state* game) {
   move_count = 0;
   move_time = 0;
 
-  game_load_level(0);
-  audio_play_once_on_channel(SOUND_SONG_REMADE, 1, MUSIC_VOLUME);
+  save_state_load(&game->save_state);
+  game_load_level(game->save_state.level);
+  // audio_play_once_on_channel(SOUND_SONG_REMADE, 1, MUSIC_VOLUME);
 }
 
 void game_run() {

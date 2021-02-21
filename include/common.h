@@ -68,6 +68,8 @@ inline float random_number(float from, float to) {
   return (float)rand() / (float)(RAND_MAX / to) + (float)rand() / (float)(RAND_MAX / from);
 }
 
-FILE* log_file;
+extern FILE* log_file;
+
+char* read_entire_file(const char* path);
 
 #endif

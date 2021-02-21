@@ -7,6 +7,53 @@
 #include "editor.h" // Probably want to abstract this out; we don't need to couple the editor to the level loader like this.
 #include "level.h"
 
+void save_state_init(Save_state* state) {
+  state->score = 0;
+  state->level = 0;
+}
+
+i32 save_state_store(Save_state* state) {
+  i32 fd = open(SAVE_STATE_FILE, O_RDWR | O_CREAT, 0644);
+  if (fd < 0) {
+    fprintf(stderr, "Failed to open file '%s'\n", SAVE_STATE_FILE);
+    return -1;
+  }
+  u32 bytes_written = write(fd, state, sizeof(Save_state));
+  if (bytes_written != sizeof(Save_state)) {
+    fprintf(stderr, "Failed to write to file '%s'\n", SAVE_STATE_FILE);
+    close(fd);
+    return -1;
+  }
+  fprintf(log_file, "Stored save state to '%s'\n", SAVE_STATE_FILE);
+  close(fd);
+  return 0;
+}
+
+i32 save_state_load(Save_state* state) {
+  i32 fd = open(SAVE_STATE_FILE, O_RDWR | O_CREAT, 0644);
+  if (fd < 0) {
+    fprintf(stderr, "Failed to open file '%s'\n", SAVE_STATE_FILE);
+    return -1;
+  }
+  u32 bytes_read = read(fd, state, sizeof(Save_state));
+
+  if (bytes_read != sizeof(Save_state)) {
+    save_state_init(state);
+    u32 bytes_written = write(fd, state, sizeof(Save_state));
+    if (bytes_written != sizeof(Save_state)) {
+      fprintf(stderr, "Failed to store save state on '%s'\n", SAVE_STATE_FILE);
+      close(fd);
+      return -1;
+    }
+    else {
+      fprintf(log_file, "Initialized save state on file '%s'\n", SAVE_STATE_FILE);
+    }
+  }
+  fprintf(log_file, "Loaded save state from '%s'\n", SAVE_STATE_FILE);
+  close(fd);
+  return 0;
+}
+
 void level_init(Level* level) {
   level->index = 0;
   level->entity_count = 0;

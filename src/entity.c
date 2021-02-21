@@ -12,7 +12,7 @@
 
 #define TEXT_BUFF_SIZE 96
 #define INTERP_MOVEMENT 1
-#define INTERP_SPEED 20
+#define INTERP_SPEED 20.0f
 
 struct Tile_move tile_moves[MAX_MOVES];
 u32 move_count = 0;

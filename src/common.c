@@ -1,10 +1,12 @@
-// util.c
+// common.c
 
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "common.h"
+
+FILE* log_file;
 
 char* read_entire_file(const char* path) {
   FILE* fp = fopen(path, "rb");
