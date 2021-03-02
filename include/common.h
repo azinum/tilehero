@@ -72,4 +72,8 @@ extern FILE* log_file;
 
 char* read_entire_file(const char* path);
 
+float lerp(float v0, float v1, float t);
+
+float lerp2(float v0, float v1, float t, float delta);
+
 #endif

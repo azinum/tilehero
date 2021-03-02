@@ -5,6 +5,8 @@
 #include "window.h"
 #include "renderer_common.h"
 #include "player.h"
+#include "math_util.h"
+#include "game_common.h"
 #include "camera.h"
 
 #define CAMERA_MOVE_SPEED (600.0f)

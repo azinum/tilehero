@@ -158,8 +158,12 @@ void game_init(Game_state* game) {
   move_count = 0;
   move_time = 0;
 
+#if 0
   save_state_load(&game->save_state);
   game_load_level(game->save_state.level);
+#else
+  game_load_level(0);
+#endif
   // audio_play_once_on_channel(SOUND_SONG_REMADE, 1, MUSIC_VOLUME);
 }
 

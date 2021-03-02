@@ -36,3 +36,14 @@ char* read_entire_file(const char* path) {
   fclose(fp);
   return result;
 }
+
+float lerp(float v0, float v1, float t) {
+  return (1 - t) * v0 + t * v1;
+}
+
+float lerp2(float v0, float v1, float t, float delta) {
+  if (fabs(v0 - v1) < delta) {
+    return v1;
+  }
+  return (1.0f - t) * v0 + t * v1;
+}

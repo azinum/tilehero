@@ -2,7 +2,6 @@
 
 #include "common.h"
 #include "renderer_common.h"
-#include "util.h"
 #include "resource.h"
 #include "window.h"
 #include "math_util.h"

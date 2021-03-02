@@ -2,7 +2,6 @@
 
 #include "common.h"
 #include "game_common.h"
-#include "util.h"
 #include "math_util.h"
 #include "config.h"
 #include "camera.h"
