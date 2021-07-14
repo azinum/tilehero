@@ -14,9 +14,9 @@ BUILD_DIR=build
 
 PROF_DIR=profile
 
-LIBS=-lportaudio -lpng -lm -lGLEW -lglfw -lGL
+LIBS=-lportaudio -lpthread -lpng -lm -lGLEW -lGL `pkg-config --cflags glfw3` `pkg-config --static --libs glfw3`
 
-LIBS_MAC=-lportaudio -lpng -lm -lGLEW -lglfw -framework OpenGL
+LIBS_MAC=-lportaudio -lpthread -lpng -lm -lGLEW -lglfw -framework OpenGL
 
 FLAGS=${SRC} -I${INCLUDE_DIR} -o ${BUILD_DIR}/${PROG_NAME} -Wall -W -Wno-missing-braces -std=c99 -ffast-math
 

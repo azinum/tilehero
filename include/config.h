@@ -4,14 +4,14 @@
 #define _CONFIG_H
 
 #define MASTER_VOLUME 1.0f
-#define MUSIC_VOLUME  0.35f
+#define MUSIC_VOLUME  0.2f
 #define SFX_VOLUME    1.0f
 #define UI_VOLUME     0.6f
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 960
 #define WINDOW_FULLSCREEN 0
-#define VSYNC 0
+#define VSYNC 1
 
 #define WORLD_STORAGE_FILE "resource/data/world.data"
 #define WORLD_STORAGE_FILE_BACKUP "resource/data/world.data.backup"

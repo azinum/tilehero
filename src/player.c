@@ -23,19 +23,19 @@ struct {
 void player_controller() {
   Game_state* game = &game_state;
 
-  if (key_pressed[GLFW_KEY_LEFT]) {
+  if (key_pressed[GLFW_KEY_LEFT] || gamepad_button_pressed[14]) {
     input.x_dir = -1;
     input.y_dir = 0;
   }
-  else if (key_pressed[GLFW_KEY_RIGHT]) {
+  else if (key_pressed[GLFW_KEY_RIGHT] || gamepad_button_pressed[12]) {
     input.x_dir = 1;
     input.y_dir = 0;
   }
-  else if (key_pressed[GLFW_KEY_UP]) {
+  else if (key_pressed[GLFW_KEY_UP] || gamepad_button_pressed[11]) {
     input.y_dir = -1;
     input.x_dir = 0;
   }
-  else if (key_pressed[GLFW_KEY_DOWN]) {
+  else if (key_pressed[GLFW_KEY_DOWN] || gamepad_button_pressed[13]) {
     input.y_dir = 1;
     input.x_dir = 0;
   }
@@ -59,7 +59,7 @@ void player_controller() {
     else {
       move_time = game->time + INTERVAL;
       // TODO(lucas): Add walk sound
-      // audio_play_once(SOUND_0F, SFX_VOLUME);
+      // audio_play_once(SOUND_0F, SFX_VOLUME / 2);
     }
   }
 }

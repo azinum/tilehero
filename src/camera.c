@@ -40,7 +40,14 @@ void camera_update() {
   if (key_down[GLFW_KEY_S]) {
     camera.y_target += CAMERA_MOVE_SPEED * game_state.delta_time;
   }
-  camera.has_target = (key_pressed[GLFW_KEY_Q]) ? (!camera.has_target) : (camera.has_target);
+
+  if (joystick_present) {
+    v2 joy = joysticks[0];
+    camera.x_target += CAMERA_MOVE_SPEED * joy.x * game_state.delta_time;
+    camera.y_target += CAMERA_MOVE_SPEED * joy.y * game_state.delta_time;
+  }
+
+  camera.has_target = (key_pressed[GLFW_KEY_Q] || gamepad_button_pressed[3] /* y */) ? (!camera.has_target) : (camera.has_target);
 
   if (middle_mouse_pressed) {
     camera_pos = V2(camera.x_target, camera.y_target);

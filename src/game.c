@@ -124,6 +124,7 @@ i32 game_load_level_on_complete(i32 index) {
   if (result == NO_ERR) {
     game_state.save_state.level = index;
     save_state_store(&game_state.save_state);
+    audio_play_once(SOUND_GOOD_MORNING, SFX_VOLUME);
   }
   return result;
 }
@@ -164,7 +165,7 @@ void game_init(Game_state* game) {
 #else
   game_load_level(0);
 #endif
-  // audio_play_once_on_channel(SOUND_SONG_REMADE, 1, MUSIC_VOLUME);
+  audio_play_once_on_channel(SOUND_SONG_REMADE, 1, MUSIC_VOLUME);
 }
 
 void game_run() {
@@ -220,8 +221,16 @@ void game_run() {
         }
       }
 
-      if (key_pressed[GLFW_KEY_R] || key_pressed[GLFW_KEY_0]) {
+      if (key_pressed[GLFW_KEY_R] || key_pressed[GLFW_KEY_0] || gamepad_button_pressed[1] /* b*/) {
         game_restart();
+        game_send_message("Loaded level %i", game->world.level.index);
+      }
+      if (gamepad_button_pressed[5]) {
+        game_load_level(game->world.level.index + 1);
+        game_send_message("Loaded level %i", game->world.level.index);
+      }
+      if (gamepad_button_pressed[4]) {
+        game_load_level(game->world.level.index - 1);
         game_send_message("Loaded level %i", game->world.level.index);
       }
       if (key_pressed[GLFW_KEY_K]) {

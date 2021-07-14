@@ -19,9 +19,25 @@ struct {
   callback framebuffer_callback;
 } window;
 
+#define MAX_GAMEPAD_BUTTONS 16
+#define MAX_JOYSTICK 16
+
 extern i8 mouse_state;
 extern i8 key_down[];
 extern i8 key_pressed[];
+
+extern u8 gamepad_button_down[];
+extern u8 gamepad_button_pressed[];
+
+extern v2 joysticks[MAX_JOYSTICK];
+extern u32 joystick_count;
+
+extern float joystick_1_x;
+extern float joystick_1_y;
+extern float joystick_2_x;
+extern float joystick_2_y;
+
+extern i32 joystick_present;
 
 #define left_mouse_down      (mouse_state & (1 << 7))
 #define left_mouse_pressed   (mouse_state & (1 << 6))

@@ -13,6 +13,24 @@ i8 mouse_state = 0;
 i8 key_down[GLFW_KEY_LAST] = {0};
 i8 key_pressed[GLFW_KEY_LAST] = {0};
 
+const u8* gamepad_button_states = NULL;
+i32 gamepad_button_count = 0;
+const float* gamepad_axes = NULL;
+i32 gamepad_axis_count = 0;
+
+u8 gamepad_button_down[MAX_GAMEPAD_BUTTONS];
+u8 gamepad_button_pressed[MAX_GAMEPAD_BUTTONS];
+
+v2 joysticks[MAX_JOYSTICK] = {0};
+u32 joystick_count = 0;
+
+float joystick_1_x = 0.0f;
+float joystick_1_y = 0.0f;
+float joystick_2_x = 0.0f;
+float joystick_2_y = 0.0f;
+
+i32 joystick_present = 0;
+
 static void opengl_configure();
 static void framebuffer_size_callback(GLFWwindow* window, i32 width, i32 height);
 
@@ -138,6 +156,30 @@ i32 window_process_input() {
 
   if (key_pressed[GLFW_KEY_F11]) {
     window_toggle_fullscreen();
+  }
+  joystick_present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+  if (joystick_present) {
+    gamepad_button_states = glfwGetJoystickButtons(0, &gamepad_button_count);
+    gamepad_axes = glfwGetJoystickAxes(0, &gamepad_axis_count);
+    for (u8 i = 0; i < gamepad_button_count; ++i) {
+      u8 key_state = gamepad_button_states[i];
+      if (key_state == GLFW_PRESS) {
+        gamepad_button_pressed[i] = !gamepad_button_down[i];
+        gamepad_button_down[i] = 1;
+      }
+      else {
+        gamepad_button_down[i] = 0;
+        gamepad_button_pressed[i] = 0;
+      }
+    }
+    if (gamepad_axes) {
+      joystick_count = gamepad_axis_count / 2;
+      for (i32 i = 0; i < gamepad_axis_count; i += 2) {
+        v2* joystick = &joysticks[i];
+        joystick->x = gamepad_axes[i];
+        joystick->y = gamepad_axes[i + 1];
+      }
+    }
   }
   return 0;
 }
